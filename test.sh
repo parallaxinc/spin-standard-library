@@ -2,7 +2,7 @@
 
 if [ -z "$SPINC" ]
 then
-    SPINC="./openspin -u"
+    SPINC="openspin"
 fi
 
 if [ "$1" == "clean" ]
@@ -13,7 +13,7 @@ fi
 
 while read line
 do
-    ${SPINC} -L . "$line" >/dev/null
+    ${SPINC} -L ./library "$line" >/dev/null
     if [ $? != 0 ]
     then 
         echo
