@@ -14,7 +14,7 @@ Please read the [guidelines](CONTRIBUTING.md) before submitting a pull request.
 
 You can compile every file in the project with the following script.
 
-    ./scripts/test.sh
+    ./test.sh
 
 ## License
 
