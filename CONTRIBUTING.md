@@ -11,7 +11,7 @@ experience of the Spin language.
 New object submissions should include demos for readily available reference
 hardware. For example:
 
-*   Sample code that runs as-is on a Propeller HYDRA
+*   Sample code that runs as-is on a Hackable Electronic Badge
 *   Sample code and a circuit schematic for running the code on a Propeller Activity Board
 
 ## Organization
