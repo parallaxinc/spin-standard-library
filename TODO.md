@@ -17,25 +17,32 @@
 
 ## Objects needed
 
-*    sensor.distance.ir
-*    sensor.distance.laser.sf02
-*    sensor.distance.laser.sf10
-*    sensor.distance.ping
-*    sensor.camera
-*    sensor.color
-*    sensor.altimeter
-*    sensor.gas
-*    sensor.gps
-*    sensor.tilt
-*    sensor.etape
-*    sensor.temperature
-*    sensor.humidity
-*    sensor.flex
-*    sensor.motion.xband
-*    sensor.motion.soundimpact
-*    sensor.light.qti
-*    sensor.gyroscope
-*    sensor.accel.tri.mma7455
+*   sensor.distance.ir
+*   sensor.distance.laser.sf02
+*   sensor.distance.laser.sf10
+*   sensor.distance.ping
+*   sensor.camera
+*   sensor.color
+*   sensor.altimeter
+*   sensor.gas
+*   sensor.gps
+*   sensor.tilt
+*   sensor.etape
+*   sensor.temperature
+*   sensor.humidity
+*   sensor.flex
+*   sensor.motion.xband
+*   sensor.motion.soundimpact
+*   sensor.light.qti
+*   sensor.gyroscope
+*   sensor.accel.tri.mma7455
+*   io.eeprom
+*   io.eeprom.spi
+*   io.sdcard
+*   com.can
+*   com.usb
+*   net.xbee.mesh
+*   net.xbee.wifi
 
 ## More possibilities
 
