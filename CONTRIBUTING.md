@@ -17,8 +17,8 @@ hardware. For example:
 
 ## Naming Conventions
 
-*   **Version numbers should never be included in a filename.** Version comments
-    are automatically added to the source.
+*   Version numbers are not included in a filename. A version comment is
+    added with other metadata to the release.
 
 *   File extensions are lower-case.
 
@@ -34,8 +34,6 @@ hardware. For example:
 *   Templates are given pretty names, with spaces replaced with underscores.
 
         Serial_Template.spin
-
-
 
 ## Organization
 
