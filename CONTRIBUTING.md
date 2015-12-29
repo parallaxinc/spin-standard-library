@@ -12,7 +12,30 @@ New object submissions should include demos for readily available reference
 hardware. For example:
 
 *   Sample code that runs as-is on a Hackable Electronic Badge
-*   Sample code and a circuit schematic for running the code on a Propeller Activity Board
+*   Sample code and a circuit schematic for running the code on a Propeller
+    Activity Board. Circuit schematics should be PNG and kept under 50kB.
+
+## Naming Conventions
+
+*   **Version numbers should never be included in a filename.** Version comments
+    are automatically added to the source.
+
+*   File extensions are lower-case.
+
+*   Core object names are lower-case, with individual words separated by periods.
+    This prevents issues with OBJ blocks on non-Windows platforms.
+
+        com.serial.object.spin
+
+*   Demos and examples are CamelCase, with no spaces.
+
+        SerialExample.spin
+
+*   Templates are given pretty names, with spaces replaced with underscores.
+
+        Serial_Template.spin
+
+
 
 ## Organization
 
@@ -26,13 +49,26 @@ The Spin Standard Library is organized into the following folder structure.
 
 #### library/
 
-The top-level of the library that will be included with PropellerIDE. All core object additions go here.
-Anything above this level is not distributed.
+The top-level of the library that will be included with PropellerIDE. All core
+object additions go here. Anything above this level is not distributed.
+
+These should be named according to their function, and placed into groups. Thus,
+the classic FullDuplexSerial object, a serial driver used for I/O, should be renamed to:
+
+    com.serial.fullduplex.spin
+
+If there are other serial drivers, they may be named:
+
+    com.serial.tiny.spin
+    com.serial.highspeed.spin
+    com.serial.lowspeed.spin
+    ...
+    ...
 
 ##### demos/
 
-These files are organized hierarchically based on the object they demonstrate. For example, let's say we
-have the following module.
+These files are organized hierarchically based on the object they demonstrate. Say
+we use the object from the previous example.
 
     com.serial.fullduplex
 
@@ -60,7 +96,7 @@ should be saved as:
 
     Awesome_Template_v1.0.spin
 
-## Style
+## Coding Style
 
 Owing to Spin's similarity to Python, for topics not covered here, please refer
 to [PEP-8](https://www.python.org/dev/peps/pep-0008/) where appropriate.
@@ -136,11 +172,13 @@ In no particular order:
             MoreCode(val2)
             val += 2
 
+*   **Do** use markdown syntax in documentation comments.
+
 *   Do not use Parallax font-specific special characters or in-source schematic diagrams.
     This feature is not portable and will be removed from PropellerIDE in the future.
-    PropellerIDE will eventually support markdown syntax in documentation, so it is
-    recommended to draw pictures of any diagrams and add them to a folder called `images/`
-    in the same folder as the object.
+    Since PropellerIDE will support markdown documentation, it is recommended to draw
+    pictures of any diagrams and add them to a folder called `images/` in the same folder
+    as the object.
 
     For an illustration in a core object:
 
