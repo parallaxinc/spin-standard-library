@@ -157,6 +157,9 @@ In no particular order:
 
 *   Avoid excessive commenting; only comment individual lines of code when necessary.
 
+*   **Do** use long, descriptive variable names instead of short, ambiguous names. This makes code
+    easier to understand and reduces the need for superfluous comments.
+
 *   **Do not** add licensing stubs or header information. This information is automatically
     added to software releases from the repository itself.
 
