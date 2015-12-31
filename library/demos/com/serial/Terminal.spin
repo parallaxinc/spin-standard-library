@@ -28,7 +28,7 @@ CON
   ColPos = 8  
 
 OBJ
-  pst   :       "com.serial"
+  pst   :       "com.serial.terminal"
 
 PUB Main | value, base, width, offset
   pst.Start(115_200)                                                            'Set Parallax Serial Terminal to 115200 baud
