@@ -42,6 +42,7 @@ CON
 OBJ
 
     ser : "com.serial"
+    num : "string.numbers"
 
 VAR
 
@@ -166,21 +167,7 @@ PUB Dec(value) | i, x
         value - byte, word, or long value to send as decimal characters.
 }}
 
-    x := value == NEGX                                                            'Check for max negative
-    if value < 0
-        value := ||(value+x)                                                        'If negative, make positive; adjust for max negative
-        ser.Char("-")                                                                   'and output sign
-    
-    i := 1_000_000_000                                                            'Initialize divisor
-    
-    repeat 10                                                                     'Loop for 10 digits
-        if value => i                                                               
-            ser.Char(value / i + "0" + x*(i == 1))                                        'If non-zero digit, output digit; adjust for max negative
-            value //= i                                                               'and digit from value
-            result~~                                                                  'flag non-zero found
-        elseif result or i == 1
-            ser.Char("0")                                                                 'If zero digit (or only digit) output it
-        i /= 10                                                                     'Update divisor
+    Str(num.Dec(value))
 
 PUB DecIn : value
 {{
@@ -201,9 +188,7 @@ PUB Bin(value, digits)
         digits - number of binary digits to send.  Will be zero padded if necessary.
 }}
 
-    value <<= 32 - digits
-    repeat digits
-        ser.Char((value <-= 1) & 1 + "0")
+    Str(num.Bin(value,digits))
 
 PUB BinIn : value
 {{
@@ -223,9 +208,7 @@ PUB Hex(value, digits)
         digits - number of hexadecimal digits to send.  Will be zero padded if necessary.
 }}
 
-    value <<= (8 - digits) << 2
-    repeat digits
-        ser.Char(lookupz((value <-= 4) & $F : "0".."9", "A".."F"))
+    Str(num.Hex(value, digits))
 
 PUB HexIn : value
 {{
@@ -379,3 +362,4 @@ PRI StrToBase(stringptr, base) : value | chr, index
             value := value * base + chr
     if (base == 10) and (byte[stringptr] == "-")                            ' If decimal, address negative sign; ignore otherwise
         value := - value
+

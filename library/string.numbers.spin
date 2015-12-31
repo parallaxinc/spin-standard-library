@@ -1,20 +1,12 @@
-''****************************************
-''*  Simple_Numbers                      *
-''*  Authors: Chip Gracey, Jon Williams  *
-''*  Copyright (c) 2006 Parallax, Inc.   *
-''*  See end of file for terms of use.   *
-''****************************************
-''
-'' Provides simple numeric conversion methods; all methods return a pointer to
-'' a string.
-''
-'' Updated... 29 APR 2006
-
+' Original authors: Chip Gracey, Jon Williams
+{{
+    Provides simple numeric conversion methods; all methods return a pointer to
+    a string.
+}}
 
 CON
 
   MAX_LEN = 64                                          ' 63 chars + zero terminator
-
   
 VAR
 
@@ -22,19 +14,19 @@ VAR
   byte  nstr[MAX_LEN]                                   ' string for numeric data
 
 
-PUB dec(value)
+PUB Dec(value)
 
 '' Returns pointer to signed-decimal string
 
-  clrstr(@nstr, MAX_LEN)                                ' clear output string  
-  return decstr(value)                                  ' return pointer to numeric string
+  ClearStr(@nstr, MAX_LEN)                                ' clear output string  
+  return DecToStr(value)                                  ' return pointer to numeric string
     
 
-PUB decf(value, width) | t_val, field
+PUB DecPadded(value, width) | t_val, field
 
 '' Returns pointer to signed-decimal, fixed-width (space padded) string
 
-  clrstr(@nstr, MAX_LEN)
+  ClearStr(@nstr, MAX_LEN)
   width := 1 #> width <# constant(MAX_LEN - 1)          ' qualify field width 
 
   t_val := ||value                                      ' work with absolute
@@ -52,15 +44,15 @@ PUB decf(value, width) | t_val, field
     repeat (width - field)                              ' yes
       nstr[idx++] := " "                                '   pad with space(s)
 
-  return decstr(value)
+  return DecToStr(value)
 
 
-PUB decx(value, digits) | div
+PUB DecZeroed(value, digits) | div
 
 '' Returns pointer to zero-padded, signed-decimal string
 '' -- if value is negative, field width is digits+1
 
-  clrstr(@nstr, MAX_LEN)  
+  ClearStr(@nstr, MAX_LEN)  
   digits := 1 #> digits <# 10
 
   if (value < 0)                                        ' negative value?   
@@ -82,41 +74,41 @@ PUB decx(value, digits) | div
   return @nstr
 
 
-PUB hex(value, digits)
+PUB Hex(value, digits)
 
 '' Returns pointer to a digits-wide hexadecimal string
 
-  clrstr(@nstr, MAX_LEN) 
-  return hexstr(value, digits)
+  ClearStr(@nstr, MAX_LEN) 
+  return HexToStr(value, digits)
 
 
-PUB ihex(value, digits)
+PUB HexIndicated(value, digits)
 
 '' Returns pointer to a digits-wide, indicated (with $) hexadecimal string
 
-  clrstr(@nstr, MAX_LEN)
+  ClearStr(@nstr, MAX_LEN)
   nstr[idx++] := "$"
-  return hexstr(value, digits)
+  return HexToStr(value, digits)
 
 
-PUB bin(value, digits)
+PUB Bin(value, digits)
 
 '' Returns pointer to a digits-wide binary string      
 
-  clrstr(@nstr, MAX_LEN)
-  return binstr(value, digits)   
+  ClearStr(@nstr, MAX_LEN)
+  return BinToStr(value, digits)   
 
 
-PUB ibin(value, digits)
+PUB BinIndicated(value, digits)
 
 '' Returns pointer to a digits-wide, indicated (with %) binary string
 
-  clrstr(@nstr, MAX_LEN)
+  ClearStr(@nstr, MAX_LEN)
   nstr[idx++] := "%"                                    ' preface with binary indicator
-  return binstr(value, digits)
+  return BinToStr(value, digits)
 
 
-PRI clrstr(strAddr, size)
+PRI ClearStr(strAddr, size)
 
 ' Clears string at strAddr
 ' -- also resets global character pointer (idx)
@@ -125,7 +117,7 @@ PRI clrstr(strAddr, size)
   idx~                                                  ' reset index
 
   
-PRI decstr(value) | div, z_pad   
+PRI DecToStr(value) | div, z_pad   
 
 ' Converts value to signed-decimal string equivalent
 ' -- characters written to current position of idx
@@ -150,7 +142,7 @@ PRI decstr(value) | div, z_pad
   return @nstr
 
 
-PRI hexstr(value, digits)
+PRI HexToStr(value, digits)
 
 ' Converts value to digits-wide hexadecimal string equivalent
 ' -- characters written to current position of idx
@@ -164,7 +156,7 @@ PRI hexstr(value, digits)
   return @nstr
   
 
-PRI binstr(value, digits)
+PRI BinToStr(value, digits)
 
 ' Converts value to digits-wide binary string equivalent
 ' -- characters written to current position of idx
@@ -176,22 +168,3 @@ PRI binstr(value, digits)
     nstr[idx++] := (value <-= 1) & 1 + "0"              ' move digits (ASCII) to string
 
   return @nstr
-
-{{
-
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
-├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
-│files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
-│modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
-│is furnished to do so, subject to the following conditions:                                                                   │
-│                                                                                                                              │
-│The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.│
-│                                                                                                                              │
-│THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE          │
-│WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR         │
-│COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
-│ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}  

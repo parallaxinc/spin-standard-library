@@ -1,45 +1,19 @@
 ' Original Authors: Jeff Martin, Andy Lindsay, Chip Gracey  
 
 {{
-    This object adds extra features specific to Parallax serial terminals.
-
-    This object is heavily based on FullDuplexSerialPlus (by Andy Lindsay), which is itself
-    heavily based on FullDuplexSerial (by Chip Gracey).
+    This object implements core serial functionality.
 
     # Usage 
 
     -   Call Start, or StartRxTx, first.
     -   Be sure to set the Parallax Serial Terminal software to the baudrate specified in Start, and the proper COM port.
     -   At 80 MHz, this object properly receives/transmits at up to 250 Kbaud, or performs transmit-only at up to 1 Mbaud.
-}}
-  
-CON
-
-    '' Control Character Constants
-
-    CS = 16  ' Clear Screen      
-    CE = 11  ' Clear to End of line     
-    CB = 12  ' Clear lines Below 
-    
-    HM =  1  ' HoMe cursor       
-    PC =  2  ' Position Cursor in x,y          
-    PX = 14  ' Position cursor in X         
-    PY = 15  ' Position cursor in Y         
-    
-    NL = 13  ' New Line        
-    LF = 10  ' Line Feed       
-    ML =  3  ' Move cursor Left          
-    MR =  4  ' Move cursor Right         
-    MU =  5  ' Move cursor Up          
-    MD =  6  ' Move cursor Down
-    TB =  9  ' TaB          
-    BS =  8  ' BackSpace          
+}}       
              
 CON
 
-   BUFFER_LENGTH = 64                                   ' Recommended as 64 or higher, but can be 2, 4, 8, 16, 32, 64, 128 or 256.
-   BUFFER_MASK   = BUFFER_LENGTH - 1
-   MAXSTR_LENGTH = 49                                   ' Maximum length of received numerical string (not including zero terminator).
+    BUFFER_LENGTH = 64                                      ' Recommended as 64 or higher, but can be 2, 4, 8, 16, 32, 64, 128 or 256.
+    BUFFER_MASK   = BUFFER_LENGTH - 1
 
 VAR
 
@@ -57,8 +31,6 @@ VAR
     
     byte    rx_buffer[BUFFER_LENGTH]                        ' Receive and transmit buffers
     byte    tx_buffer[BUFFER_LENGTH]
-    
-    byte    str_buffer[MAXSTR_LENGTH+1]                     ' String buffer for numerical strings
 
 PUB Start(baudrate) : okay
 {{
@@ -73,7 +45,7 @@ PUB Start(baudrate) : okay
 }}
 
     okay := StartRxTx(31, 30, 0, baudrate)
-    waitcnt(clkfreq + cnt)                                'Wait 1 second for PST
+    waitcnt(clkfreq + cnt)                                  ' Wait 1 second for PST
 
 PUB StartRxTx(rxpin, txpin, mode, baudrate) : okay
 {{
@@ -162,16 +134,9 @@ PRI RxCheck : bytechr
         rx_tail := (rx_tail + 1) & BUFFER_MASK
        
 DAT
-
-'***********************************
-'* Assembly language serial driver *
-'***********************************
-
                         org
-'
-'
-' Entry
-'
+
+
 entry                   mov     t1,par                'get structure address
                         add     t1,#4 << 2            'skip past heads and tails
 
@@ -201,10 +166,9 @@ entry                   mov     t1,par                'get structure address
         if_z            or      dira,txmask
 
                         mov     txcode,#transmit      'initialize ping-pong multitasking
-'
-'
-' Receive
-'
+
+
+
 receive                 jmpret  rxcode,txcode         'run chunk of tx code, then return
 
                         test    rxtxmode,#%001  wz    'wait for start bit on rx pin
@@ -243,6 +207,7 @@ receive                 jmpret  rxcode,txcode         'run chunk of tx code, the
                         wrlong  t2,par
 
                         jmp     #receive              'byte done, receive next byte
+
 
 
 transmit                jmpret  txcode,rxcode         'run chunk of rx code, then return
@@ -286,10 +251,9 @@ transmit                jmpret  txcode,rxcode         'run chunk of rx code, the
                         djnz    txbits,#:bit          'another bit to transmit?
 
                         jmp     #transmit             'byte done, transmit next byte
-'
-'
-' Uninitialized data
-'
+
+
+
 t1                      res     1
 t2                      res     1
 t3                      res     1
@@ -310,3 +274,4 @@ txdata                  res     1
 txbits                  res     1
 txcnt                   res     1
 txcode                  res     1
+
