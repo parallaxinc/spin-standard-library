@@ -100,18 +100,6 @@ PUB Char(bytechr)
 
     ser.Char(bytechr)
 
-PUB Chars(bytechr, count)
-{{
-    Send multiple copies of a single-byte character. Waits for room in transmit buffer if necessary.
-
-    Parameters:
-        bytechr - character (ASCII byte value) to send.
-        count   - number of bytechrs to send.
-}}
-
-    repeat count
-        ser.Char(bytechr)
-
 PUB CharIn
 {{
     Receive single-byte character.  Waits until character received.
@@ -177,7 +165,7 @@ PUB DecIn : value
 }}
 
     StrInMax(@str_buffer, MAXSTR_LENGTH)
-    value := StrToBase(@str_buffer, 10)
+    value := num.StrToBase(@str_buffer, 10)
 
 PUB Bin(value, digits)
 {{
@@ -198,7 +186,7 @@ PUB BinIn : value
 }}
    
     StrInMax(@str_buffer, MAXSTR_LENGTH)
-    value := StrToBase(@str_buffer, 2)
+    value := num.StrToBase(@str_buffer, 2)
    
 PUB Hex(value, digits)
 {{
@@ -218,7 +206,7 @@ PUB HexIn : value
 }}
 
     StrInMax(@str_buffer, MAXSTR_LENGTH)
-    value := StrToBase(@str_buffer, 16)
+    value := num.StrToBase(@str_buffer, 16)
 
 PUB Clear
 {{
@@ -347,19 +335,3 @@ PUB RxFlush
 }}
 
     ser.RxFlush
-    
-PRI StrToBase(stringptr, base) : value | chr, index
-{
-    Converts a zero terminated string representation of a number to a value in the designated base.
-
-    Ignores all non-digit characters (except negative (-) when base is decimal (10)).
-}
-
-    value := index := 0
-    repeat until ((chr := byte[stringptr][index++]) == 0)
-        chr := -15 + --chr & %11011111 + 39*(chr > 56)                      ' Make "0"-"9","A"-"F","a"-"f" be 0 - 15, others out of range
-        if (chr > -1) and (chr < base)                                      ' Accumulate valid values into result; ignore others
-            value := value * base + chr
-    if (base == 10) and (byte[stringptr] == "-")                            ' If decimal, address negative sign; ignore otherwise
-        value := - value
-
