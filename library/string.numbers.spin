@@ -3,7 +3,6 @@
     Provides simple numeric conversion methods; all methods return a pointer to
     a string.
 }}
-
 CON
 
     MAX_LEN = 64                                          ' 63 chars + zero terminator

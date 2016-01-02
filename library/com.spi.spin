@@ -1,97 +1,99 @@
-{{      
-************************************************
-* Propeller SPI Engine                    v1.2 *
-* Author: Beau Schwabe                         *
-* Copyright (c) 2009 Parallax                  *
-* See end of file for terms of use.            *
-************************************************
-
-Revision History:
-         V1.0   - original program
-         
-         V1.1   - fixed problem with SHIFTOUT MSBFIRST option
-                - fixed argument allocation in the SPI Engines main loop
-
-         V1.2   - Added Clock delay option and fixed bug in SHIFTIN function       
-}}
+' Author: Beau Schwabe
 CON
 
     #0,MSBPRE,LSBPRE,MSBPOST,LSBPOST                    '' Used for SHIFTIN routines
-''                           
-''       =0      =1     =2      =3
-''
+
 '' MSBPRE   - Most Significant Bit first ; data is valid before the clock
 '' LSBPRE   - Least Significant Bit first ; data is valid before the clock
 '' MSBPOST  - Most Significant Bit first ; data is valid after the clock
 '' LSBPOST  - Least Significant Bit first ; data is valid after the clock
 
-    
     #4,LSBFIRST,MSBFIRST                                '' Used for SHIFTOUT routines
-''              
-''       =4      =5
-''
+
 '' LSBFIRST - Least Significant Bit first ; data is valid after the clock
 '' MSBFIRST - Most Significant Bit first ; data is valid after the clock
 
-
-
     #1,_SHIFTOUT,_SHIFTIN                               '' Used for operation Mode
-''              
-''       =1      =2
 
 VAR
-    long     cog, command
-PUB SHIFTOUT(Dpin, Cpin, Mode, Bits, Value)             ''If SHIFTOUT is called with 'Bits' set to Zero, then the COG will shut
-                                                        ''down.  Another way to shut the COG down is to call 'stop' from Spin.
-    setcommand(_SHIFTOUT, @Dpin)
-PUB SHIFTIN(Dpin, Cpin, Mode, Bits)|Value,Flag          ''If SHIFTIN is called with 'Bits' set to Zero, then the COG will shut
-                                                        ''down.  Another way to shut the COG down is to call 'stop' from Spin.
 
-    Flag := 1                                           ''Set Flag                                           
-    setcommand(_SHIFTIN, @Dpin)
-    repeat until Flag == 0                              ''Wait for Flag to clear ... data is ready
-    
-    Result := Value
-'------------------------------------------------------------------------------------------------------------------------------
-PUB start(Delay,State) : okay
+    long    cog
+    long    command
+    byte    _datapin
+    byte    _clockpin
+    byte    _inputmode
+    byte    _outputmode 
+
+PUB Start(datapin, clockpin, inputmode, outputmode, delay, state) : okay
 {{
+    Start SPI Engine - Starts a cog
 
-         Delay := 15            ''Clock delay
+    returns false if no cog available
+
+         delay := 15            ''Clock delay
                                 ''  = 300ns + (N-1) * 50ns
 
                                 '' Example1:
-                                ''     A Delay of 5 would be 500ns
+                                ''     A delay of 5 would be 500ns
                                 ''     300ns + 4 * 50ns = 500ns
 
                                 '' Example2:
-                                ''     A Delay of 15 would be 1us
+                                ''     A delay of 15 would be 1us
                                 ''     300ns + 14 * 50ns = 1000ns = 1us
 
-         State := 1             '' 0 - Start Clock LOW
+         state := 1             '' 0 - Start Clock LOW
                                 '' 1 - Start Clock HIGH                                                         
-                                
-
 }}
 
-'' Start SPI Engine - starts a cog
-'' returns false if no cog available
-    stop
-    ClockDelay := Delay
-    ClockState := State
+    Stop
+
+    _datapin    := datapin
+    _clockpin   := clockpin
+    _outputmode := outputmode 
+    _inputmode  := inputmode
+
+    clockdelay := delay
+    clockstate := state
+
     okay := cog := cognew(@loop, @command) + 1
-PUB stop
-'' Stop SPI Engine - frees a cog
+
+PUB Send(bits, value)
+
+    ShiftOut(_datapin, _clockpin, _outputmode, bits, value)
+
+PUB Receive(bits)
+
+    ShiftIn(_datapin, _clockpin, _inputmode, bits)
+
+PUB Stop
+{{
+    Stop SPI Engine - frees a cog
+}}
+
     if cog
-       cogstop(cog~ - 1)
+       cogStop(cog~ - 1)
     command~
-PRI setcommand(cmd, argptr)
+
+PRI ShiftOut(dpin, cpin, mode, bits, value)                     ''If SHIFTOUT is called with 'Bits' set to Zero, then the COG will shut
+                                                                ''down.  Another way to shut the COG down is to call 'Stop' from Spin.
+    SetCommand(_SHIFTOUT, @dpin)
+
+PRI ShiftIn(dpin, cpin, mode, bits) | value, flag                  ''If SHIFTIN is called with 'Bits' set to Zero, then the COG will shut
+                                                                ''down.  Another way to shut the COG down is to call 'Stop' from Spin.
+    flag := 1
+    SetCommand(_SHIFTIN, @dpin)
+    repeat until flag == 0
+    
+    return value
+
+PRI SetCommand(cmd, argptr)
+
     command := cmd << 16 + argptr                       ''write command and pointer
     repeat while command                                ''wait for command to be cleared, signifying receipt
-'################################################################################################################
-DAT           org
-'  
-'' SPI Engine - main loop
-'
+
+DAT          
+              org
+
 loop          rdlong  t1,par          wz                ''wait for command
         if_z  jmp     #loop
               movd    :arg,#arg0                        ''get 5 arguments ; arg0 to arg4
@@ -129,7 +131,7 @@ SHIFTOUT_                                               ''SHIFTOUT Entry
               muxnz   dira,           t1                ''          Set DataPin to an OUTPUT
               mov     t2,             #1        wz      ''     Configure ClockPin
               shl     t2,             arg1              ''          Set Mask             
-              test    ClockState,     #1        wc      ''          Determine Starting State
+              test    clockstate,     #1        wc      ''          Determine Starting state
     if_nc     muxz    outa,           t2                ''          PreSet ClockPin LOW
     if_c      muxnz   outa,           t2                ''          PreSet ClockPin HIGH              
               muxnz   dira,           t2                ''          Set ClockPin to an OUTPUT
@@ -148,7 +150,7 @@ SHIFTIN_                                                ''SHIFTIN Entry
               muxz    dira,           t1                ''          Set DataPin to an INPUT
               mov     t2,             #1        wz      ''     Configure ClockPin
               shl     t2,             arg1              ''          Set Mask             
-              test    ClockState,     #1        wc      ''          Determine Starting State
+              test    clockstate,     #1        wc      ''          Determine Starting state
     if_nc     muxz    outa,           t2                ''          PreSet ClockPin LOW
     if_c      muxnz   outa,           t2                ''          PreSet ClockPin HIGH              
               muxnz   dira,           t2                ''          Set ClockPin to an OUTPUT
@@ -261,7 +263,7 @@ PostClock_ret ret                                       ''          return
 '------------------------------------------------------------------------------------------------------------------------------
 'tested OK
 ClkDly
-              mov       t6,     ClockDelay
+              mov       t6,     clockdelay
 ClkPause      djnz      t6,     #ClkPause                               
 ClkDly_ret    ret
 '------------------------------------------------------------------------------------------------------------------------------
@@ -287,8 +289,8 @@ _LSBPOST                long    $3                      ''          Applies to S
 _LSBFIRST               long    $4                      ''          Applies to SHIFTOUT
 _MSBFIRST               long    $5                      ''          Applies to SHIFTOUT
 
-ClockDelay              long    0
-ClockState              long    0
+clockdelay              long    0
+clockstate              long    0
 
                                                         ''temp variables
 t1                      long    0                       ''     Used for DataPin mask     and     COG shutdown 
@@ -296,7 +298,7 @@ t2                      long    0                       ''     Used for CLockPin
 t3                      long    0                       ''     Used to hold DataValue SHIFTIN/SHIFTOUT
 t4                      long    0                       ''     Used to hold # of Bits
 t5                      long    0                       ''     Used for temporary data mask
-t6                      long    0                       ''     Used for Clock Delay
+t6                      long    0                       ''     Used for Clock delay
 address                 long    0                       ''     Used to hold return address of first Argument passed
 
 arg0                    long    0                       ''arguments passed to/from high-level Spin
@@ -305,20 +307,3 @@ arg2                    long    0
 arg3                    long    0
 arg4                    long    0
 
-{{
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
-├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
-│files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
-│modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
-│is furnished to do so, subject to the following conditions:                                                                   │
-│                                                                                                                              │
-│The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.│
-│                                                                                                                              │
-│THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE          │
-│WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR         │
-│COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
-│ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}
