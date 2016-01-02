@@ -1,43 +1,4 @@
-{{
-''****************************************
-''*  HM55B Compass Module TV DEMO   V1.4 *
-''*  Author: Beau Schwabe                *
-''*  Copyright (c) 2009 Parallax, Inc.   *               
-''*  See end of file for terms of use.   *               
-''****************************************
-
-
-Revision History:
-  Version 1.0   - (09/11/2006)  Created original object to read an HM55B Compass module
-  
-  Version 1.1   - (02/09/2008)  Fixed sign detection at improper bit location
-                                
-  Version 1.2   - (01/12/2009)  Added calibration scheme.
-
-  Version 1.3   - (01/12/2009)  Partitioned calibration scheme into separate Add-on program
-
-  Version 1.4   - (03/24/2009)  Calibration values displayed for easier interpolation  
-
-}}
-CON     ''General Constants for Propeller Setup
-  _CLKMODE = XTAL1 + PLL16X
-  _XINFREQ = 5_000_000
-
-
-CON     ''Setup Constants for the TV and Graphics display  
-      _stack = ($3000 + $3000 + 100) >> 2               'accommodate display memory and stack
-     x_tiles = 16
-     y_tiles = 12
-  paramcount = 14
-display_base = $5000
- bitmap_base = $2000
-
-
-CON     ''Setup Constants for the Compass
-    Enable = 0
-     Clock = 1
-      Data = 2
-   
+' Author: Beau Schwabe
 {{
 
             ┌────┬┬────┐
@@ -49,8 +10,27 @@ CON     ''Setup Constants for the Compass
             └──────────┘
 
 }}      
+CON
+    _clkmode = XTAL1 + PLL16X
+    _xinfreq = 5_000_000
 
+    ' Setup Constants for the TV and Graphics display  
+
+    stack           = ($3000 + $3000 + 100) >> 2               'accommodate display memory and stack
+    x_tiles         = 16
+    y_tiles         = 12
+    paramcount      = 14
+    display_base    = $5000
+    bitmap_base     = $2000
+
+    ' Setup Constants for the Compass
+
+    Enable  = 0
+    Clock   = 1
+    Data    = 2
+   
 VAR     ''Setup variables related to the TV display 
+
     long  tv_status     '0/1/2 = off/visible/invisible           read-only
     long  tv_enable     '0/? = off/on                            write-only
     long  tv_pins       '%ppmmm = pins                           write-only
@@ -69,62 +49,68 @@ VAR     ''Setup variables related to the TV display
     long  colors[64]
 
 VAR     ''Setup variables related to converting numbers to strings for display 
+
     long  idx           ' ( 1 long ) pointer into string    
     byte  nstr[64]      ' (16 longs) string
     byte  z_pad
 
 VAR     ''Setup variables related to the compass    
+
     long CorrectHeading
     long Deg               
 
 OBJ     ''Setup Object references that make this demo work
+
     tv    :     "display.tv"
     gr    :     "display.tv.graphics"
     HM55B :     "sensor.compass.hm55b"
-    Calibrate : "HM55B Compass Calibration"
+    Calibrate : "Calibration"
 
 PUB DEMO_Initialization | i,dx,dy
 
-    'start tv
+    ' start tv
+
     longmove(@tv_status, @tvparams, paramcount)
     tv_screen := @screen
     tv_colors := @colors
     tv.start(@tv_status)
 
-    'init colors
-    repeat i from 0 to 63
-      colors[i] := $02_9D_BB_2A
-{
-                  Color 3
-                  ││ Color 2
-                  ││ ││ Color 1
-                  ││ ││ ││ Color 0
-                  ││ ││ ││ ││
-    colors[i] := $02_9D_BB_2A
+    ' init colors
 
-Examples: (See Palette Demo for other available colors)
-  BB RED
-  2A Dark BLUE
-  02 BLACK
-  5B GREEN
-  9D YELLOW
-  CD PINK        
-  FC PURPLE
-  BC ORANGE
-  04 GREY
-  3C Light BLUE
+    repeat i from 0 to 63
+        colors[i] := $02_9D_BB_2A
+{
+                      Color 3
+                      ││ Color 2
+                      ││ ││ Color 1
+                      ││ ││ ││ Color 0
+                      ││ ││ ││ ││
+        colors[i] := $02_9D_BB_2A
+    
+    Examples: (See Palette Demo for other available colors)
+      BB RED
+      2A Dark BLUE
+      02 BLACK
+      5B GREEN
+      9D YELLOW
+      CD PINK        
+      FC PURPLE
+      BC ORANGE
+      04 GREY
+      3C Light BLUE
     
 }
-    'init tile screen
+    ' init tile screen
     repeat dx from 0 to tv_hc - 1
-      repeat dy from 0 to tv_vc - 1
-        screen[dy * tv_hc + dx] := display_base >> 6 + dy + dx * tv_vc + ((dy & $3F) << 10)
+        repeat dy from 0 to tv_vc - 1
+            screen[dy * tv_hc + dx] := display_base >> 6 + dy + dx * tv_vc + ((dy & $3F) << 10)
 
-    'start and setup graphics
+    ' start and setup graphics
     gr.start                                            '' Initialize Graphics Object
     gr.setup(16, 12, 128, 96, bitmap_base)
 
     'start and setup Compass
+
     HM55B.start(Enable,Clock,Data)                      '' Initialize Compass Object
 
     Compass_Demo                                        '' Start the Compass DEMO
@@ -259,7 +245,7 @@ PUB Decx(value, digits) | div
 
     return @nstr
 
-DAT     ''Data setup section for TV parameters
+DAT
 
 tvparams                long    0                        ' status
                         long    1                        ' enable
@@ -276,21 +262,3 @@ tvparams                long    0                        ' status
                         long    0                        ' broadcast
                         long    0                        ' auralcog
 
-CON
-{{
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
-├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
-│files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
-│modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
-│is furnished to do so, subject to the following conditions:                                                                   │
-│                                                                                                                              │
-│The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.│
-│                                                                                                                              │
-│THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE          │
-│WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR         │
-│COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
-│ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}
