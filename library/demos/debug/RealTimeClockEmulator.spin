@@ -6,7 +6,7 @@ CON
 OBJ
 
     clock   : "debug.emulator.rtc"
-    term    : "com.termial.fullduplex"
+    term    : "com.serial.terminal"
 
 VAR
 
@@ -16,23 +16,23 @@ VAR
 
 PUB Main
 
-    Ser.start(31, 30, 0, 2400)  '' Initialize termial communication to the PC
+    term.Start(115200)                              ' Initialize termial communication to the PC
   
-    Clock.Start(@TimeString)    '' Initiate Prop Clock 
+    Clock.Start(@TimeString)                        ' Initiate Prop Clock 
 
-    Clock.Suspend               '' Suspend Clock while being set
+    Clock.Suspend                                   ' Suspend Clock while being set
 
-    Clock.SetYear(09)           '' 00 - 31 ... Valid from 2000 to 2031
-    Clock.SetMonth(03)          '' 01 - 12 ... Month
-    Clock.SetDate(11)           '' 01 - 31 ... Date
+    Clock.SetYear(09)                               ' 00 - 31 ... Valid from 2000 to 2031
+    Clock.SetMonth(03)                              ' 01 - 12 ... Month
+    Clock.SetDate(11)                               ' 01 - 31 ... Date
     
-    Clock.SetHour(12)           '' 01 - 12 ... Hour        
-    Clock.SetMin(00)            '' 00 - 59 ... Minute    
-    Clock.SetSec(00)            '' 00 - 59 ... Second
+    Clock.SetHour(12)                               ' 01 - 12 ... Hour        
+    Clock.SetMin(00)                                ' 00 - 59 ... Minute    
+    Clock.SetSec(00)                                ' 00 - 59 ... Second
 
-    Clock.SetAMPM(1)            '' 0 = AM ; 1 = PM
+    Clock.SetAMPM(1)                                ' 0 = AM ; 1 = PM
 
-    Clock.Restart               '' Start Clock after being set    
+    Clock.Restart                                   ' Start Clock after being set    
 
     repeat
         Clock.ParseDateStamp(@DateStamp)

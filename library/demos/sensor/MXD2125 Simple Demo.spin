@@ -16,7 +16,7 @@ VAR
   long XVal, YVal
 OBJ
     text  : "display.tv.text"
-    accel : "sensor.accel.dual.mxd2125.simple"
+    accel : "tiny.sensor.accel.dual.mxd2125"
 
 PUB Setup
   text.start(12)

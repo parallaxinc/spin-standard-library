@@ -100,6 +100,19 @@ PUB Char(bytechr)
 
     ser.Char(bytechr)
 
+PUB Chars(bytechr, count)
+{{
+    Send `count` number of a single-byte character.
+
+    Parameter:
+
+     - bytechr - character (ASCII byte value) to send.
+     - count - number of characters to send.
+}}
+
+    repeat count
+        ser.Char(bytechr)
+
 PUB CharIn
 {{
     Receive single-byte character.  Waits until character received.

@@ -15,7 +15,7 @@ VAR
   
 OBJ
 
-  F : "math.float"
+  F : "tiny.math.float"
 
 
 PUB FloatToString(Single) : StringPtr

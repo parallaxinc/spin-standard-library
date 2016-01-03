@@ -32,7 +32,6 @@ PUB Main | value
   
   term.Str(String("Convert Decimal to Hexadecimal..."))                          ' Heading
   repeat                                                                        ' Main loop
-    term.Chars(term#NL, 2)                                                        ' Carriage returns
     term.Str(String("Enter decimal value: "))                                    ' Prompt user to enter value
     value := term.DecIn                                                          ' Get value
     term.Str(String(term#NL,"Your value in hexadecimal is: $"))                   ' Announce output
