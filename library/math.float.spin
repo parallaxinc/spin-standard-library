@@ -70,128 +70,28 @@ CON
   
 VAR
 
-  long  f32_Cmd
-  byte  cog
+    long    f32_Cmd
+    byte    cog
   
-PUB start
+PUB Start
 {{
   Start start floating point engine in a new cog.
   Returns:     True (non-zero) if cog started, or False (0) if no cog is available.
 }}
-  stop
+
+  Stop
   f32_Cmd := 0
   return cog := cognew(@f32_entry, @f32_Cmd) + 1
 
-PUB stop
+PUB Stop
 {{
   Stop floating point engine and release the cog.
 }}
+
   if cog
     cogstop(cog~ - 1)
 
-PUB Cmd_ptr
-{{
-  return the Hub address of f32_Cmd, so other code can call F32 functions directly
-}}
-  return @f32_Cmd
-
-PUB Call_ptr
-{{
-  return the Hub address of the dispatch table, so other code can call F32 functions directly
-}}
-  return @cmdCallTable
-
-PUB atof( strptr ) : f | int, sign, dmag, mag, get_exp, b
-  ' get all the digits as if this is an integer (but track the exponent)
-  ' int := sign := dmag := mag := get_exp := 0
-  longfill( @int, 0, 5 )
-  repeat
-    case b := byte[strptr++]
-      "-": sign := $8000_0000
-      "+": ' just ignore, but allow
-      "0".."9":
-           int := int*10 + b - "0"
-           mag += dmag
-      ".": dmag := -1
-      other: ' either done, or about to do exponent
-           if get_exp
-             ' we just finished processing the exponent
-             if sign
-               int := -int
-             mag += int
-             quit
-           else
-             ' convert int to a (signed) float
-             f := FFloat( int ) | sign
-             ' should we continue?
-             if (b == "E") or (b == "e")
-               ' int := sign := dmag := 0
-               longfill( @int, 0, 3 )
-               get_exp := 1
-             else
-               quit
-  ' Exp10 is the weak link...uses the Log table in P1 ROM
-  'f := FMul( f, Exp10( FFloat( mag ) ) )
-  ' use these loops for more precision (slower for large exponents, positive or negative)
-  b := 0.1
-  if mag > 0
-    b := 10.0
-  repeat ||mag
-    f := FMul( f, b )
-
-PUB FAdd(a, b)
-{{
-  Addition: result = a + b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFAdd
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-          
-PUB FSub(a, b)
-{{
-  Subtraction: result = a - b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFSub
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-  
-PUB FMul(a, b)
-{{
-  Multiplication: result = a * b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFMul
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-
-PUB FDiv(a, b)
-{{
-  Division: result = a / b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFDiv
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-
-PUB FFloat(n)
+PUB FFloat(a)
 {{
   Convert integer to floating point.
   Parameters:
@@ -199,6 +99,36 @@ PUB FFloat(n)
   Returns:   32-bit floating point value
 }}
   result  := cmdFFloat
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+
+PUB FRound(a) | b
+{{
+  Round floating point number.
+  Parameters:
+    a        32-bit floating point value
+    b        flag: 3 signifies floating point rounding to the nearest whole number
+  Returns:   32-bit floating point value
+}}
+
+  b       := %011
+  result  := cmdFTruncRound
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+
+PUB FTrunc(a) | b
+{{
+  Truncate floating point number.
+  Parameters:
+    a        32-bit floating point value
+    b        flag: 2 signifies floating point truncation
+  Returns:   32-bit floating point value
+}}
+
+  b       := %010
+  result  := cmdFTruncRound
   f32_Cmd := @result
   repeat
   while f32_Cmd
@@ -217,7 +147,7 @@ PUB UintTrunc(a)
   repeat
   while f32_Cmd
 
-PUB FTrunc(a) | b
+PUB FIntTrunc(a) | b
 {{
   Convert floating point to integer (with truncation).
   Parameters:
@@ -225,13 +155,14 @@ PUB FTrunc(a) | b
     b        flag: 0 signifies truncation
   Returns:   32-bit integer value
 }}
+
   b       := %000
   result  := cmdFTruncRound
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB FRound(a) | b
+PUB FIntRound(a) | b
 {{
   Convert floating point to integer (with rounding).
   Parameters:
@@ -239,48 +170,99 @@ PUB FRound(a) | b
     b        flag: 1 signifies rounding to the nearest integer
   Returns:   32-bit integer value
 }}
+
   b       := %001
   result  := cmdFTruncRound
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB FloatTrunc(a) | b
+PUB FNeg(a)
 {{
-  Convert floating point to whole number (floating point, with truncation).
+  Negate: result = -a.
   Parameters:
     a        32-bit floating point value
-    b        flag: 2 signifies floating point truncation
   Returns:   32-bit floating point value
 }}
-  b       := %010
-  result  := cmdFTruncRound
+
+  return a ^ $8000_0000
+
+PUB FAbs(a)
+{{
+  Absolute Value: result = |a|.
+  Parameters:
+    a        32-bit floating point value
+  Returns:   32-bit floating point value
+}}
+
+  return a & $7FFF_FFFF
+
+PUB FAdd(a, b)
+{{
+  Addition: result = a + b
+  Parameters:
+    a        32-bit floating point value
+    b        32-bit floating point value
+  Returns:   32-bit floating point value
+}}
+
+  result  := cmdFAdd
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+          
+PUB FSub(a, b)
+{{
+  Subtraction: result = a - b
+  Parameters:
+    a        32-bit floating point value
+    b        32-bit floating point value
+  Returns:   32-bit floating point value
+}}
+
+  result  := cmdFSub
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+  
+PUB FMul(a, b)
+{{
+  Multiplication: result = a * b
+  Parameters:
+    a        32-bit floating point value
+    b        32-bit floating point value
+  Returns:   32-bit floating point value
+}}
+
+  result  := cmdFMul
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB FloatRound(a) | b
+PUB FDiv(a, b)
 {{
-  Convert floating point to whole number (floating point, with rounding).
+  Division: result = a / b
   Parameters:
     a        32-bit floating point value
-    b        flag: 3 signifies floating point rounding to the nearest whole number
+    b        32-bit floating point value
   Returns:   32-bit floating point value
 }}
-  b       := %011
-  result  := cmdFTruncRound
+
+  result  := cmdFDiv
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB FSqr(a)
+PUB FMod(a, b)
 {{
-  Square root.
+  Floating point remainder: result = the remainder of a / b.
   Parameters:
     a        32-bit floating point value
+    b        32-bit floating point value  
   Returns:   32-bit floating point value
 }}
-  result  := cmdFSqr
+
+  result  := cmdFMod
   f32_Cmd := @result
   repeat
   while f32_Cmd
@@ -296,7 +278,21 @@ PUB FCmp(a, b)
               0 if a == b
               1 if a > b
 }}
+
   result  := cmdFCmp
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+  
+PUB Sqrt(a)
+{{
+  Square root.
+  Parameters:
+    a        32-bit floating point value
+  Returns:   32-bit floating point value
+}}
+
+  result  := cmdFSqr
   f32_Cmd := @result
   repeat
   while f32_Cmd
@@ -308,6 +304,7 @@ PUB Sin(a)
     a        32-bit floating point value (angle in radians)
   Returns:   32-bit floating point value
 }}
+
   result  := cmdFSin
   f32_Cmd := @result
   repeat
@@ -320,6 +317,7 @@ PUB Cos(a)
     a        32-bit floating point value (angle in radians)
   Returns:   32-bit floating point value
 }}
+
   result  := cmdFCos
   f32_Cmd := @result
   repeat
@@ -332,6 +330,7 @@ PUB Tan(a)
     a        32-bit floating point value (angle in radians)
   Returns:   32-bit floating point value
 }}
+
   result  := cmdFTan
   f32_Cmd := @result
   repeat
@@ -345,6 +344,7 @@ PUB Log(a) | b
     b        constant used to convert base 2 to base e
   Returns:   32-bit floating point value
 }}
+
   b       := 1.442695041
   result  := cmdFLog2
   f32_Cmd := @result
@@ -359,6 +359,7 @@ PUB Log2(a) | b
     b        0 is a flag to skip the base conversion (skips a multiplication by 1.0)
   Returns:   32-bit floating point value
 }}
+
   b       := 0
   result  := cmdFLog2
   f32_Cmd := @result
@@ -373,6 +374,7 @@ PUB Log10(a) | b
     b        constant used to convert base 2 to base 10
   Returns:   32-bit floating point value
 }}
+
   b       := 3.321928095
   result  := cmdFLog2
   f32_Cmd := @result
@@ -387,6 +389,7 @@ PUB Exp(a) | b
     b        constant used to convert base 2 to base e
   Returns:   32-bit floating point value
 }}
+
   b       := 1.442695041
   result  := cmdFExp2
   f32_Cmd := @result
@@ -401,6 +404,7 @@ PUB Exp2(a) | b
     b        0 is a flag to skip the base conversion (skips a division by 1.0)
   Returns:   32-bit floating point value
 }}
+
   b       := 0
   result  := cmdFExp2
   f32_Cmd := @result
@@ -415,6 +419,7 @@ PUB Exp10(a) | b
     b        constant used to convert base 2 to base 10
   Returns:   32-bit floating point value
 }}
+
   b       := 3.321928095
   result  := cmdFExp2
   f32_Cmd := @result
@@ -429,6 +434,7 @@ PUB Pow(a, b)
     b        32-bit floating point value  
   Returns:   32-bit floating point value
 }}
+
   result  := cmdFPow
   f32_Cmd := @result
   repeat
@@ -441,30 +447,14 @@ PUB Frac(a)
     a        32-bit floating point value
   Returns:   32-bit floating point value
 }}
+
   result  := cmdFFrac
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB FNeg(a)
-{{
-  Negate: result = -a.
-  Parameters:
-    a        32-bit floating point value
-  Returns:   32-bit floating point value
-}}
-  return a ^ $8000_0000
 
-PUB FAbs(a)
-{{
-  Absolute Value: result = |a|.
-  Parameters:
-    a        32-bit floating point value
-  Returns:   32-bit floating point value
-}}
-  return a & $7FFF_FFFF
-  
-PUB Radians(a) | b
+PUB Rad(a) | b
 {{
   Convert degrees to radians
   Parameters:
@@ -472,13 +462,14 @@ PUB Radians(a) | b
     b        the conversion factor
   Returns:   32-bit floating point value (angle in radians)
 }}
+
   b       := constant(pi / 180.0)
   result  := cmdFMul
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB Degrees(a) | b
+PUB Deg(a) | b
 {{
   Convert radians to degrees
   Parameters:
@@ -486,58 +477,14 @@ PUB Degrees(a) | b
     b        the conversion factor
   Returns:   32-bit floating point value (angle in degrees)
 }}
+
   b       := constant(180.0 / pi)
   result  := cmdFMul
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB FMin(a, b)
-{{
-  Minimum: result = the minimum value a or b.
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value  
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFCmp
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-  if result < 0
-    return a
-  return b
-  
-PUB FMax(a, b)
-{{
-  Maximum: result = the maximum value a or b.
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value  
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFCmp
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-  if result < 0
-    return b
-  return a
-
-PUB FMod(a, b)
-{{
-  Floating point remainder: result = the remainder of a / b.
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value  
-  Returns:   32-bit floating point value
-}}
-  result  := cmdFMod
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
-
-PUB ASin(a) | b
+PUB ArcSin(a) | b
 {{
   Arc Sine of a (in radians).
   Parameters:
@@ -545,13 +492,14 @@ PUB ASin(a) | b
     b        1 is a flag signifying return the sine component
   Returns:   32-bit floating point value (angle in radians)
 }}
+
   b       := 1
   result  := cmdASinCos
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB ACos(a) | b
+PUB ArcCos(a) | b
 {{
   Arc Cosine of a (in radians).
   Parameters:
@@ -560,13 +508,14 @@ PUB ACos(a) | b
   Returns:   32-bit floating point value (angle in radians)
              if |a| > 1, NaN is returned
 }}
+
   b       := 0
   result  := cmdASinCos
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB ATan(a) | b
+PUB ArcTan(a) | b
 {{
   Arc Tangent of a.
   Parameters:
@@ -574,13 +523,14 @@ PUB ATan(a) | b
     b        atan(a) = atan2(a,1.0)
   Returns:   32-bit floating point value (angle in radians)
 }}
+
   b       := 1.0
   result  := cmdATan2
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
-PUB ATan2(a, b)
+PUB ArcTan2(a, b)
 {{
   Arc Tangent of vector a, b (in radians, no division is performed, so b==0 is legal).
   Parameters:
@@ -588,6 +538,7 @@ PUB ATan2(a, b)
     b        32-bit floating point value
   Returns:   32-bit floating point value (angle in radians)
 }}
+
   result  := cmdATan2
   f32_Cmd := @result
   repeat
@@ -600,6 +551,7 @@ PUB Floor(a)
     a        32-bit floating point value
   Returns:   32-bit floating point value
 }}
+
   result  := cmdFloor
   f32_Cmd := @result
   repeat
@@ -612,28 +564,69 @@ PUB Ceil(a)
     a        32-bit floating point value
   Returns:   32-bit floating point value
 }}
+
   result  := cmdCeil
   f32_Cmd := @result
   repeat
   while f32_Cmd
 
+PUB Minimum(a, b)
+{{
+  Minimum: result = the minimum value a or b.
+  Parameters:
+    a        32-bit floating point value
+    b        32-bit floating point value  
+  Returns:   32-bit floating point value
+}}
+
+  result  := cmdFCmp
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+  if result < 0
+    return a
+  return b
+  
+PUB Maximum(a, b)
+{{
+  Maximum: result = the maximum value a or b.
+  Parameters:
+    a        32-bit floating point value
+    b        32-bit floating point value  
+  Returns:   32-bit floating point value
+}}
+
+  result  := cmdFCmp
+  f32_Cmd := @result
+  repeat
+  while f32_Cmd
+  if result < 0
+    return b
+  return a
+
+PUB Cmd_ptr
+{{
+  return the Hub address of f32_Cmd, so other code can call F32 functions directly
+}}
+
+  return @f32_Cmd
+
+PUB Call_ptr
+{{
+  return the Hub address of the dispatch table, so other code can call F32 functions directly
+}}
+
+  return @cmdCallTable
 
 CON
-  SignFlag      = $1
-  ZeroFlag      = $2
-  NaNFlag       = $8
 
+    SignFlag      = $1
+    ZeroFlag      = $2
+    NaNFlag       = $8
 
 DAT
-
-'----------------------------
-' Assembly language routines
-'----------------------------
-
-'----------------------------
-' Main control loop
-'----------------------------
                         org     0                       ' (try to keep 2 or fewer instructions between rd/wrlong)
+
 f32_entry               rdlong  ret_ptr, par wz         ' wait for command to be non-zero, and store it in the call location
               if_z      jmp     #f32_entry
 

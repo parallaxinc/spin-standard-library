@@ -15,8 +15,47 @@ VAR
   
 OBJ
 
-  F : "tiny.math.float"
+  math : "tiny.math.float"
 
+PUB StringToFloat( strptr ) : f | int, sign, dmag, mag, get_exp, b
+{{
+    get all the digits as if this is an integer (but track the exponent)
+    int := sign := dmag := mag := get_exp := 0
+}}
+  longfill( @int, 0, 5 )
+  repeat
+    case b := byte[strptr++]
+      "-": sign := $8000_0000
+      "+": ' just ignore, but allow
+      "0".."9":
+           int := int*10 + b - "0"
+           mag += dmag
+      ".": dmag := -1
+      other: ' either done, or about to do exponent
+           if get_exp
+             ' we just finished processing the exponent
+             if sign
+               int := -int
+             mag += int
+             quit
+           else
+             ' convert int to a (signed) float
+             f := math.FFloat( int ) | sign
+             ' should we continue?
+             if (b == "E") or (b == "e")
+               ' int := sign := dmag := 0
+               longfill( @int, 0, 3 )
+               get_exp := 1
+             else
+               quit
+  ' Exp10 is the weak link...uses the Log table in P1 ROM
+  'f := FMul( f, Exp10( FFloat( mag ) ) )
+  ' use these loops for more precision (slower for large exponents, positive or negative)
+  b := 0.1
+  if mag > 0
+    b := 10.0
+  repeat ||mag
+    f := math.FMul ( f, b )
 
 PUB FloatToString(Single) : StringPtr
 
@@ -265,12 +304,12 @@ PRI Setup(single) : stringptr
     
     'if very small, bias up
     if exponent < -32
-      single := F.FMul(single, 1e13)
+      single := math.FMul(single, 1e13)
       exponent += result := 13
       
     'determine exact exponent and integer
     repeat
-      integer := F.FRound(F.FMul(single, tenf[exponent - digits + 1]))
+      integer := math.FRound(math.FMul(single, tenf[exponent - digits + 1]))
       if integer < teni[digits - 1]
         exponent--
       elseif integer => teni[digits]

@@ -19,7 +19,6 @@ PUB FFloat(integer) : single | s, x, m
 
     return Pack(@s)             'pack result
    
-
 PUB FRound(single) : integer
 
 ''Convert float to rounded integer
@@ -48,7 +47,7 @@ PUB FAbs(singleA) : single
   return singleA & $7FFF_FFFF   'clear sign bit
   
 
-PUB FSqr(singleA) : single | s, x, m, root
+PUB FSqrt(singleA) : single | s, x, m, root
 
 ''Compute square root of singleA
 
