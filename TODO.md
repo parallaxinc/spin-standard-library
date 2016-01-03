@@ -11,9 +11,7 @@
         sensor.accel.dual.mxd2125.simple.spin
         sensor.accel.dual.mxd2125.spin
 
-*   Why are there three serial drivers?
 *   Why are there two servo drivers?
-*   Why are there four floating point libraries?
 
 ## Objects needed
 
@@ -36,13 +34,14 @@
 *   sensor.light.qti
 *   sensor.gyroscope
 *   sensor.accel.tri.mma7455
-*   io.eeprom
-*   io.eeprom.spi
-*   io.sdcard
+*   storage.eeprom
+*   storage.eeprom.spi
+*   storage.sdcard
 *   com.can
 *   com.usb
 *   net.xbee.mesh
 *   net.xbee.wifi
+*   signal.adc.mcp320X (X is 2,4,8)
 
 ## More possibilities
 
