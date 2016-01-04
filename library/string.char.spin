@@ -22,13 +22,6 @@ PUB IsDigit(c)
 
     return lookdown(c: "0".."9")
 
-PUB IsHexDigit(c)
-{{
-    Check if character is hexadecimal.
-}}
-
-    return lookdown(c: "0".."9", "a".."f", "A".."F")
-
 PUB IsLower(c)
 {{
     Check if character is lowercase.
