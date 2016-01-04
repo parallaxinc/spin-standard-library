@@ -10,6 +10,7 @@ OBJ
 
     term  : "com.serial.terminal"
     num   : "string.numbers"
+    cc    : "string.char"
 
 VAR
 
@@ -60,21 +61,9 @@ PUB Expected(str)
         term.Char (look)
         term.Chars(term#NL, 2)
 
-PUB IsDigit(c)
-
-    return lookdown(c: "0".."9")
-    
-PUB IsAlpha(c)
-
-    return lookdown(c: "a".."z", "A".."Z")
-
-PUB IsSpace(c)
-
-    return lookdown(c: " ",term#NL)
-    
 PUB SkipSpace
 
-    repeat while IsSpace(look) and look <> term#NL
+    repeat while cc.IsSpace(look) and look <> term#NL
         GetChar
 
 PUB Match(c)
@@ -89,12 +78,12 @@ PUB Match(c)
 
 PUB GetNumber | i
 
-    if not IsDigit(look) and look <> term#NL
+    if not cc.IsDigit(look) and look <> term#NL
         Expected(string("number"))
         return
     
     i := 0
-    repeat while IsDigit(look) and look <> term#NL
+    repeat while cc.IsDigit(look) and look <> term#NL
         inputstring[i] := look
         GetChar
         i++
@@ -102,7 +91,7 @@ PUB GetNumber | i
     inputstring[i] := 0
  
     result := num.StrToBase(@inputstring, 10)
-    if IsAlpha(look)
+    if cc.IsAlpha(look)
         Expected(string("number"))
         return
     SkipSpace
@@ -122,7 +111,7 @@ PUB GetFactor
 PUB GetTerm
 
     result := GetFactor
-    if IsDigit(look)
+    if cc.IsDigit(look)
         Expected(string("operator"))
         return
         
@@ -136,7 +125,7 @@ PUB GetTerm
 PUB GetExpression
 
     result := GetTerm
-    if IsDigit(look)
+    if cc.IsDigit(look)
         Expected(string("operator"))
         return
         
