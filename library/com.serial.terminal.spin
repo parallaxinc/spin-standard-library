@@ -90,41 +90,45 @@ PUB Stop
 
     ser.Stop
 
-PUB Char(bytechr)
+PUB Count
+{{
+    Get count of characters in receive buffer.
+}}
+
+    return ser.Count
+
+PUB Flush
+{{
+    Flush receive buffer.
+}}
+
+    ser.Flush
+
+PUB Char(ch)
 {{
     Send single-byte character.  Waits for room in transmit buffer if necessary.
-
-    Parameter:
-        bytechr - character (ASCII byte value) to send.
 }}
 
-    ser.Char(bytechr)
+    ser.Char(ch)
 
-PUB Chars(bytechr, count)
+PUB Chars(ch, size)
 {{
-    Send `count` number of a single-byte character.
-
-    Parameter:
-
-     - bytechr - character (ASCII byte value) to send.
-     - count - number of characters to send.
+    Send string of size `size` filled with `bytechr`.
 }}
 
-    repeat count
-        ser.Char(bytechr)
+    repeat size
+        ser.Char(ch)
 
 PUB CharIn
 {{
     Receive single-byte character.  Waits until character received.
-
-    Returns: $00..$FF
 }}
 
     return ser.CharIn
 
 PUB Str(stringptr)
 {{
-    Send zero terminated string.
+    Send zero-terminated string.
     Parameter:
         stringptr - pointer to zero terminated string to send.
 }}
@@ -161,7 +165,7 @@ PUB StrInMax(stringptr, maxcount)
             quit
     byte[stringptr+(byte[stringptr-1] == NL)]~                                    'Zero terminate string; overwrite NL or append 0 char
 
-PUB Dec(value) | i, x
+PUB Dec(value)
 {{
     Send value as decimal characters.
     Parameter:
@@ -170,7 +174,7 @@ PUB Dec(value) | i, x
 
     Str(num.Dec(value))
 
-PUB DecIn : value
+PUB DecIn
 {{
     Receive carriage return terminated string of characters representing a decimal value.
   
@@ -178,7 +182,7 @@ PUB DecIn : value
 }}
 
     StrInMax(@str_buffer, MAXSTR_LENGTH)
-    value := num.StrToBase(@str_buffer, 10)
+    return num.StrToBase(@str_buffer, 10)
 
 PUB Bin(value, digits)
 {{
@@ -191,7 +195,7 @@ PUB Bin(value, digits)
 
     Str(num.Bin(value,digits))
 
-PUB BinIn : value
+PUB BinIn
 {{
     Receive carriage return terminated string of characters representing a binary value.
     
@@ -199,7 +203,7 @@ PUB BinIn : value
 }}
    
     StrInMax(@str_buffer, MAXSTR_LENGTH)
-    value := num.StrToBase(@str_buffer, 2)
+    return num.StrToBase(@str_buffer, 2)
    
 PUB Hex(value, digits)
 {{
@@ -211,7 +215,7 @@ PUB Hex(value, digits)
 
     Str(num.Hex(value, digits))
 
-PUB HexIn : value
+PUB HexIn
 {{
     Receive carriage return terminated string of characters representing a hexadecimal value.
   
@@ -219,7 +223,7 @@ PUB HexIn : value
 }}
 
     StrInMax(@str_buffer, MAXSTR_LENGTH)
-    value := num.StrToBase(@str_buffer, 16)
+    return num.StrToBase(@str_buffer, 16)
 
 PUB Clear
 {{
@@ -227,27 +231,13 @@ PUB Clear
 }}
   
     ser.Char(CS)
-
-PUB ClearEnd
+    
+PUB NewLine
 {{
-    Clear line from cursor to end of line.
+    Clear screen and place cursor at top-left.
 }}
   
-    ser.Char(CE)
-  
-PUB ClearBelow
-{{
-    Clear all lines below cursor.
-}}
-  
-    ser.Char(CB)
-  
-PUB Home
-{{
-    Send cursor to home position (top-left).
-}}
-  
-    ser.Char(HM)
+    ser.Char(NL)
   
 PUB Position(x, y)
 {{
@@ -273,20 +263,6 @@ PUB PositionY(y)
     ser.Char(PY)
     ser.Char(y)
 
-PUB NewLine
-{{
-    Send cursor to new line (carriage return plus line feed).
-}}
-  
-    ser.Char(NL)
-  
-PUB LineFeed
-{{
-    Send cursor down to next line.
-}}
-  
-    ser.Char(LF)
-  
 PUB MoveLeft(x)
 {{
     Move cursor left x characters.
@@ -318,33 +294,3 @@ PUB MoveDown(y)
   
     repeat y
         ser.Char(MD)
-  
-PUB Tab
-{{
-    Send cursor to next tab position.
-}}
-  
-    ser.Char(TB)
-  
-PUB Backspace
-{{
-    Delete one character to left of cursor and move cursor there.
-}}
-  
-    ser.Char(BS)
-  
-PUB RxCount : count
-{{
-    Get count of characters in receive buffer.
-
-    Returns: number of characters waiting in receive buffer.
-}}
-
-    return ser.RxCount
-
-PUB RxFlush
-{{
-    Flush receive buffer.
-}}
-
-    ser.RxFlush

@@ -80,7 +80,24 @@ PUB Stop
         cogstop(cog~ - 1)
     longfill(@rx_head, 0, 9)
 
-PUB Char(bytechr)
+PUB Count
+{{
+    Get count of characters in receive buffer.
+
+    Returns: number of characters waiting in receive buffer.
+}}
+
+    result := rx_head - rx_tail
+    result -= BUFFER_LENGTH*(count < 0)
+
+PUB Flush
+{{
+    Flush receive buffer.
+}}
+
+    repeat while rxcheck => 0
+
+PUB Char(ch)
 {{
     Send single-byte character.  Waits for room in transmit buffer if necessary.
 
@@ -89,48 +106,31 @@ PUB Char(bytechr)
 }}
 
     repeat until (tx_tail <> ((tx_head + 1) & BUFFER_MASK))
-    tx_buffer[tx_head] := bytechr
+    tx_buffer[tx_head] := ch
     tx_head := (tx_head + 1) & BUFFER_MASK
     
     if rxtx_mode & %1000
         CharIn
 
-PUB CharIn : bytechr
+PUB CharIn
 {{
     Receive single-byte character.  Waits until character received.
 
     Returns: $00..$FF
 }}
 
-    repeat while (bytechr := RxCheck) < 0
-  
-PUB RxCount : count
-{{
-    Get count of characters in receive buffer.
+    repeat while (result := RxCheck) < 0
 
-    Returns: number of characters waiting in receive buffer.
-}}
-
-    count := rx_head - rx_tail
-    count -= BUFFER_LENGTH*(count < 0)
-
-PUB RxFlush
-{{
-    Flush receive buffer.
-}}
-
-    repeat while rxcheck => 0
-    
-PRI RxCheck : bytechr
+PRI RxCheck
 {
     Check if character received; return immediately.
 
     Returns: -1 if no byte received, $00..$FF if character received.
 }
 
-    bytechr~~
+    result~~
     if rx_tail <> rx_head
-        bytechr := rx_buffer[rx_tail]
+        result := rx_buffer[rx_tail]
         rx_tail := (rx_tail + 1) & BUFFER_MASK
        
 DAT
