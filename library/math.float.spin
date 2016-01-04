@@ -40,33 +40,33 @@ Notes to self:
   * if x <= 0.0002, the approximations' error is < f32 resolution!
 
 }}
-
 CON
-  ' the list of all the PASM functions' offsets in the dispatch table
-  ' You probably only need this table can be used to call F32 routines from inside your own PASM code
-  offAdd        = offGain * 0
-  offSub        = offGain * 1
-  offMul        = offGain * 2
-  offDiv        = offGain * 3
-  offFloat      = offGain * 4
-  offTruncRound = offGain * 5
-  offUintTrunc  = offGain * 6
-  offSqr        = offGain * 7
-  offCmp        = offGain * 8
-  offSin        = offGain * 9
-  offCos        = offGain * 10
-  offTan        = offGain * 11
-  offLog2       = offGain * 12
-  offExp2       = offGain * 13
-  offPow        = offGain * 14
-  offFrac       = offGain * 15
-  offMod        = offGain * 16
-  offASinCos    = offGain * 17
-  offATan2      = offGain * 18
-  offCeil       = offGain * 19
-  offFloor      = offGain * 20
-  ' each entry is a long...4 bytes
-  offGain       = 4
+
+    ' the list of all the PASM functions' offsets in the dispatch table
+    ' You probably only need this table can be used to call F32 routines from inside your own PASM code
+    offAdd        = offGain * 0
+    offSub        = offGain * 1
+    offMul        = offGain * 2
+    offDiv        = offGain * 3
+    offFloat      = offGain * 4
+    offTruncRound = offGain * 5
+    offUintTrunc  = offGain * 6
+    offSqr        = offGain * 7
+    offCmp        = offGain * 8
+    offSin        = offGain * 9
+    offCos        = offGain * 10
+    offTan        = offGain * 11
+    offLog2       = offGain * 12
+    offExp2       = offGain * 13
+    offPow        = offGain * 14
+    offFrac       = offGain * 15
+    offMod        = offGain * 16
+    offASinCos    = offGain * 17
+    offATan2      = offGain * 18
+    offCeil       = offGain * 19
+    offFloor      = offGain * 20
+    ' each entry is a long...4 bytes
+    offGain       = 4
   
 VAR
 
@@ -75,56 +75,59 @@ VAR
   
 PUB Start
 {{
-  Start start floating point engine in a new cog.
-  Returns:     True (non-zero) if cog started, or False (0) if no cog is available.
+    Start start floating point engine in a new cog.
+    Returns:     True (non-zero) if cog started, or False (0) if no cog is available.
 }}
 
-  Stop
-  f32_Cmd := 0
-  return cog := cognew(@f32_entry, @f32_Cmd) + 1
+    Stop
+    f32_Cmd := 0
+    return cog := cognew(@f32_entry, @f32_Cmd) + 1
 
 PUB Stop
 {{
-  Stop floating point engine and release the cog.
+    Stop floating point engine and release the cog.
 }}
 
-  if cog
-    cogstop(cog~ - 1)
+    if cog
+        cogstop(cog~ - 1)
 
 PUB FFloat(a)
 {{
-  Convert integer to floating point.
-  Parameters:
-    n        32-bit integer value
-  Returns:   32-bit floating point value
+    Convert integer to floating point.
+    Parameters:
+      n        32-bit integer value
+    Returns:   32-bit floating point value
 }}
-  result  := cmdFFloat
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
 
-PUB FRound(a) | b
+    result  := cmdFFloat
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
+
+PUB FRound(a) | b 
 {{
-  Round floating point number.
-  Parameters:
-    a        32-bit floating point value
-    b        flag: 3 signifies floating point rounding to the nearest whole number
-  Returns:   32-bit floating point value
+    Round floating point number.
+
+    Parameters:
+      a        32-bit floating point value
+      b        flag: 3 signifies floating point rounding to the nearest whole number
+    Returns:   32-bit floating point value
 }}
 
-  b       := %011
-  result  := cmdFTruncRound
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    b       := %011
+    result  := cmdFTruncRound
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FTrunc(a) | b
 {{
-  Truncate floating point number.
-  Parameters:
-    a        32-bit floating point value
-    b        flag: 2 signifies floating point truncation
-  Returns:   32-bit floating point value
+    Truncate floating point number.
+
+    Parameters:
+      a        32-bit floating point value
+      b        flag: 2 signifies floating point truncation
+    Returns:   32-bit floating point value
 }}
 
   b       := %010
@@ -135,187 +138,191 @@ PUB FTrunc(a) | b
 
 PUB UintTrunc(a)
 {{
-  Convert floating point to unsigned integer (with truncation).
-  Parameters:
-    a        32-bit floating point value
-  Returns:   32-bit unsigned integer value
-  (negative values are clamped to 0)
+    Convert floating point to unsigned integer (with truncation).
+
+    Parameters:
+      a        32-bit floating point value
+
+    Returns:   32-bit unsigned integer value
+    (negative values are clamped to 0)
 }}
 
-  result  := cmdUintTrunc
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdUintTrunc
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FIntTrunc(a) | b
 {{
-  Convert floating point to integer (with truncation).
-  Parameters:
-    a        32-bit floating point value
-    b        flag: 0 signifies truncation
-  Returns:   32-bit integer value
+    Convert floating point to integer (with truncation).
+
+    Parameters:
+      a        32-bit floating point value
+      b        flag: 0 signifies truncation
+    Returns:   32-bit integer value
 }}
 
-  b       := %000
-  result  := cmdFTruncRound
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    b       := %000
+    result  := cmdFTruncRound
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FIntRound(a) | b
 {{
-  Convert floating point to integer (with rounding).
-  Parameters:
-    a        32-bit floating point value
-    b        flag: 1 signifies rounding to the nearest integer
-  Returns:   32-bit integer value
+    Convert floating point to integer (with rounding).
+
+    Parameters:
+      a        32-bit floating point value
+      b        flag: 1 signifies rounding to the nearest integer
+    Returns:   32-bit integer value
 }}
 
-  b       := %001
-  result  := cmdFTruncRound
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    b       := %001
+    result  := cmdFTruncRound
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FNeg(a)
 {{
-  Negate: result = -a.
-  Parameters:
-    a        32-bit floating point value
-  Returns:   32-bit floating point value
+    Negate: result = -a.
+    Parameters:
+      a        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  return a ^ $8000_0000
+    return a ^ $8000_0000
 
 PUB FAbs(a)
 {{
-  Absolute Value: result = |a|.
-  Parameters:
-    a        32-bit floating point value
-  Returns:   32-bit floating point value
+    Absolute Value: result = |a|.
+    Parameters:
+      a        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  return a & $7FFF_FFFF
+    return a & $7FFF_FFFF
 
 PUB FAdd(a, b)
 {{
-  Addition: result = a + b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
+    Addition: result = a + b
+    Parameters:
+      a        32-bit floating point value
+      b        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFAdd
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFAdd
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
           
 PUB FSub(a, b)
 {{
-  Subtraction: result = a - b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
+    Subtraction: result = a - b
+    Parameters:
+      a        32-bit floating point value
+      b        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFSub
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFSub
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
   
 PUB FMul(a, b)
 {{
-  Multiplication: result = a * b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
+    Multiplication: result = a * b
+    Parameters:
+      a        32-bit floating point value
+      b        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFMul
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFMul
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FDiv(a, b)
 {{
-  Division: result = a / b
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit floating point value
+    Division: result = a / b
+    Parameters:
+      a        32-bit floating point value
+      b        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFDiv
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFDiv
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FMod(a, b)
 {{
-  Floating point remainder: result = the remainder of a / b.
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value  
-  Returns:   32-bit floating point value
+    Floating point remainder: result = the remainder of a / b.
+    Parameters:
+      a        32-bit floating point value
+      b        32-bit floating point value  
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFMod
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFMod
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB FCmp(a, b)
 {{
-  Floating point comparison.
-  Parameters:
-    a        32-bit floating point value
-    b        32-bit floating point value
-  Returns:   32-bit integer value
-             -1 if a < b
-              0 if a == b
-              1 if a > b
+    Floating point comparison.
+    Parameters:
+      a        32-bit floating point value
+      b        32-bit floating point value
+    Returns:   32-bit integer value
+               -1 if a < b
+                0 if a == b
+                1 if a > b
 }}
 
-  result  := cmdFCmp
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFCmp
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
   
 PUB Sqrt(a)
 {{
-  Square root.
-  Parameters:
-    a        32-bit floating point value
-  Returns:   32-bit floating point value
+    Square root.
+    Parameters:
+      a        32-bit floating point value
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFSqr
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFSqr
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB Sin(a)
 {{
-  Sine of an angle (radians).
-  Parameters:
-    a        32-bit floating point value (angle in radians)
-  Returns:   32-bit floating point value
+    Sine of an angle (radians).
+    Parameters:
+      a        32-bit floating point value (angle in radians)
+    Returns:   32-bit floating point value
 }}
 
-  result  := cmdFSin
-  f32_Cmd := @result
-  repeat
-  while f32_Cmd
+    result  := cmdFSin
+    f32_Cmd := @result
+    repeat
+    while f32_Cmd
 
 PUB Cos(a)
 {{
-  Cosine of an angle (radians).
-  Parameters:
-    a        32-bit floating point value (angle in radians)
-  Returns:   32-bit floating point value
+    Cosine of an angle (radians).
+    Parameters:
+      a        32-bit floating point value (angle in radians)
+    Returns:   32-bit floating point value
 }}
 
   result  := cmdFCos
