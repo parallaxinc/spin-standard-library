@@ -1,5 +1,4 @@
 CON
-
     _clkmode = xtal1 + pll16x
     _xinfreq = 5_000_000
 
@@ -20,7 +19,7 @@ PUB Main | idx, a
 
     repeat idx from 1 to 20
 
-        a := fp.Log(fp.FFloat(idx))
+        a := fp.Log(fp.FloatF(idx))
     
         term.Chars(" ",3)
         term.Str(num.DecPadded(idx, 3))
