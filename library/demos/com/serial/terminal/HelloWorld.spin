@@ -9,5 +9,5 @@ OBJ
 
 PUB Main
 
-    term.Start (115200)    
+    term.Start (115200)
     term.Str (string("Hello World!"))

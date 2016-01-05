@@ -23,4 +23,8 @@ do
     elif [[ $ENCODING == *"CRLF line terminators"* ]] ; then
         dos2unix "$line"
     fi
+
+    # Remove trailing whitespace
+    sed -i "$line" -e 's/[ \t]*$//g'
+
 done < <(find . -name \*.spin)

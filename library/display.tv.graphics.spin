@@ -1,8 +1,8 @@
 ''***************************************
 ''*  Graphics Driver v1.0               *
 ''*  Author: Chip Gracey                *
-''*  Copyright (c) 2005 Parallax, Inc.  *               
-''*  See end of file for terms of use.  *               
+''*  Copyright (c) 2005 Parallax, Inc.  *
+''*  See end of file for terms of use.  *
 ''***************************************
 
 ''
@@ -288,11 +288,11 @@ PUB textmode(x_scale, y_scale, spacing, justification)
 ''                    bits[3..2]: 0..3 = bottom, center, top, bottom
 
   longmove(@text_xs, @x_scale, 4)                       'retain high-level text data
- 
+
   setcommand(_textmode, @x_scale)                       'set text mode
 
 
-PUB box(x, y, box_width, box_height) | x2, y2, pmin, pmax 
+PUB box(x, y, box_width, box_height) | x2, y2, pmin, pmax
 
 '' Draw a box with round/square corners, according to pixel width
 ''

@@ -16,28 +16,28 @@ CON
 
 ' At 80MHz the ADC/DAC sample resolutions and rates are as follows:
 '
-' sample   sample               
-' bits       rate               
-' ----------------              
-' 5       2.5 MHz               
-' 6      1.25 MHz               
-' 7       625 KHz               
-' 8       313 KHz               
-' 9       156 KHz               
-' 10       78 KHz               
-' 11       39 KHz               
-' 12     19.5 KHz               
-' 13     9.77 KHz               
-' 14     4.88 KHz               
-                                
+' sample   sample
+' bits       rate
+' ----------------
+' 5       2.5 MHz
+' 6      1.25 MHz
+' 7       625 KHz
+' 8       313 KHz
+' 9       156 KHz
+' 10       78 KHz
+' 11       39 KHz
+' 12     19.5 KHz
+' 13     9.77 KHz
+' 14     4.88 KHz
+
   bits = 11               'try different values from table here
-  
+
 
 PUB go
 
   cognew(@asm_entry, 0)   'launch assembly program into a COG
 
-  
+
 DAT
 
 '
@@ -56,20 +56,20 @@ asm_entry     mov       dira,asm_dira                   'make pins 8 (ADC) and 0
               movs      ctrb,#10                        'DUTY DIFFERENTIAL mode for CTRB
               movd      ctrb,#11
               movi      ctrb,#%00111_000
-              
+
               mov       asm_cnt,cnt                     'prepare for WAITCNT loop
               add       asm_cnt,asm_cycles
 
-              
+
 :loop         waitcnt   asm_cnt,asm_cycles              'wait for next CNT value (timing is determinant after WAITCNT)
 
               mov       asm_sample,phsa                 'capture PHSA and get difference
               sub       asm_sample,asm_old
               add       asm_old,asm_sample
-                                                         
+
               shl       asm_sample,#32-bits             'justify sample and output to FRQB
               mov       frqb,asm_sample
-    
+
               jmp       #:loop                          'wait for next sample period
 '
 '
@@ -84,9 +84,9 @@ asm_sample    res       1
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

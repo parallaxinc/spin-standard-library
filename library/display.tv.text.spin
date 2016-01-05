@@ -1,8 +1,8 @@
 ''***************************************
 ''*  TV Text 40x13 v1.0                 *
 ''*  Author: Chip Gracey                *
-''*  Copyright (c) 2006 Parallax, Inc.  *               
-''*  See end of file for terms of use.  *               
+''*  Copyright (c) 2006 Parallax, Inc.  *
+''*  See end of file for terms of use.  *
 ''***************************************
 
 CON
@@ -15,11 +15,11 @@ CON
 
   tv_count = 14
 
-  
+
 VAR
 
   long  col, row, color, flag
-  
+
   word  screen[screensize]
   long  colors[8 * 2]
 
@@ -27,16 +27,16 @@ VAR
   long  tv_enable     '0/non-0 = off/on                           write-only
   long  tv_pins       '%pppmmmm = pin group, pin group mode       write-only
   long  tv_mode       '%tccip = tile,chroma,interlace,ntsc/pal    write-only
-  long  tv_screen     'pointer to screen (words)                  write-only      
-  long  tv_colors     'pointer to colors (longs)                  write-only                            
-  long  tv_ht         'horizontal tiles                           write-only                            
-  long  tv_vt         'vertical tiles                             write-only                            
-  long  tv_hx         'horizontal tile expansion                  write-only                            
-  long  tv_vx         'vertical tile expansion                    write-only                            
-  long  tv_ho         'horizontal offset                          write-only                            
-  long  tv_vo         'vertical offset                            write-only                            
-  long  tv_broadcast  'broadcast frequency (Hz)                   write-only                            
-  long  tv_auralcog   'aural fm cog                               write-only                            
+  long  tv_screen     'pointer to screen (words)                  write-only
+  long  tv_colors     'pointer to colors (longs)                  write-only
+  long  tv_ht         'horizontal tiles                           write-only
+  long  tv_vt         'vertical tiles                             write-only
+  long  tv_hx         'horizontal tile expansion                  write-only
+  long  tv_vx         'vertical tile expansion                    write-only
+  long  tv_ho         'horizontal offset                          write-only
+  long  tv_vo         'vertical offset                            write-only
+  long  tv_broadcast  'broadcast frequency (Hz)                   write-only
+  long  tv_auralcog   'aural fm cog                               write-only
 
 
 OBJ
@@ -51,12 +51,12 @@ PUB start(basepin) : okay
 
   setcolors(@palette)
   out(0)
-  
+
   longmove(@tv_status, @tv_params, tv_count)
   tv_pins := (basepin & $38) << 1 | (basepin & 4 == 4) & %0101
   tv_screen := @screen
   tv_colors := @colors
-  
+
   okay := tv.start(@tv_status)
 
 

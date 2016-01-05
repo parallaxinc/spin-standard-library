@@ -12,11 +12,11 @@
 {
 Revision History:
                   Version 1.0   -    original file created
-                  
+
                   Version 1.1   -    For Channel "B" there was a typo in the 'Synth' object
                                      The line that reads...
                                      DIRB[Pin]~~                        'make pin output
-                                     ...should read...  
+                                     ...should read...
                                      DIRA[Pin]~~                        'make pin output
 }
 CON
@@ -33,10 +33,10 @@ VAR
 
 OBJ
   Freq : "signal.synth"
-  
+
 PUB CTR_Demo
 
-    Freq.Synth("A",Pin, Frequency)                      'Synth({Counter"A" or Counter"B"},Pin, Freq)       
+    Freq.Synth("A",Pin, Frequency)                      'Synth({Counter"A" or Counter"B"},Pin, Freq)
 
     repeat                                              'loop forever to keep cog alive
 
@@ -57,4 +57,4 @@ DAT
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}    
+}}

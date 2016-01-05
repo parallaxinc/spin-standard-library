@@ -97,7 +97,7 @@ PUB Start(SCL) | SDA                   ' SDA goes HIGH to LOW with SCL HIGH
    dira[SDA]~~
    outa[SDA]~                          ' Now drive SDA LOW
    outa[SCL]~                          ' Leave SCL LOW
-  
+
 PUB Stop(SCL) | SDA                    ' SDA goes LOW to HIGH with SCL High
    SDA := SCL + 1
    outa[SCL]~~                         ' Drive SCL HIGH
@@ -110,7 +110,7 @@ PUB Write(SCL, data) : ackbit | SDA
 '' only while the SCL line is HIGH.  Data is always 8 bits (+ ACK/NAK).
 '' SDA is assumed LOW and SCL and SDA are both left in the LOW state.
    SDA := SCL + 1
-   'ackbit := 0 
+   'ackbit := 0
    data <<= 24
    repeat 8                            ' Output data to SDA
       outa[SDA] := (data <-= 1) & 1
@@ -148,7 +148,7 @@ PUB ReadPage(SCL, devSel, addrReg, dataPtr, count) : ackbit
    Start(SCL)                          ' Select the device & send address
    ackbit := Write(SCL, devSel | Xmit)
    ackbit := (ackbit << 1) | Write(SCL, addrReg >> 8 & $FF)
-   ackbit := (ackbit << 1) | Write(SCL, addrReg & $FF)          
+   ackbit := (ackbit << 1) | Write(SCL, addrReg & $FF)
    Start(SCL)                          ' Reselect the device for reading
    ackbit := (ackbit << 1) | Write(SCL, devSel | Recv)
    repeat count - 1
@@ -192,9 +192,9 @@ PUB WritePage(SCL, devSel, addrReg, dataPtr, count) : ackbit
    Start(SCL)                          ' Select the device & send address
    ackbit := Write(SCL, devSel | Xmit)
    ackbit := (ackbit << 1) | Write(SCL, addrReg >> 8 & $FF)
-   ackbit := (ackbit << 1) | Write(SCL, addrReg & $FF)          
+   ackbit := (ackbit << 1) | Write(SCL, addrReg & $FF)
    repeat count                        ' Now send the data
-      ackbit := ackbit << 1 | ackbit & $80000000 ' "Sticky" sign bit         
+      ackbit := ackbit << 1 | ackbit & $80000000 ' "Sticky" sign bit
       ackbit |= Write(SCL, byte[dataPtr++])
    Stop(SCL)
    return ackbit
@@ -239,9 +239,9 @@ PUB WriteWait(SCL, devSel, addrReg) : ackbit
 CON
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

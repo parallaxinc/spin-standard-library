@@ -7,17 +7,17 @@
 *****************************************
 
 *****************************************************************
- Control ramping of up to 32-Servos      Version2     08-18-2009 
+ Control ramping of up to 32-Servos      Version2     08-18-2009
 *****************************************************************
- Coded by Beau Schwabe (Parallax).                                              
+ Coded by Beau Schwabe (Parallax).
 *****************************************************************
 
 
  History:
                            Version 1 - (05-11-2009) initial concept
-                           
+
                            Version 2 - (08-18-2009) updated where 'CoreSpeed' is iniitalized so that the
-                                                    Servo32 object can take beter advantage of the assigned value.                                
+                                                    Servo32 object can take beter advantage of the assigned value.
 }}
 
 CON
@@ -38,11 +38,11 @@ CON
                                              '' 480 = 6us @ 12.917ms
                                              '' 560 = 7us @ 11.071ms
                                              '' 620 = 7.75us @ 10ms
-                                             '' 640 = 8us @ 9.6875ms                                                             
+                                             '' 640 = 8us @ 9.6875ms
 
 
 PUB StartRamp (ServoData)
-    cognew(@RampStart,ServoData)                                             
+    cognew(@RampStart,ServoData)
 
 DAT
 
@@ -55,16 +55,16 @@ DAT
 
                         org
 '------------------------------------------------------------------------------------------------------------------------------------------------
-RampStart               
+RampStart
                         mov     Address1,       par              'ServoData
-                        mov     Address2,       Address1                 
+                        mov     Address2,       Address1
                         add     Address2,       #128             'ServoTarget
-                        mov     Address3,       Address2                 
+                        mov     Address3,       Address2
                         add     Address3,       #128             'ServoDelay
 '---------------------------------------------------------------------------------------
-Ch01                    sub      dly + 00,      #1      wc 
+Ch01                    sub      dly + 00,      #1      wc
                    if_c rdlong   dly + 00,      Address3         'Move Delay into temp delay value
-                        call     #RampCore                        
+                        call     #RampCore
 '---------------------------------------------------------------------------------------
 Ch02                    sub      dly + 01,      #1      wc
                    if_c rdlong   dly + 01,      Address3         'Move Delay into temp delay value
@@ -194,22 +194,22 @@ Ch32                    sub      dly + 32,      #1      wc
 '-------------------------------------------------------------------
 '-------------------------------------------------------------------
 RampCore
-                        rdlong   temp1,         Address1         'Move ServoData into temp1               
+                        rdlong   temp1,         Address1         'Move ServoData into temp1
                         rdlong   temp2,         Address2         'Move ServoTarget into temp2
                   if_nc jmp      #CodeBalance
                         cmp      temp1,         temp2   wc,wz
 
-            if_c_and_nz add      temp1,         _CoreSpeed        'Increment ServoData if ServoTarget is greater   
+            if_c_and_nz add      temp1,         _CoreSpeed        'Increment ServoData if ServoTarget is greater
            if_nc_and_nz sub      temp1,         _CoreSpeed        'Decrement ServoData if ServoTarget is less
-           
+
 OutLoop                 wrlong   temp1,         Address1         'Update ServoData value
 
                         add      Address1,      #4               'Increment Delay pointer
-                        add      Address2,      #4               'Increment ServoData pointer         
+                        add      Address2,      #4               'Increment ServoData pointer
                         add      Address3,      #4
-RampCore_ret            ret                        
+RampCore_ret            ret
 
-CodeBalance             nop                                      'makes for equal code branch path               
+CodeBalance             nop                                      'makes for equal code branch path
                         jmp     #OutLoop
 '-------------------------------------------------------------------
 '-------------------------------------------------------------------

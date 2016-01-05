@@ -1,8 +1,8 @@
 ''******************************************
 ''*  Memsic Dual Accelerometer Demo   v1.0 *
 ''*  Author: Paul Baker                    *
-''*  Copyright (c) 2007 Parallax, Inc.     *               
-''*  See end of file for terms of use.     *               
+''*  Copyright (c) 2007 Parallax, Inc.     *
+''*  See end of file for terms of use.     *
 ''******************************************
 CON
   _CLKMODE = XTAL1 + PLL16X
@@ -14,11 +14,11 @@ CON
   D           = 500             'Distance and Perspective
   SD          = 400
 
-  CX          =  0              'Screen Center X 
+  CX          =  0              'Screen Center X
   CY          =  0              'Screen Center Y
 
   MaxPoints   = 40
-  
+
   'Constants used by the Accelerometer Object
   Xout_pin    =  0              'Propeller pin MX2125 X out is connected to
   Yout_pin    =  1              'Propeller pin MX2125 Y out is connected to
@@ -27,7 +27,7 @@ CON
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   bitmap_base = $2000
   display_base = $5000
 
@@ -57,18 +57,18 @@ VAR
     long              S1,S2,S3                          'sine of rotation angles
     long              C1,C2,C3                          'cosine of rotation angles
     long              PointX,PointY,PointZ              'current display point
-    long              ScnPntX[MaxPoints],ScnPntY[MaxPoints],ScnPntZ[MaxPoints],SX[MaxPoints],SY[MaxPoints] 
+    long              ScnPntX[MaxPoints],ScnPntY[MaxPoints],ScnPntZ[MaxPoints],SX[MaxPoints],SY[MaxPoints]
     long              TEMPX,TEMPY,TEMPZ
     long              Points
     long              Lines
 
-    'Variables used to convert raw sensor data into degree tilt 
-    long              offset, scale  
+    'Variables used to convert raw sensor data into degree tilt
+    long              offset, scale
 
 OBJ
     tv    :       "display.tv"                                  'located in default Library
     gr    :       "display.tv.graphics"                            'located in default Library
-    accel :       "sensor.accel.dual.mxd2125"  
+    accel :       "sensor.accel.dual.mxd2125"
 
 PUB Setup
   offset := 90 * (clkfreq / 200)                        'offset value for sensor data conversion
@@ -80,24 +80,24 @@ PUB Setup
 
   repeat               'main program loop
     gr.clear                                            'clear bitmap
-   
+
     gr.colorwidth(2, 0)                                 'Set Color and Width
     gr.textmode(1,1,7,%0100)                            'Set text mode
     gr.text(0,82,string("Dual Axis Accelerometer Demo"))'Display Header Text
-   
+
     'set angles of plane
     R1 := 0                                      'Rotation angle between X and Y axis (not used with 2 axis sensor)
     R2 := (accel.x*90-offset)/scale * -1         'Rotation angle between X and Z axis (-1 used to reflect display's X axis)
     R3 := (accel.y*90-offset)/scale - 90         'Rotation angle between Y and Z axis (-90 used to rotate display's Y axis)
-    
-    TranslatePoints                                     'Perform rotational translation and 3D->2D projection 
+
+    TranslatePoints                                     'Perform rotational translation and 3D->2D projection
     DrawPolygons                                        'Draw 2D projected wireframe
-   
+
     gr.copy(display_base)                               'copy bitmap to display
-   
+
 PRI Start_TV_and_graphics | i,dx,dy
   'start tv
-  longmove(@tv_status, @tvparams, paramcount)           'copy initial values for TV object into variable space 
+  longmove(@tv_status, @tvparams, paramcount)           'copy initial values for TV object into variable space
   tv_screen := @screen                                  'initalize pointers
   tv_colors := @colors
   tv.start(@tv_status)                                  'load cog with TV driver
@@ -107,14 +107,14 @@ PRI Start_TV_and_graphics | i,dx,dy
     colors[i] := $00001010 * (5+4) & $F + $2B060C02
 
   'init tile screen
-  repeat dx from 0 to tv_hc - 1                         'initialize tile pointers to region of memory containing data 
+  repeat dx from 0 to tv_hc - 1                         'initialize tile pointers to region of memory containing data
     repeat dy from 0 to tv_vc - 1
       screen[dy * tv_hc + dx] := display_base >> 6 + dy + dx * tv_vc + ((dy & $3F) << 10)
 
   'start and setup graphics
   gr.start                                              'load cog with graphics driver
   gr.setup(16, 12, 128, 96, bitmap_base)                'initialize graphics driver
-  
+
 PRI cos(angle) : x
 
 '' Get cosine of angle (0-8191)
@@ -133,31 +133,31 @@ PRI sin(angle) : y
   if angle & $1000
     -y
 
-{*******************************************************************************    
+{*******************************************************************************
 * Following code is a stripped down version of Beau Schwabe's 3D graphics demo *
 * availible at http://forums.parallax.com/forums/default.aspx?f=25&m=144641    *
 ********************************************************************************}
- 
+
 PRI TranslatePoints|i
 
     Points := PLANE[0]                                  'Retrieve # of points from DataBase
     Lines  := PLANE[1]                                  'Retrieve # of lines from DataBase
 
-    S1 := Sin((R1*1024)/45)                             'Convert DEG (0-360) to 13-Bit Sine and Cosine value        
+    S1 := Sin((R1*1024)/45)                             'Convert DEG (0-360) to 13-Bit Sine and Cosine value
     S2 := Sin((R2*1024)/45)
-    S3 := Sin((R3*1024)/45)    
+    S3 := Sin((R3*1024)/45)
     C1 := Cos((R1*1024)/45)
     C2 := Cos((R2*1024)/45)
     C3 := Cos((R3*1024)/45)
-    
-    repeat i from 1 to Points                          'Rotate Points                           
+
+    repeat i from 1 to Points                          'Rotate Points
       PointX := ~PLANE[((i-1)*3)+2]                     'Retrieve X coordinate from DataBase
       PointY := ~PLANE[((i-1)*3)+3]                     'Retrieve Y coordinate from DataBase
       PointZ := ~PLANE[((i-1)*3)+4]                     'Retrieve Z coordinate from DataBase
 
       TEMPX := (PointX * C2 - PointZ * S2) / 65535      'Rotate points around the y axis.
       TEMPZ := (PointX * S2 + PointZ * C2) / 65535
-    
+
       ScnPntZ[i] := (TEMPZ * C1 - PointY * S1) / 65535  'Rotate points around the x axis.
       TEMPY := (TEMPZ * S1 + PointY * C1) / 65535
 
@@ -170,7 +170,7 @@ PRI TranslatePoints|i
       SY[i] := ScnPntY[i] * D / TEMPZ + CY
 
 PRI  DrawPolygons|i,coord1,coord2,color
-     repeat i from 1 to Lines                                                   
+     repeat i from 1 to Lines
        coord1 := PLANE[((Points * 3)+2)+((i-1)*3)]
        coord2 := PLANE[((Points * 3)+3)+((i-1)*3)]
        color  := PLANE[((Points * 3)+4)+((i-1)*3)]
@@ -179,7 +179,7 @@ PRI  DrawPolygons|i,coord1,coord2,color
        gr.plot(SX[coord1],SY[coord1])                   'draw point
        gr.line(SX[coord2],SY[coord2])                   'draw line
 
-    
+
 DAT
                     'Data representation example for a 3D object
 
@@ -235,9 +235,9 @@ tvparams                long    0               'status
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

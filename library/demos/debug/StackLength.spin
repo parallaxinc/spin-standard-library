@@ -1,16 +1,16 @@
 ' Author: Jeff Martin
 {{
     This code demonstrates the use of the Stack Length object.  See the Stack Length object for more information.
-    
+
     The example object being tested appears under the heading "Code/Object Being Tested for Stack Usage," near the
     bottom of this source.  Hypothetically, it is the code written by a developer and given 32 longs of Stack space
     during development.
-    
+
     Now that this object is done, the developer wishes to check its actual stack utilization, so he temporarily adds
     the code that appears under the heading "Temporary Code to Test Stack Usage," below, downloads with F11, opens
     the Parallax Serial Terminal and sets it to the Propeller chip's programming port at (115200 baud), resets the
     Propeller and waits for message.
-    
+
     The message "Stack Usage: 9" appears and now he knows his code should reserve only 9 longs of space for Stack.
     He makes the change, deletes the "temporary stack testing code" and calls it done!
 }}
@@ -33,14 +33,14 @@ PUB Main
 VAR
 
     long    stack[32]
-  
+
 PUB Start(Pin, DelayMS, Count)
 {{
     Start new toggling process in a new cog.
 }}
 
     cognew(Toggle(Pin, DelayMS, Count), @Stack)
-  
+
 PUB Toggle(Pin, DelayMS, Count)
 {{
     Toggle Pin, Count times with DelayMS milliseconds in between.

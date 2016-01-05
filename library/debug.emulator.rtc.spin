@@ -27,30 +27,30 @@ PUB SetHour(_HH)
 
 PUB SetAMPM(_AP)
     AP := _AP
-    
+
 PUB SetDate(_DD)
     DD := _DD
 
 PUB SetMonth(_MO)
     MO := _MO
-    
+
 PUB SetYear(_YY)
     YY := _YY
 
 PUB Suspend
     ClockFlag := 1              '' Suspend Clock
-    repeat while ClockFlag == 1 '' Clock responds with a 2 when suspend received 
+    repeat while ClockFlag == 1 '' Clock responds with a 2 when suspend received
     ParseTime(_TimeAddress)     '' Unpack current time variable values from 'long'
-    
+
 PUB Restart
-    UnParseTime(_TimeAddress)   '' Pack current time variable values into 'long'     
+    UnParseTime(_TimeAddress)   '' Pack current time variable values into 'long'
     ClockFlag := 0              '' Restart Clock
 
 PUB Run(TimeAddress)
 
-'' TimeAddress variable allocation:                                  
+'' TimeAddress variable allocation:
 '' Leap   Year    Month   Date   AM/PM  Hours   Minutes   Seconds
-'' (0-1) (00-31)  (1-12) (1-31)  (0-1) (1-12)  (00-59)   (00-59)                                     
+'' (0-1) (00-31)  (1-12) (1-31)  (0-1) (1-12)  (00-59)   (00-59)
 ''   0____00000____0000___00000____0____0000____000000____000000
 
 APswitch := 1
@@ -79,7 +79,7 @@ repeat
      MonthDays += LY
 
   SS += 1                       '' Increment Time Calendar
-  
+
   if SS == 60                   '' Seconds LOGIC
      SS := 0
      MM += 1
@@ -101,12 +101,12 @@ repeat
         AP := 1 - AP
         if AP == 0
            DD += 1
-   
-  
+
+
   if DD == MonthDays + 1        '' Days LOGIC
      DD := 1
      MO += 1
-  
+
   if MO == 13                   '' Months LOGIC
      MO := 1
      YY += 1
@@ -114,17 +114,17 @@ repeat
   if YY == 33                   '' Years LOGIC
      YY := 32
 
-  UnParseTime(TimeAddress)      '' Pack current time variable values into 'long'   
+  UnParseTime(TimeAddress)      '' Pack current time variable values into 'long'
 
 PUB UnParseTime(TimeAddress)
     Result := LY<<31 | YY<<26 | MO<< 22 | DD<<17 | AP<<16 | HH<<12 | MM<<6 | SS
     longmove(TimeAddress,@Result,1)
 
 PUB ParseTime(TimeAddress)
-    longmove(@Temp,TimeAddress,1) 'Parse Data 
+    longmove(@Temp,TimeAddress,1) 'Parse Data
     SS := Temp & %111111
     Temp := Temp >> 6
-    MM := Temp & %111111  
+    MM := Temp & %111111
     Temp := Temp >> 6
     HH := Temp & %1111
     Temp := Temp >> 4
@@ -143,7 +143,7 @@ PUB ParseDateStamp(DataAddress)
     DateTimeStamp[1] := "0"                             '<-Year
     DateTimeStamp[2] := $30 + YY/10                     '<-Year
     DateTimeStamp[3] := $30 + YY-(YY/10)*10             '<-Year
-    DateTimeStamp[4] := "/"    
+    DateTimeStamp[4] := "/"
     DateTimeStamp[5] := $30 + MO/10                    ''<-Month
     DateTimeStamp[6] := $30 + MO-(MO/10)*10             '<-Month
     DateTimeStamp[7] := "/"
@@ -155,17 +155,17 @@ PUB ParseDateStamp(DataAddress)
 PUB ParseTimeStamp(DataAddress)
     DateTimeStamp[0] := $30 + HH/10                    ''<-Hour
     DateTimeStamp[1] := $30 + HH-(HH/10)*10             '<-Hour
-    DateTimeStamp[2] := ":"    
+    DateTimeStamp[2] := ":"
     DateTimeStamp[3] := $30 + MM/10                    ''<-Minute
     DateTimeStamp[4] := $30 + MM-(MM/10)*10             '<-Minute
-    DateTimeStamp[5] := ":"    
+    DateTimeStamp[5] := ":"
     DateTimeStamp[6] := $30 + SS/10                    ''<-Second
     DateTimeStamp[7] := $30 + SS-(SS/10)*10             '<-Second
     if AP < 1
        DateTimeStamp[8] := "a"                         ''<-Set am
     else
        DateTimeStamp[8] := "p"                         ''<-Set pm
-    DateTimeStamp[9] := "m"   
+    DateTimeStamp[9] := "m"
     DateTimeStamp[10] := 0      ' String Terminator ALWAYS Zero
     bytemove(DataAddress,@DateTimeStamp,11)
 

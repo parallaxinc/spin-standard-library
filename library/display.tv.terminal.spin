@@ -7,7 +7,7 @@
 
 {-----------------REVISION HISTORY-----------------
  v1.1 - Updated 5/15/2006 to use actual pin number, instead of pin group, for Start method's basepin parameter.}
- 
+
 CON
 
   x_tiles = 16
@@ -37,9 +37,9 @@ CON
   y_clear = y_scroll_longs << 2
   y_clear_longs = y_screen - y_scroll_longs
 
-  paramcount = 14       
+  paramcount = 14
 
-  
+
 VAR
 
   long  x, y, bitmap_base
@@ -49,7 +49,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -61,7 +61,7 @@ VAR
 
   long  bitmap[x_tiles * y_tiles << 4 + 16]     'add 16 longs to allow for 64-byte alignment
   word  screen[x_tiles * y_tiles]
-  
+
 
 OBJ
 
@@ -75,7 +75,7 @@ PUB start(basepin)
 ''
 ''  basepin = first of three pins on a 4-pin boundary (0, 4, 8...) to have
 ''  1.1k, 560, and 270 ohm resistors connected and summed to form the 1V,
-''  75 ohm DAC for baseband video   
+''  75 ohm DAC for baseband video
 
   'init bitmap and tile screen
   bitmap_base := (@bitmap + $3F) & $7FC0

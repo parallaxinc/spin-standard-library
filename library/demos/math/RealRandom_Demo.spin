@@ -26,7 +26,7 @@ OBJ
 
   text  : "display.tv.text"
   rr    : "math.realrandom"
-  
+
 
 PUB start | i
 
@@ -37,18 +37,18 @@ PUB start | i
   text.start(12)
   text.str(string(10,16,11,6))
   text.hex(rr.random, 8)
-                                         
+
   'output the random numbers' lsb's to headphones
-  i := rr.random_ptr 
+  i := rr.random_ptr
   dira[11..10]~~
   repeat
     outa[11..10] := long[i]
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

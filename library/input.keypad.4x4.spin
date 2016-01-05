@@ -2,8 +2,8 @@
 *****************************************
 * 4x4 Keypad Reader           v1.0      *
 * Author: Beau Schwabe                  *
-* Copyright (c) 2007 Parallax           *               
-* See end of file for terms of use.     *               
+* Copyright (c) 2007 Parallax           *
+* See end of file for terms of use.     *
 *****************************************
 }}
 {
@@ -39,11 +39,11 @@ Looking at the Back of the 4x4 keypad...
 ┌─────── ││││││││ ───────┐
 │     oo ││││││││ o      │
 │                        │
-│  O    O    O    O    O │ 
+│  O    O    O    O    O │
 │                        │
 │  O    O    O    O    O │
 │         {LABEL}        │
-│  O    O    O    O    O │ 
+│  O    O    O    O    O │
 │                        │
 │  O    O    O    O    O │
 │                        │
@@ -54,7 +54,7 @@ Looking at the Back of the 4x4 keypad...
 }
 VAR
   word  keypad
-  
+
 PUB ReadKeyPad
     keypad := 0                 'Clear 4x4 'keypad' value
     ReadRow(3)                  'Call routine to read entire ROW 0
@@ -70,10 +70,10 @@ PRI ReadRow(n)
     outa[0..7]~                 'preset P0 to P7 as LOWs
     dira[0..7]~~                'make P0 to P7 OUTPUTs ... discharge pins or "capacitors" to VSS
     dira[0..7]~                 'make P0 to P7 INPUTSs ... now the pins act like tiny capacitors
-    outa[n]~~                   'preset Pin 'n' HIGH         
+    outa[n]~~                   'preset Pin 'n' HIGH
     dira[n]~~                   'make Pin 'n' an OUTPUT... Make only one pin HIGH ; will charge
                                 '                          "capacitor" if switch is closed.
-                                ' 
+                                '
     keypad += ina[4..7]         'read ROW value        ... If a switch is open, the pin or "capacitor"
     dira[n]~                    'make Pn an INPUT          will remain discharged
 

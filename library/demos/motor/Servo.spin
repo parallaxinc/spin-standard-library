@@ -8,13 +8,13 @@
 }}
 
 CON
-    _clkmode = xtal1 + pll16x                           
+    _clkmode = xtal1 + pll16x
     _xinfreq = 5_000_000                                'Note Clock Speed for your setup!!
 
     ServoCh1 = 0                                        'Select DEMO servo
 
 VAR
-    
+
 OBJ
   SERVO : "motor.servo"
 
@@ -31,26 +31,26 @@ PUB Servo32_DEMO | temp
                                 'Note: At ANY time, the 'Set' command overides
                                 '      the servo position.  To 'Ramp' from the
                                 '      current position to the next position,
-                                '      you must use the 'SetRamp' command 
+                                '      you must use the 'SetRamp' command
 
 '         'Set(Pin, Width)
     SERVO.Set(ServoCh1,1500)                  'Move Servo to Center
 
-          'SetRamp(Pin, Width,Delay)<-- 100 = 1 sec 6000 = 1 min    
-    SERVO.SetRamp(ServoCh1,2000,200)          'Pan Servo          
+          'SetRamp(Pin, Width,Delay)<-- 100 = 1 sec 6000 = 1 min
+    SERVO.SetRamp(ServoCh1,2000,200)          'Pan Servo
 
     repeat 1500000                            'Do nothing here just to wait for
                                               'background ramping to complete
-    
-    SERVO.SetRamp(ServoCh1,1000,50)           'Pan Servo          
 
-    repeat 800000                             'Do nothing here just to wait for          
+    SERVO.SetRamp(ServoCh1,1000,50)           'Pan Servo
+
+    repeat 800000                             'Do nothing here just to wait for
                                               'background ramping to complete
 
-                                              
-    SERVO.Set(ServoCh1,1500)                  'Force Servo to Center 
 
-{{      
+    SERVO.Set(ServoCh1,1500)                  'Force Servo to Center
+
+{{
     Note: It is no longer necessary to preset the servo before starting the Servo32 object, but for backwards compatibility
           the old method will still work just fine.
 
@@ -59,10 +59,10 @@ PUB Servo32_DEMO | temp
 
           To disable a servo channel simply specify the servo width that has a value outside of the allowed range.  The default
           for this range is set between 500us and 2500us
-           
 
-    
-}}      
+
+
+}}
 
 DAT
 {{
@@ -81,4 +81,4 @@ DAT
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}      
+}}

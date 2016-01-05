@@ -28,7 +28,7 @@ OBJ
   vga     : "display.vga.tile.1600x1200"
 ' mouse   : "input.mouse"             'no cog left for mouse!!
 
-  
+
 VAR
 
   long  col, row, color
@@ -38,7 +38,7 @@ VAR
   long  cursor[1+32]
 
   long  cursor_x, cursor_y, cursor_col, cursor_def
-  
+
 
 PUB start | j, k
 
@@ -114,7 +114,7 @@ PRI box(left, top, clr, str) | width, height, x, y, i
   col := left + 1
   row := top + 1
   print_string(str)
-  
+
 
 PRI boxchr(c): i
 
@@ -125,7 +125,7 @@ PRI print_string(ptr)
 
   repeat while byte[ptr]
     print(byte[ptr++])
-    
+
 
 PRI print(c) | i, k
 
@@ -175,7 +175,7 @@ PRI newline | i
       wordmove(@array.word[i*cols], @array.word[(i+2)*cols], cols)
     'clear new line
     wordfill(@array.word[(rows-2)*cols], spacetile, cols<<1)
-      
+
 
 DAT
 
@@ -214,7 +214,7 @@ propeller long
   long %00000000_00011111_11111000_00000000
   long %00000000_00000000_00000000_00000000
   byte 15,15
-  
+
 vgacolors long
 
   long $F010F010       'yellow on dk green
@@ -250,9 +250,9 @@ text file "lincoln2.txt"
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │
@@ -264,4 +264,4 @@ text file "lincoln2.txt"
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}     
+}}

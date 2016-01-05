@@ -1,11 +1,11 @@
 ''*******************************************
 ''*  TSL230 Light to Frequency Demo   v1.0  *
 ''*  Author: Paul Baker                     *
-''*  Copyright (c) 2007 Parallax, Inc.      *               
-''*  See end of file for terms of use.      *               
+''*  Copyright (c) 2007 Parallax, Inc.      *
+''*  See end of file for terms of use.      *
 ''*******************************************
-CON 
-        _clkmode = xtal1 + pll16x 
+CON
+        _clkmode = xtal1 + pll16x
         _XinFREQ = 5_000_000
 OBJ
   term : "display.tv.text"
@@ -23,9 +23,9 @@ PUB Go
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

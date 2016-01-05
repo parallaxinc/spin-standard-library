@@ -8,7 +8,7 @@
 {-----------------REVISION HISTORY-----------------
  v1.0.1 - Updated 5/15/2006 to use TV_Terminal v1.1
  v1.0.2 - Updated 6/15/2006 to use keyboard pins on Propeller Demo Board Rev. C}
- 
+
 CON
 
         _clkmode        = xtal1 + pll16x
@@ -19,7 +19,7 @@ OBJ
 
         term    : "display.tv.terminal"
         kb      : "input.keyboard"
- 
+
 
 PUB start | i
 
@@ -38,9 +38,9 @@ PUB start | i
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │
@@ -52,4 +52,4 @@ PUB start | i
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}    
+}}

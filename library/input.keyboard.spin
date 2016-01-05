@@ -637,7 +637,7 @@ _auto                   res     1       'read-only at start
 ''      3D      =
 ''      3E      >
 ''      3F      ?
-''      40      @       
+''      40      @
 ''      41..5A  A..Z
 ''      5B      [
 ''      5C      \

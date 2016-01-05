@@ -13,9 +13,9 @@ Test Circuit:
 FPin ───┳──┳── SDF(sigma-delta feedback)
           │      ┣──── SDI(sigma-delta input)
         L   100K
-                     
-         GND    GND  
-                                 
+                
+         GND    GND
+
 
 Test Coils:
 
@@ -31,14 +31,14 @@ Wire used was the "Radio Shack Special" GREEN (about 27 gauge)
 How does it work?
 
 Note: The reported resonate frequency is NOT the actual resonate LC frequency.  Instead it is where the voltage produced from
-      the LC circuit was clipped.  
+      the LC circuit was clipped.
 
       In the example circuit below:
-      
+
              C     L
         A ────┳──── GND
-                │ 
-                B         
+                │
+                B
 
       When you apply a small voltage at a specific frequency to an LC circuit (at point "A") that is at or near the resonate
       frequency of LC, it is not uncommon to measure 10's or 100's of times the amount of voltage (at point "B") that you are
@@ -58,7 +58,7 @@ Note: The reported resonate frequency is NOT the actual resonate LC frequency.  
 
 
       A typical magnitude plot of a frequency sweep applied to an LC circuit might look something like this:
-      
+
                     *
                     *
                     *
@@ -99,7 +99,7 @@ Note: The reported resonate frequency is NOT the actual resonate LC frequency.  
        lower "de-tuned" value because the voltage magnitude no longer "clips" at the reported resonate frequency.
        Typical ranges are full scale between 65535 (no metal) and 0 (metal saturation)
 
- 
+
                           X    *****
                               *     *
  ADC reports value here --> *         *
@@ -133,7 +133,7 @@ CON
 
 VAR
     long              FMax, FTemp, FValue, Frequency
-    
+
 PUB demo
     'start and setup graphics
     gr.start
@@ -170,11 +170,11 @@ PUB DisplayInductorValue | X
 
       'copy bitmap to display
       gr.copy(display_base)
-'**************************************** Graphics Option Finish *********************************************      
+'**************************************** Graphics Option Finish *********************************************
 
 PUB FindResonateFrequency | P
     dira[FPin]                  := 1
-    
+
     FMax := 0
     repeat Frequency from LowerFrequency to UpperFrequency step 1000
       Freq.Synth("A", FPin, Frequency)

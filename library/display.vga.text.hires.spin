@@ -69,7 +69,7 @@ CON
 
   cols = hp / 8
   rows = vp / 12
-  
+
 
 VAR long cog[2]
 
@@ -154,7 +154,7 @@ PUB start(BasePin, ScreenPtr, ColorPtr, CursorPtr, SyncPtr) : okay | i, j
   'if both COGs launched, return true
   if cog[0] and cog[1]
     return true
-    
+
   'else, stop any launched COG and return false
   else
     stop
@@ -173,11 +173,11 @@ CON
 
   #1, scanbuff[128], scancode[128*2-1+3], maincode      'enumerate COG RAM usage
 
-  main_size = $1F0 - maincode                           'size of main program   
+  main_size = $1F0 - maincode                           'size of main program
 
   hv_inactive = (hn << 1 + vn) * $0101                  'H,V inactive states
 
-  
+
 DAT
 
 '*****************************************************
@@ -215,29 +215,29 @@ d0                      long    1 << 9                  'd0 always resides here 
 
                         'Move main program into maincode area
 
-:move                   mov     $1EF,main_begin+main_size-1                 
+:move                   mov     $1EF,main_begin+main_size-1
                         sub     :move,d0s0              '(do reverse move to avoid overwrite)
-                        djnz    main_ctr,#:move                                     
-                                                                                        
-                        'Build scanbuff display routine into scancode                      
-                                                                                        
-:waitvid                mov     scancode+0,i0           'org     scancode                                              
-:shr                    mov     scancode+1,i1           'waitvid color,scanbuff+0                    
-                        add     :waitvid,d1             'shr     scanbuff+0,#8                       
-                        add     :shr,d1                 'waitvid color,scanbuff+1                    
-                        add     i0,#1                   'shr     scanbuff+1,#8                       
-                        add     i1,d0                   '...                                         
+                        djnz    main_ctr,#:move
+
+                        'Build scanbuff display routine into scancode
+
+:waitvid                mov     scancode+0,i0           'org     scancode
+:shr                    mov     scancode+1,i1           'waitvid color,scanbuff+0
+                        add     :waitvid,d1             'shr     scanbuff+0,#8
+                        add     :shr,d1                 'waitvid color,scanbuff+1
+                        add     i0,#1                   'shr     scanbuff+1,#8
+                        add     i1,d0                   '...
                         djnz    scan_ctr,#:waitvid      'waitvid color,scanbuff+cols-1
-                            
-                        mov     scancode+cols*2-1,i2    'mov     vscl,#hf                            
-                        mov     scancode+cols*2+0,i3    'waitvid hvsync,#0                           
-                        mov     scancode+cols*2+1,i4    'jmp     #scanret                            
-                                                                                 
+
+                        mov     scancode+cols*2-1,i2    'mov     vscl,#hf
+                        mov     scancode+cols*2+0,i3    'waitvid hvsync,#0
+                        mov     scancode+cols*2+1,i4    'jmp     #scanret
+
                         'Init I/O registers and sync COGs' video circuits
-                                                                                              
-                        mov     dira,reg_dira           'set pin directions                   
-                        mov     dirb,reg_dirb                                                 
-                        movi    frqa,#(pr / 5) << 2     'set pixel rate                                      
+
+                        mov     dira,reg_dira           'set pin directions
+                        mov     dirb,reg_dirb
+                        movi    frqa,#(pr / 5) << 2     'set pixel rate
                         mov     vcfg,reg_vcfg           'set video configuration
                         mov     vscl,#1                 'set video to reload on every pixel
                         waitcnt sync_cnt,colormask      'wait for start value in cnt, add ~1ms
@@ -246,12 +246,12 @@ d0                      long    1 << 9                  'd0 always resides here 
                         mov     vscl,#100               'insure initial WAITVIDs lock cleanly
 
                         'Jump to main loop
-                        
+
                         jmp     #vsync                  'jump to vsync - WAITVIDs will now be locked!
 
                         'Data
 
-d0s0                    long    1 << 9 + 1         
+d0s0                    long    1 << 9 + 1
 d1                      long    1 << 10
 main_ctr                long    main_size
 scan_ctr                long    cols
@@ -274,7 +274,7 @@ main_begin              org     maincode                'main code follows (gets
 
 
 ' Main loop, display field - each COG alternately builds and displays four scan lines
-                          
+
 vsync                   mov     x,#vs                   'do vertical sync lines
                         call    #blank_vsync
 
@@ -285,22 +285,22 @@ vb_lines                mov     x,#vb                   'do vertical back porch 
                         mov     color_ptr,color_base    'reset color pointer to first row
                         mov     row,#0                  'reset row counter for cursor insertion
                         mov     fours,#rows * 3 / 2     'set number of 4-line builds for whole screen
-                        
+
                         'Build four scan lines into scanbuff
 
 fourline                mov     font_ptr,font_third     'get address of appropriate font section
                         shl     font_ptr,#7+2
                         add     font_ptr,font_base
-                        
+
                         movd    :pixa,#scanbuff-1       'reset scanbuff address (pre-decremented)
                         movd    :pixb,#scanbuff-1
-                        
+
                         mov     y,#2                    'must build scanbuff in two sections because
                         mov     vscl,vscl_line2x        '..pixel counter is limited to twelve bits
 
 :halfrow                waitvid underscore,#0           'output lows to let other COG drive VGA pins
                         mov     x,#cols/2               '..for 2 scan lines, ready for half a row
-                        
+
 :column                 rdbyte  z,screen_ptr            'get character from screen memory
                         ror     z,#7                    'get inverse flag into bit 0, keep chr high
                         shr     z,#32-7-2       wc      'get inverse flag into c, chr into bits 8..2
@@ -323,7 +323,7 @@ fourline                mov     font_ptr,font_third     'get address of appropri
 :cursor                 rdbyte  x,cursor_base           'x in range?
                         add     cursor_base,#1
                         cmp     x,#cols         wc
-                        
+
                         rdbyte  y,cursor_base           'y match?
                         add     cursor_base,#1
                         cmp     y,row           wz
@@ -339,12 +339,12 @@ fourline                mov     font_ptr,font_third     'get address of appropri
                         test    y,#%010         wc      'get mode bits into flags
                         test    y,#%001         wz
         if_nc_and_z     jmp     #:nocursor              'if cursor disabled, no cursor
-        
+
         if_c_and_z      test    slowbit,cnt     wc      'if blink mode, get blink state
         if_c_and_nz     test    fastbit,cnt     wc
 
                         test    y,#%100         wz      'get box or underscore cursor piece
-        if_z            mov     x,longmask          
+        if_z            mov     x,longmask
         if_nz           mov     x,underscore
         if_nz           cmp     font_third,#2   wz      'if underscore, must be last font section
 
@@ -372,7 +372,7 @@ scanret                 mov     vscl,#hs                'do horizontal sync pixe
                         djnz    y,#scanline             'another scan line?
 
                         'Next group of four scan lines
-                        
+
                         add     font_third,#2           'if font_third + 2 => 3, subtract 3 (new row)
                         cmpsub  font_third,#3   wc      'c=0 for same row, c=1 for new row
         if_c            add     screen_ptr,#cols        'if new row, advance screen pointer
@@ -383,7 +383,7 @@ scanret                 mov     vscl,#hs                'do horizontal sync pixe
                         'Visible section done, do vertical sync front porch lines
 
                         wrlong  longmask,par            'write -1 to refresh indicator
-                        
+
 vf_lines                mov     x,#vf                   'do vertical front porch lines (# set at runtime)
                         call    #blank
 
@@ -408,7 +408,7 @@ blank_vsync_ret         ret
                         'Data
 
 screen_base             long    0                       'set at runtime (3 contiguous longs)
-color_base              long    0                       'set at runtime    
+color_base              long    0                       'set at runtime
 cursor_base             long    0                       'set at runtime
 
 font_base               long    0                       'set at runtime

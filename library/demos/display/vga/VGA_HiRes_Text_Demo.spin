@@ -65,7 +65,7 @@ VAR
   word  colors[rows]
   'cursor control bytes
   byte  cx0, cy0, cm0, cx1, cy1, cm1
-  
+
 
 PUB start | i, j
 
@@ -80,7 +80,7 @@ PUB start | i, j
   'set up colors
   repeat i from 0 to rows - 1
     colors[i] := %%0100_1310
-    
+
   colors[0] := %%3000_3330
   colors[1] := %%0000_0300
   colors[2] := %%1100_3300
@@ -89,7 +89,7 @@ PUB start | i, j
   colors[5] := %%3310_0000
   colors[6] := %%1330_0000
   colors[7] := %%0020_3300
-  
+
   colors[rows-1] := %%1110_2220
 
   'fill screen with characters
@@ -105,14 +105,14 @@ PUB start | i, j
   repeat
     cx0 := mouse.bound_x      'cursor 0 follows mouse
     cy0 := mouse.bound_y
-    
+
     if mouse.button(0)        'if left-click, cursor 1 moves to mouse
       cx1 := mouse.bound_x
       cy1 := mouse.bound_y
-      
+
     if mouse.button(1)        'if right-click, scroll random characters
       'wait for refresh to avoid chopiness during scroll
-      repeat until sync       
+      repeat until sync
       sync := 0
       'scroll center of screen
       longmove(@screen + cols * 8, @screen + cols * 9, (rows - 10) * cols >> 2)
@@ -123,9 +123,9 @@ PUB start | i, j
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │
@@ -137,4 +137,4 @@ PUB start | i, j
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}        
+}}

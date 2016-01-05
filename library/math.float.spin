@@ -1,16 +1,16 @@
 ' Original authors: Cam Thompson, Jonathan "lonesock" Dummer
 {{
     IEEE 754 compliant 32-bit floating point math routines for the Propeller in a single cog.
-    
+
     # Features
 
      *  prop resources:       1 cog, 690 longs
-    
+
     # Usage
      *  call start first (starts a new cog)
      *  use functions as expected
      *  realize that you are storing the result into a regular long variable type (signed 4-byte integer), _encoded_as_a_float_!
-    
+
     # Notes
      *  CORDIC using floats would be very slow
      *  integer-only CORDIC isn't super accurate for tiny integers
@@ -49,12 +49,12 @@ CON
     ' each entry is a long...4 bytes
 
     offGain       = 4
-  
+
 VAR
 
     long    f32_Cmd
     byte    cog
-  
+
 PUB Start
 {{
     Start start floating point engine in a new cog.
@@ -174,7 +174,7 @@ PUB AddF(a, b)
 }}
 
     return SetCommand(a, b, cmdFAdd)
-          
+
 PUB SubF(a, b)
 {{
     Subtraction: result = a - b
@@ -185,7 +185,7 @@ PUB SubF(a, b)
 }}
 
     return SetCommand(a, b, cmdFSub)
-  
+
 PUB MulF(a, b)
 {{
     Multiplication: result = a * b
@@ -213,7 +213,7 @@ PUB ModF(a, b)
     Floating point remainder: result = the remainder of a / b.
     Parameters:
       a        32-bit floating point value
-      b        32-bit floating point value  
+      b        32-bit floating point value
     Returns:   32-bit floating point value
 }}
 
@@ -232,7 +232,7 @@ PUB CmpF(a, b)
 }}
 
     return SetCommand(a, b, cmdFCmp)
-  
+
 PUB Sqrt(a)
 {{
     Square root.
@@ -344,7 +344,7 @@ PUB Pow(a, b)
     Power (a to the power b).
     Parameters:
       a        32-bit floating point value
-      b        32-bit floating point value  
+      b        32-bit floating point value
     Returns:   32-bit floating point value
 }}
 
@@ -452,7 +452,7 @@ PUB Minimum(a, b)
     Minimum: result = the minimum value a or b.
     Parameters:
       a        32-bit floating point value
-      b        32-bit floating point value  
+      b        32-bit floating point value
     Returns:   32-bit floating point value
 }}
 
@@ -460,13 +460,13 @@ PUB Minimum(a, b)
     if result < 0
       return a
     return b
-  
+
 PUB Maximum(a, b)
 {{
     Maximum: result = the maximum value a or b.
     Parameters:
       a        32-bit floating point value
-      b        32-bit floating point value  
+      b        32-bit floating point value
     Returns:   32-bit floating point value
 }}
 
@@ -551,7 +551,7 @@ _FAdd                   call    #_Unpack2               ' unpack two variables
 
                         call    #_Pack                  ' pack result and exit
 _FSub_ret
-_FAdd_ret               ret      
+_FAdd_ret               ret
 
 
 '----------------------------
@@ -609,7 +609,7 @@ _FMul_ret               ret
 _FDiv                   call    #_Unpack2               ' unpack two variables
           if_c_or_z     mov     fnumA, NaN              ' check for NaN or divide by 0
           if_c_or_z     jmp     _FDiv_ret
-        
+
                         xor     flagA, flagB            ' get sign of result
                         sub     expA, expB              ' subtract exponents
 
@@ -658,13 +658,13 @@ _FTruncRound            mov     t1, fnumA               ' grab a copy of the inp
                         shl     manA, #2                ' left justify mantissa
                         sub     expA, #30               ' our target exponent is 30
                         abs     expA, expA      wc      ' adjust for exponent sign, and track if it was negative
-                          
+
               if_z_and_nc mov   manA, NaN               ' integer output, and it's too large for us to handle
               if_z_and_nc jmp   #:check_sign
-              
+
               if_nz_and_nc mov  fnumA, t1                ' float output, and we're already all integer
               if_nz_and_nc jmp  _FTruncRound_ret
-                        
+
                         ' well, I need to kill off some bits, so let's do it
                         cmp     expA, #32       wc      ' DO set the C flag here...I want to know if expA =< 31, aka < 32
                         max     expA, #31               ' DON'T set the C flag here...max sets C if D<S
@@ -701,7 +701,7 @@ _UintTrunc              call    #_Unpack
               if_c      mov     fnumA, manA
 _UintTrunc_ret          ret
 
-                                  
+
 '------------------------------------------------------------------------------
 ' square root
 ' fnumA = sqrt(fnumA)
@@ -709,7 +709,7 @@ _UintTrunc_ret          ret
 _FSqr                   call    #_Unpack                 ' unpack floating point value
           if_c_or_z     jmp     _FSqr_ret               ' check for NaN or zero
                         test    flagA, #signFlag wz      ' check for negative
-          if_nz         mov     fnumA, NaN               ' yes, then return NaN                       
+          if_nz         mov     fnumA, NaN               ' yes, then return NaN
           if_nz         jmp     _FSqr_ret
 
                         sar     expA, #1 wc             ' if odd exponent, shift mantissa
@@ -728,7 +728,7 @@ _FSqr                   call    #_Unpack                 ' unpack floating point
                         rcl     fnumA, #1
                         shl     manA, #1
                         djnz    t2, #:sqrt
-                        
+
                         mov     manA, fnumA             ' store new mantissa value and exit
                         call    #_Pack
 _FSqr_ret               ret
@@ -771,11 +771,11 @@ _Table_Interp           ' store the fractional part
                         ' read the 2 intermediate values, and scale them for interpolation
                         rdword  t1, t2
                         shl     t1, #14
-                        
+
                         add     t2, #2
-                        
-                        test    t2, TableMask   wz      'table address has overflowed.  added to fix LOG          
-        if_z_and_nc     mov     t2, Bit16               'fix table value unless we're doing the SINE table.  added to fix LOG            
+
+                        test    t2, TableMask   wz      'table address has overflowed.  added to fix LOG
+        if_z_and_nc     mov     t2, Bit16               'fix table value unless we're doing the SINE table.  added to fix LOG
         if_nz_or_c      rdword  t2, t2                  'else, look up the correct value.  conditional added to fix LOG
                         shl     t2, #14
                         ' interpolate
@@ -966,15 +966,15 @@ _Pow                    mov     t7, fnumA wc            ' save sign of result
                         call    #_Unpack
                         mov     fnumA, t7               ' restore base
           if_z          jmp     #:pow2                  ' check for exponent = 0
-          
+
                         test    expA, Bit31 wz          ' if exponent < 0, return NaN
           if_nz         jmp     #:pow1
 
                         max     expA, #23               ' check if exponent = integer
-                        shl     manA, expA    
-                        and     manA, Mask29 wz, nr                         
+                        shl     manA, expA
+                        and     manA, Mask29 wz, nr
           if_z          jmp     #:pow2                  ' yes, then check if odd
-          
+
 :pow1                   mov     fnumA, NaN              ' return NaN
                         jmp     _Pow_ret
 
@@ -986,7 +986,7 @@ _Pow                    mov     t7, fnumA wc            ' save sign of result
                         call    #_Log2                  ' get log of base
                         mov     fnumB, t6               ' multiply by power
                         call    #_FMul
-                        call    #_Exp2                  ' get result      
+                        call    #_Exp2                  ' get result
 
                         test    t7, Bit31 wz            ' check for negative
           if_nz         xor     fnumA, Bit31
@@ -1001,7 +1001,7 @@ _Frac                   call    #_Unpack                ' get fraction
                         test    expA, Bit31 wz          ' check for exp < 0 or NaN
           if_c_or_nz    jmp     #:exit
                         max     expA, #23               ' remove the integer
-                        shl     manA, expA    
+                        shl     manA, expA
                         and     manA, Mask29
                         mov     expA, #0                ' return fraction
 
@@ -1012,7 +1012,7 @@ _Frac_ret               ret
 
 '------------------------------------------------------------------------------
 ' input:   fnumA        32-bit floating point value
-'          fnumB        32-bit floating point value 
+'          fnumB        32-bit floating point value
 ' output:  flagA        fnumA flag bits (Nan, Infinity, Zero, Sign)
 '          expA         fnumA exponent (no bias)
 '          manA         fnumA mantissa (aligned to bit 29)
@@ -1035,12 +1035,12 @@ _Unpack2                mov     t1, fnumA               ' save A
 
                         mov     fnumA, t1               ' unpack A
                         call    #_Unpack
-                        cmp     manB, #0 wz             ' set Z flag                      
+                        cmp     manB, #0 wz             ' set Z flag
 _Unpack2_ret            ret
 
 
 '------------------------------------------------------------------------------
-' input:   fnumA        32-bit floating point value 
+' input:   fnumA        32-bit floating point value
 ' output:  flagA        fnumA flag bits (Nan, Infinity, Zero, Sign)
 '          expA         fnumA exponent (no bias)
 '          manA         fnumA mantissa (aligned to bit 29)
@@ -1060,15 +1060,15 @@ _Unpack                 mov     flagA, fnumA            ' get sign
           if_nz         jmp     #:finite
                         mov     fnumA, NaN              ' no, then return NaN
                         mov     flagA, #NaNFlag
-                        jmp     #:exit2        
+                        jmp     #:exit2
 
 :zeroSubnormal          or      manA, expA wz,nr        ' check for zero
           if_nz         jmp     #:subnorm
                         or      flagA, #ZeroFlag        ' yes, then set zero flag
                         neg     expA, #150              ' set exponent and exit
                         jmp     #:exit2
-                                 
-:subnorm                shl     manA, #7                ' fix justification for subnormals  
+
+:subnorm                shl     manA, #7                ' fix justification for subnormals
 :subnorm2               test    manA, Bit29 wz
           if_nz         jmp     #:exit1
                         shl     manA, #1
@@ -1077,11 +1077,11 @@ _Unpack                 mov     flagA, fnumA            ' get sign
 
 :finite                 shl     manA, #6                ' justify mantissa to bit 29
                         or      manA, Bit29             ' add leading one bit
-                        
+
 :exit1                  sub     expA, #127              ' remove bias from exponent
 :exit2                  test    flagA, #NaNFlag wc      ' set C flag
                         cmp     manA, #0 wz             ' set Z flag
-_Unpack_ret             ret       
+_Unpack_ret             ret
 
 
 '------------------------------------------------------------------------------
@@ -1089,9 +1089,9 @@ _Unpack_ret             ret
 '          expA         fnumA exponent (no bias)
 '          manA         fnumA mantissa (aligned to bit 29)
 ' output:  fnumA        32-bit floating point value
-' changes: fnumA, flagA, expA, manA 
+' changes: fnumA, flagA, expA, manA
 '------------------------------------------------------------------------------
-_Pack                   cmp     manA, #0 wz             ' check for zero                                        
+_Pack                   cmp     manA, #0 wz             ' check for zero
           if_z          mov     expA, #0
           if_z          jmp     #:exit1
 
@@ -1118,7 +1118,7 @@ _Pack                   cmp     manA, #0 wz             ' check for zero
                         shr     fnumA, #9
                         movi    fnumA, expA             ' bits 23:30 exponent
                         shl     flagA, #31
-                        or      fnumA, flagA            ' bit 31 sign            
+                        or      fnumA, flagA            ' bit 31 sign
 _Pack_ret               ret
 
 
@@ -1242,7 +1242,7 @@ _ASinCos_ret            ret
 '------------------------------------------------------------------------------
 _Ceil                   mov     t6, #1                  ' set adjustment value
                         jmp     #floor2
-                        
+
 _Floor                  neg     t6, #1                  ' set adjustment value
 
 floor2                  call    #_Unpack                ' unpack variable
@@ -1258,14 +1258,14 @@ floor2                  call    #_Unpack                ' unpack variable
                         test    fnumA, Bit31 wz
           if_nz         jmp     #:exit
 
-                        mov     fnumA, t4               ' get fraction  
+                        mov     fnumA, t4               ' get fraction
                         call    #_Frac
 
                         or      fnumA, fnumA wz
           if_nz         add     t5, t6                  ' if non-zero, then adjust
 
-:exit                   mov     fnumA, t5               ' convert integer to float 
-                        call    #_FFloat                '}                
+:exit                   mov     fnumA, t5               ' convert integer to float
+                        call    #_FFloat                '}
 _Ceil_ret
 _Floor_ret              ret
 

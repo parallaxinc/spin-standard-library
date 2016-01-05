@@ -33,7 +33,7 @@ OBJ
 VAR
 
   byte  aa,ga,gp,vp,vr,f1,f2,f3,f4,na,nf,fa,ff          'vocal tract parameters
-   
+
   word  input[4]                                        'stereo spatializer parameters
   word  angle[4]
   word  depth[4]
@@ -47,12 +47,12 @@ PUB start
   'start vocal tract and make "uh" sound
   v.start(@aa, -1, -1, -1)
   gp := 88
-  f1 := constant(670 / 19)        
-  f2 := constant(1160 / 19)       
-  f3 := constant(2600 / 19)       
-  f4 := constant(3100 / 19)       
+  f1 := constant(670 / 19)
+  f2 := constant(1160 / 19)
+  f3 := constant(2600 / 19)
+  f4 := constant(3100 / 19)
   v.go(0)
-  ga := 50                        
+  ga := 50
   v.go(0)
 
   'start stereo spatializer and set knobs
@@ -62,7 +62,7 @@ PUB start
   'connect vocal tract output to spatializer input #0
   input[0] := v.sample_ptr
 
-  'start mouse  
+  'start mouse
   m.start(24,25)
   m.bound_limits(0, 0, 0, 255, constant(buffer_size >> 4 - 1), 0)
   m.bound_scales(1, -1, 1)
@@ -74,9 +74,9 @@ PUB start
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

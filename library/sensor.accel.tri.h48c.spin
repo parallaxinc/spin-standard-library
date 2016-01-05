@@ -2,14 +2,14 @@
 *********************************************
 * H48C Tri-Axis Accelerometer VGA_DEMO V1.1 *
 * Author: Beau Schwabe                      *
-* Copyright (c) 2008 Parallax               *               
-* See end of file for terms of use.         *               
+* Copyright (c) 2008 Parallax               *
+* See end of file for terms of use.         *
 *********************************************
 
-Revision History: 
+Revision History:
 
 Version 1.0 - (Sept. 2006) - Initial release with a TV mode 3D-graphics cube
-Version 1.1 - (March 2008) - 3D-graphics cube removed  
+Version 1.1 - (March 2008) - 3D-graphics cube removed
                            - Basic VGA mode display used instead of TV
                            - Added 600nS padding delay around Clock rise and fall times
  }}
@@ -23,12 +23,12 @@ Version 1.1 - (March 2008) - 3D-graphics cube removed
    VSS ──│3  4│── Zero-G
            └──────────┘
 
-Note1: Zero-G output not used in this demo                          
+Note1: Zero-G output not used in this demo
 
 Note2: orientation
 
          Z   Y    
-         │  /    /   °/  reference mark on H48C Chip, not white dot on 6-Pin module 
+         │  /    /   °/  reference mark on H48C Chip, not white dot on 6-Pin module
          │ /    /    /
          │/     o   white reference mark on 6-Pin module indicating Pin #1
           ──── X
@@ -40,11 +40,11 @@ Note2: orientation
 
 
 Note3: The H48C should be powered with a 5V supply.  It has an internal regulator
-       that regulates the voltage down to 3.3V where Vref is set to 1/2 of the 3.3V 
+       that regulates the voltage down to 3.3V where Vref is set to 1/2 of the 3.3V
        In this object, the axis is already compensated with regard to Vref. Because
        of this, the formulas are slightly different (simplified) compared to what is
        stated in the online documentation.
- 
+
 G = ( axis / 4095 ) x ( 3.3 / 0.3663 )
 
         or
@@ -67,7 +67,7 @@ i.e.
 VAR
 long    cog,CS,DIO,CLK,H48C_vref,H48C_x,H48C_y,H48C_z,H48C_thetaA,H48C_thetaB,H48C_thetaC
 
-PUB stop                                                               
+PUB stop
 '' Stop driver - frees a cog
     if cog
        cogstop(cog~ -  1)
@@ -85,15 +85,15 @@ PUB start(CS_,DIO_,CLK_):okay
 PUB vref
     return H48C_vref
 PUB x
-    return H48C_x    
+    return H48C_x
 PUB y
-    return H48C_y    
+    return H48C_y
 PUB z
     return H48C_z
 PUB thetaA
-    return H48C_thetaA    
+    return H48C_thetaA
 PUB thetaB
-    return H48C_thetaB    
+    return H48C_thetaB
 PUB thetaC
     return H48C_thetaC
 DAT
@@ -124,7 +124,7 @@ H48C          org
               add       t1,                     #4
               mov       H48C_z_,                t1
 
-              add       t1,                     #4                              'Get variable Adress locations for X,Y,Z Angle's                              
+              add       t1,                     #4                              'Get variable Adress locations for X,Y,Z Angle's
               mov       H48C_thetaA_,           t1
               add       t1,                     #4
               mov       H48C_thetaB_,           t1
@@ -167,7 +167,7 @@ H48C          org
               mov       cy,                     y_
               call      #cordic
               mov       thetaC_,                ca
-              
+
               mov       t1,                     H48C_vref_                      'Write Vref data back
               wrlong    vref_,                  t1
               mov       t1,                     H48C_x_                         'Write x data back
@@ -183,7 +183,7 @@ H48C          org
               mov       t1,                     H48C_thetaC_                    'Write theta C back
               wrlong    thetaC_,                t1
 
-              jmp       #H48C                            
+              jmp       #H48C
 '------------------------------------------------------------------------------------------------------------------------------
 DataIO                                                                          'Select DAC register and read data
               andn      outa,                   CSPin_mask                      '     Make CS pin LOW         (Select the device)
@@ -193,7 +193,7 @@ DataIO                                                                          
               call      #SHIFTIN                                                '          Read DAC register data
               or        outa,                   CSPin_mask                      '     Make CS pin HIGH       (Deselect the device)
               and       t3,                     DataMask
-DataIO_ret    ret              
+DataIO_ret    ret
 '------------------------------------------------------------------------------------------------------------------------------
 SHIFTOUT                                                                        'SHIFTOUT Entry
               andn      outa,                   DIOPin_mask                     'Pre-Set Data pin LOW
@@ -206,7 +206,7 @@ MSBFIRST_                                                                       
               shl       t5,                     t4                              '          Shift "1" N number of bits to the left.
               shr       t5,                     #1                              '          Shifting the number of bits left actually puts
                                                                                 '          us one more place to the left than we want. To
-                                                                                '          compensate we'll shift one position right.              
+                                                                                '          compensate we'll shift one position right.
 MSB_Sout      test      t3,                     t5      wc                      '          Test MSB of DataValue
               muxc      outa,                   DIOPin_mask                     '          Set DataBit HIGH or LOW
               shr       t5,                     #1                              '          Prepare for next DataBit
@@ -226,13 +226,13 @@ MSBPOST_Sin   call      #Clock                                                  
 
               rcl       t3,                     #1                              '          rotate "C" flag into return value
               djnz      t4,                     #MSBPOST_Sin                    '          Decrement t4 ; jump if not Zero
-SHIFTIN_ret   ret              
+SHIFTIN_ret   ret
 '------------------------------------------------------------------------------------------------------------------------------
 Clock         Call      #Delay600nS
               or        outa,                   CLKPin_mask                     'Set ClockPin HIGH
-              Call      #Delay600nS              
+              Call      #Delay600nS
               andn      outa,                   CLKPin_mask                     'Set ClockPin LOW
-              Call      #Delay600nS              
+              Call      #Delay600nS
 Clock_ret     ret
 
 Delay600nS    'Wait a total of 48 Clocks including the initial CALL entry command
@@ -240,16 +240,16 @@ Delay600nS    'Wait a total of 48 Clocks including the initial CALL entry comman
               add       t2,     #32             '4 Clocks
               waitcnt   t2,     #0              '5+(27) Clocks
 Delay600nS_ret ret                              '4 Clocks
-              
+
 '------------------------------------------------------------------------------------------------------------------------------
 ' Perform CORDIC cartesian-to-polar conversion
 
 'Input = cx(x) and cy(x)
 'Output = cx(ro) and ca(theta)
 
-cordic        abs       cx,cx           wc 
-        if_c  neg       cy,cy             
-              mov       ca,#0             
+cordic        abs       cx,cx           wc
+        if_c  neg       cy,cy
+              mov       ca,#0
               rcr       ca,#1
 
               movs      :lookup,#table
@@ -269,20 +269,20 @@ cordic        abs       cx,cx           wc
               djnz      t2,#:loop
 
               shr       ca,                     #19
-              
+
 cordic_ret    ret
 
 table         long    $20000000, $12E4051E, $09FB385B, $051111D4, $028B0D43
               long    $0145D7E1, $00A2F61E, $00517C55, $0028BE53, $00145F2F
               long    $000A2F98, $000517CC, $00028BE6, $000145F3, $0000A2FA
               long    $0000517D, $000028BE, $0000145F, $00000A30, $00000518
-              
+
 '------------------------------------------------------------------------------------------------------------------------------
 ' Initialized data
 
-                 '     ┌───── Start Bit              
+                 '     ┌───── Start Bit
                  '     │┌──── Single/Differential Bit
-                 '     ││┌┳┳─ Channel Select         
+                 '     ││┌┳┳─ Channel Select
                  '     
 Xselect       long    %11000    'DAC Control Code
 Yselect       long    %11001    'DAC Control Code
@@ -292,7 +292,7 @@ VoltRef       long    %11011    'DAC Control Code
 DataMask      long    $1FFF     '13-Bit data mask
 
 ' Uninitialized data
-x_            long    0                  
+x_            long    0
 y_            long    0
 z_            long    0
 thetaA_       long    0
@@ -307,10 +307,10 @@ t4            res     1         'temp
 t5            res     1         'temp
 
 CSPin_mask    res     1         'IO pin mask
-DIOPin_mask   res     1         'IO pin mask 
-CLKPin_mask   res     1         'IO pin mask 
+DIOPin_mask   res     1         'IO pin mask
+CLKPin_mask   res     1         'IO pin mask
 
-H48C_vref_    res     1         'variable address location                      Arg3 
+H48C_vref_    res     1         'variable address location                      Arg3
 
 H48C_x_       res     1         'variable address location                      Arg4
 H48C_y_       res     1         'variable address location                      Arg5

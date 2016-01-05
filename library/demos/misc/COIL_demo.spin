@@ -11,15 +11,15 @@
 ''                               3.3V
 ''                                
 ''                           ┌──┳─┫
-''         220Ω 500Ω      ┌┳┌680pF       
+''         220Ω 500Ω      ┌┳┌680pF
 ''Ping I/O ────┳────└─┻┘ └─╋─────── Read I/O
-''               R1 │     │       │             
+''               R1 │     │       │
 ''                  │     220Ω   1M
 ''                  │ D1  │       │             NPN = 2n3904
 ''Coil I/O ──────╋─|<──┻───────┫             PNP = 2n3906 (best results when matched)
 ''                                              D1 = 1n914  (not critical - back EMF protect)
 ''Coil I/O ─ ─ ─ ┤            GND             R1 = sensitivity adjustment
-''                    
+''
 ''Coil I/O ─ ─ ─ ┘ (optional Coils)
 
 
@@ -39,7 +39,7 @@ CON
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   bitmap_base = $2000
   display_base = $5000
 
@@ -56,7 +56,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -80,7 +80,7 @@ VAR
   long CoilValue
 
   byte int_string[20],p
-    
+
 
 OBJ
   tv   : "display.tv"
@@ -126,7 +126,7 @@ PUB start | i,dx,dy
     IntString(CoilValue)
     'display text of CoilValue
     gr.text(0,60,@int_string)
-    
+
     'display analog meter
     gr.color(1)
     gr.width(0)
@@ -139,8 +139,8 @@ PUB start | i,dx,dy
     gr.width(0)
     gr.arc(0, 0, 40, 40, 4096-((CoilValue*4096)/100) ,1, 1, 3)
     'arc(x, y, xr, yr, angle, anglestep, steps, arcmode)
-    
-    
+
+
 
     'display bargraph
     gr.color(2)
@@ -207,4 +207,4 @@ DAT
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}                        
+}}

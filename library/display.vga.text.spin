@@ -15,11 +15,11 @@ CON
 
   vga_count = 21
 
-  
+
 VAR
 
   long  col, row, color, flag
-  
+
   word  screen[screensize]
   long  colors[8 * 2]
 
@@ -28,7 +28,7 @@ VAR
   long  vga_pins      '%pppttt = pins                     write-only
   long  vga_mode      '%tihv = tile,interlace,hpol,vpol   write-only
   long  vga_screen    'pointer to screen (words)          write-only
-  long  vga_colors    'pointer to colors (longs)          write-only            
+  long  vga_colors    'pointer to colors (longs)          write-only
   long  vga_ht        'horizontal tiles                   write-only
   long  vga_vt        'vertical tiles                     write-only
   long  vga_hx        'horizontal tile expansion          write-only
@@ -60,13 +60,13 @@ PUB start(basepin) : okay
 
   setcolors(@palette)
   out(0)
-  
+
   longmove(@vga_status, @vga_params, vga_count)
   vga_pins := basepin | %000_111
   vga_screen := @screen
   vga_colors := @colors
   vga_rate := clkfreq >> 2
-  
+
   okay := vga.start(@vga_status)
 
 

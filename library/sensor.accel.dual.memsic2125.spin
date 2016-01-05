@@ -63,7 +63,7 @@ PUB setlevel
     calflag := 1
 
 PUB ro : acceleration
-    return _ro 
+    return _ro
 
 PUB theta : angle
     return _theta
@@ -91,8 +91,8 @@ DAT
 '
 ' Entry
 '
-entry                   mov     ctra,ctra_value         'Setup both counters to simultaniously 
-                        mov     ctrb,ctrb_value         'read the X-axis and Y-axis from the accelerometer 
+entry                   mov     ctra,ctra_value         'Setup both counters to simultaniously
+                        mov     ctrb,ctrb_value         'read the X-axis and Y-axis from the accelerometer
 
                         mov     frqa,#1
                         mov     frqb,#1
@@ -100,10 +100,10 @@ entry                   mov     ctra,ctra_value         'Setup both counters to 
 :loop                   mov     phsa,#0                 'Reset phase A and phase B on each counter
                         mov     phsb,#0
 
-                        waitpeq mask_value,mask_value   'Wait until both the X-axis and Y-axis pins go HIGH  
+                        waitpeq mask_value,mask_value   'Wait until both the X-axis and Y-axis pins go HIGH
                         waitpeq zero,mask_value         'Wait until both the X-axis and Y-axis pins go LOW
 
-                        mov     rawx,phsa               'move raw phase A and raw phase B values into their 
+                        mov     rawx,phsa               'move raw phase A and raw phase B values into their
                         mov     rawy,phsb               'coresponding variables
 
                         rdlong  t1,par          wz      'check calibration flag
@@ -127,14 +127,14 @@ entry                   mov     ctra,ctra_value         'Setup both counters to 
                         wrlong  rawx,t1
                         add     t1,#4
                         wrlong  rawy,t1
-                        
+
                         jmp     #:loop
 
 ' Perform CORDIC cartesian-to-polar conversion
 
-cordic                  abs     cx,cx           wc 
-        if_c            neg     cy,cy             
-                        mov     ca,#0             
+cordic                  abs     cx,cx           wc
+        if_c            neg     cy,cy
+                        mov     ca,#0
                         rcr     ca,#1
 
                         movs    :lookup,#table

@@ -34,7 +34,7 @@ PUB start | h, i, j, k, x, y
   repeat i from 0 to tiles - 1
     colors[i] := $2804
 
-  'draw some lines  
+  'draw some lines
   repeat y from 1 to 8
     repeat x from 0 to 511
       plot(x, x/y)
@@ -52,13 +52,13 @@ PUB start | h, i, j, k, x, y
 PRI plot(x,y) | i
 
   if x => 0 and x < 512 and y => 0 and y < 384
-    pixels[y << 4 + x >> 5] |= |< x  
+    pixels[y << 4 + x >> 5] |= |< x
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │
@@ -70,4 +70,4 @@ PRI plot(x,y) | i
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}    
+}}

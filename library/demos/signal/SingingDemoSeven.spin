@@ -19,16 +19,16 @@ CON
   _xinfreq = 5_000_000
 
   #0
-  
+
 ' Notes and octaves
 '
 ' Ab       A       A#       Bb       B       C       C#       Db       D       D#       Eb       E       F       F#       Gb       G       G#
 '─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  o0Af[4], o0A[4], o0As[0], o0Bf[4], o0B[4], o0C[4], o0Cs[0], o0Df[4], o0D[4], o0Ds[0], o0Ef[4], o0E[4], o0F[4], o0Fs[0], o0Gf[4], o0G[4], o0Gs[0] 
-  o1Af[4], o1A[4], o1As[0], o1Bf[4], o1B[4], o1C[4], o1Cs[0], o1Df[4], o1D[4], o1Ds[0], o1Ef[4], o1E[4], o1F[4], o1Fs[0], o1Gf[4], o1G[4], o1Gs[0] 
-  o2Af[4], o2A[4], o2As[0], o2Bf[4], o2B[4], o2C[4], o2Cs[0], o2Df[4], o2D[4], o2Ds[0], o2Ef[4], o2E[4], o2F[4], o2Fs[0], o2Gf[4], o2G[4], o2Gs[0] 
-  o3Af[4], o3A[4], o3As[0], o3Bf[4], o3B[4], o3C[4], o3Cs[0], o3Df[4], o3D[4], o3Ds[0], o3Ef[4], o3E[4], o3F[4], o3Fs[0], o3Gf[4], o3G[4], o3Gs[0] 
-  o4Af[4], o4A[4], o4As[0], o4Bf[4], o4B[4], o4C[4], o4Cs[0], o4Df[4], o4D[4], o4Ds[0], o4Ef[4], o4E[4], o4F[4], o4Fs[0], o4Gf[4], o4G[4], o4Gs[0] 
+  o0Af[4], o0A[4], o0As[0], o0Bf[4], o0B[4], o0C[4], o0Cs[0], o0Df[4], o0D[4], o0Ds[0], o0Ef[4], o0E[4], o0F[4], o0Fs[0], o0Gf[4], o0G[4], o0Gs[0]
+  o1Af[4], o1A[4], o1As[0], o1Bf[4], o1B[4], o1C[4], o1Cs[0], o1Df[4], o1D[4], o1Ds[0], o1Ef[4], o1E[4], o1F[4], o1Fs[0], o1Gf[4], o1G[4], o1Gs[0]
+  o2Af[4], o2A[4], o2As[0], o2Bf[4], o2B[4], o2C[4], o2Cs[0], o2Df[4], o2D[4], o2Ds[0], o2Ef[4], o2E[4], o2F[4], o2Fs[0], o2Gf[4], o2G[4], o2Gs[0]
+  o3Af[4], o3A[4], o3As[0], o3Bf[4], o3B[4], o3C[4], o3Cs[0], o3Df[4], o3D[4], o3Ds[0], o3Ef[4], o3E[4], o3F[4], o3Fs[0], o3Gf[4], o3G[4], o3Gs[0]
+  o4Af[4], o4A[4], o4As[0], o4Bf[4], o4B[4], o4C[4], o4Cs[0], o4Df[4], o4D[4], o4Ds[0], o4Ef[4], o4E[4], o4F[4], o4Fs[0], o4Gf[4], o4G[4], o4Gs[0]
   o5Af[4], o5A[4], o5As[0], o5Bf[4], o5B
 
   #1, pausenote, halfnote
@@ -37,7 +37,7 @@ CON
   #0, aa,ga,gp,vp,vr,f1,f2,f3,f4,na,nf,fa,ff
 
   shift = -24                   'this pitch shift may be changed: try -48 (-1/2 octave), -4 (-1 key)
-  
+
   buffer_size = $1000           'this may be reduced to $10 to save memory, but echoes go away
 
 
@@ -50,7 +50,7 @@ OBJ
 VAR
 
   byte  vt[4*13]      'vocal tracts
-   
+
   word  input[4]      'spatializer parameters
   word  angle[4]
   word  depth[4]
@@ -72,12 +72,12 @@ PUB start | i
   stereo.start(@input, @buffer, buffer_size, 11, -1, 10, -1) 'start spatializer
 
   repeat tract from 0 to 3
-    set(vp, 1)                           'set vibrato pitch range - try changing the 1 to 40                
+    set(vp, 1)                           'set vibrato pitch range - try changing the 1 to 40
     set(vr, 55 + tract<<2)               'give each vocal tract a slightly different vibrato rate
 
   repeat
     advance(0)   'basso                  'try commenting out some of these lines to hear fewer parts
-    advance(1)   'tenor                       
+    advance(1)   'tenor
     advance(2)   'alto
     advance(3)   'soprano
 
@@ -91,7 +91,7 @@ PRI set_formants(sf1, sf2, sf3, sf4) | i
 PRI set(parameter, value)
 
   vt[tract*13+parameter] := value
-  
+
 
 PRI go(time)
 
@@ -116,28 +116,28 @@ PRI advance(tractx) | note
       seven(100)                'normal
   else
     state[tract]~~              'end of notes
-    
+
 
 PRI seven(pace)
 
   v[tract].set_pace(pace)
 
   set_formants(470,1650,2500,3500)
-  set(ff, 165+tract<<3)                                      
+  set(ff, 165+tract<<3)
   go(10)
   set(fa, hivol[tract]/3)       'comment this line out to hear 'heaven' instead of 'seven'
   go(200)
   set(aa, hivol[tract]/2)
   go(50)
   set(fa, 0)
-  go(50)  
+  go(50)
   set(ga, hivol[tract])
   set_formants(700,1750,2500,3500)
-  go(70)  
+  go(70)
   set_formants(700,1500,2400,3400)
-  go(150)  
+  go(150)
   set_formants(600,1440,2300,3300)
-  go(50)  
+  go(50)
   set(ga, lowvol[tract])
   set(aa, 0)
   set(ff, 240 + tract<<2)
@@ -150,7 +150,7 @@ PRI seven(pace)
   set(ga, hivol[tract])
   set(aa, hivol[tract]>>2)
   set_formants(500,1440,2300,3300)
-  go(25)  
+  go(25)
   set_formants(550,1750,2400,3400)
   go(60)
   go(50)
@@ -166,7 +166,7 @@ PRI seven(pace)
   set(na, 0)
   go(200)
 
-    
+
 DAT
 
 soprano byte o3G
@@ -202,7 +202,7 @@ soprano byte o3G
         byte o4A
         byte o3G + pausenote
         byte 0
-        
+
 alto    byte o3D
         byte o3D                'measure
         byte o3D
@@ -317,9 +317,9 @@ angles  word  $0000, $5C00, $A400, $FFFF
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

@@ -22,8 +22,8 @@ PUB Start(StartPin, NumEnc, NumDelta, PosAddr): Pass
 ''            PosAddr  = Address of a buffer of longs where each encoder's position (and deta position, if any) is to be stored.
 ''RETURNS:    True if successful, False otherwise.
 
-  Pin := StartPin                                                                                     
-  TotEnc := NumEnc                                                                                    
+  Pin := StartPin
+  TotEnc := NumEnc
   TotDelta := NumDelta
   Pos := PosAddr
   Stop
@@ -42,9 +42,9 @@ PUB ReadDelta(EncID): DeltaPos
 ''Read delta position (relative position value since last time read) of EncID.
 
   DeltaPos := 0 + -(EncID < TotDelta) * -long[Pos][TotEnc+EncID] + (long[Pos][TotEnc+EncID] := long[Pos][EncID])
-  
-    
- 
+
+
+
 '************************************
 '* Encoder Reading Assembly Routine *
 '************************************
@@ -60,26 +60,26 @@ DAT
 '             = 144 + 50*(TotEnc-1)
 
                         org     0
-                                                                                                
+
 Update                  test    Pin, #$20               wc      'Test for upper or lower port
                         muxc    :PinSrc, #%1                    'Adjust :PinSrc instruction for proper port
                         mov     IPosAddr, #IntPos               'Clear all internal encoder position values
                         movd    :IClear, IPosAddr               '  set starting internal pointer
-                        mov     Idx, TotEnc                     '  for all encoders...  
+                        mov     Idx, TotEnc                     '  for all encoders...
         :IClear         mov     0, #0                           '  clear internal memory
                         add     IPosAddr, #1                    '  increment pointer
-                        movd    :IClear, IPosAddr               
+                        movd    :IClear, IPosAddr
                         djnz    Idx, #:IClear                   '  loop for each encoder
-                                                                
+
                         mov     St2, ina                        'Take first sample of encoder pins
-                        shr     St2, Pin                
+                        shr     St2, Pin
 :Sample                 mov     IPosAddr, #IntPos               'Reset encoder position buffer addresses
-                        movd    :IPos+0, IPosAddr                               
+                        movd    :IPos+0, IPosAddr
                         movd    :IPos+1, IPosAddr
-                        mov     MPosAddr, PAR                           
+                        mov     MPosAddr, PAR
                         mov     St1, St2                        'Calc 2-bit signed offsets (St1 = B1:A1)
-                        mov     T1,  St2                        '                           T1  = B1:A1 
-                        shl     T1, #1                          '                           T1  = A1:x 
+                        mov     T1,  St2                        '                           T1  = B1:A1
+                        shl     T1, #1                          '                           T1  = A1:x
         :PinSrc         mov     St2, inb                        '  Sample encoders         (St2 = B2:A2 left shifted by first encoder offset)
                         shr     St2, Pin                        '  Adj for first encoder   (St2 = B2:A2)
                         xor     St1, St2                        '          St1  =              B1^B2:A1^A2
@@ -104,7 +104,7 @@ Update                  test    Pin, #$20               wc      'Test for upper 
                         add     IPosAddr, #1                    'Increment encoder position addresses
                         movd    :IPos+0, IPosAddr
                         movd    :IPos+1, IPosAddr
-                        add     MPosAddr, #4                            
+                        add     MPosAddr, #4
 :Next                   djnz    Idx, #:UpdatePos                'Loop for each encoder
                         jmp     #:Sample                        'Loop forever
 
@@ -140,7 +140,7 @@ Reads 1 to 16 two-bit gray-code quadrature encoders and provides 32-bit absolute
 Connect each encoder to two contiguous I/O pins (multiple encoders must be connected to a contiguous block of pins).  If delta position support is
 required, those encoders must be at the start of the group, followed by any encoders not requiring delta position support.
 
-To use this object: 
+To use this object:
   1) Create a position buffer (array of longs).  The position buffer MUST contain NumEnc + NumDelta longs.  The first NumEnc longs of the position buffer
      will always contain read-only, absolute positions for the respective encoders.  The remaining NumDelta longs of the position buffer will be "last
      absolute read" storage for providing delta position support (if used) and should be ignored (use ReadDelta() method instead).
@@ -152,7 +152,7 @@ To use this object:
      for this feature.
 
 Example Code:
-           
+
 OBJ
   Encoder : "input.quadrature"
 
@@ -162,7 +162,7 @@ VAR
 PUB Init
   Encoder.Start(8, 2, 1, @Pos)           'Start continuous two-encoder reader (encoders connected to pins 8 - 11)
 
-PUB Main 
+PUB Main
   repeat
     <read Pos[0] or Pos[1] here>         'Read each encoder's absolute position
     <variable> := Encoder.ReadDelta(0)   'Read 1st encoder's delta position (value since last read)
@@ -197,7 +197,7 @@ resulting 2-bit value gives more transition detail (00 or 11 if no transition, 0
 Columns 3 and 4 show the results of further XORs and one AND operation.  The result is a convenient set of 2-bit signed values: 0 if no transition, +1 if
 clockwise, and -1 and if counter-clockwise.
 
-This object's Update routine performs the sampling (column 1) and logical operations (colum 3) of up to 16 2-bit pairs in one operation, then adds the 
+This object's Update routine performs the sampling (column 1) and logical operations (colum 3) of up to 16 2-bit pairs in one operation, then adds the
 resulting offset (-1, 0 or +1) to each position counter, iteratively.
 
       1      |      2      |          3           |       4        |     5

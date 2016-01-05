@@ -2,10 +2,10 @@
 CON
     _clkmode = xtal1 + pll16x
     _xinfreq = 5_000_000
-    
+
     LCD_PIN   = 0
     LCD_BAUD  = 19_200
-    LCD_LINES = 4    
+    LCD_LINES = 4
 
 OBJ
 
@@ -13,7 +13,7 @@ OBJ
     num : "string.numbers"
 
 PUB Main | idx
-                                                
+
     if lcd.Start(LCD_PIN, LCD_BAUD, LCD_LINES)              ' start lcd
 
         lcd.SetCursor(0)                                    ' cursor off
@@ -24,15 +24,15 @@ PUB Main | idx
         lcd.Char(0)                                         ' display custom bullet character
         lcd.Str(string(" Dec", 13))
         lcd.Char(0)
-        lcd.Str(string(" Hex", 13)) 
+        lcd.Str(string(" Hex", 13))
         lcd.Char(0)
-        lcd.Str(string(" Bin"))     
-        
+        lcd.Str(string(" Bin"))
+
         repeat
             repeat idx from 0 to 255
                 UpdateLCD(idx)
                 waitcnt(clkfreq / 5 + cnt)                  ' pad with 1/5 sec
-            
+
             repeat idx from -255 to 0
                 UpdateLCD(idx)
                 waitcnt(clkfreq / 5 + cnt)

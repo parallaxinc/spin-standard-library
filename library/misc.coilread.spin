@@ -12,18 +12,18 @@
 CON
 
   CoilConstant = 85
-  
+
 VAR
 
    long cogon, cog
    long COILStack[24]
    long CoilTemp
    long CoilCalibrate
-  
+
 OBJ
 
    time : "system.clock"
-  
+
 PUB start(PingPin,CoilPin,ReadPin,COILAddress)
 
 '' Start COILREAD - starts a cog
@@ -39,7 +39,7 @@ PUB stop
 
   if cogon~
     cogstop(cog)
-    
+
 PUB COILREAD(PingPin,CoilPin,ReadPin,COILAddress)
        dira[ReadPin] := 0                                   'Make ReadPin an INPUT
        outa[PingPin] := 0                                   'Preset PingPin as a LOW
@@ -53,7 +53,7 @@ repeat
        CoilTemp := 100-(( CoilTemp * 100 ) / CoilCalibrate ) 'Value calculated is a percentage and
                                                             'should be temperature compensated.
        long [COILAddress] := CoilTemp                       'Update Coilvalue
-       
+
 PRI CoilCore(PingPin,ReadPin)
        dira[PingPin] := 1                                   'Make PingPin an OUTPUT
        outa[PingPin] := 1                                   'Make PingPin HIGH                          'Ping the COIL for 10uS'

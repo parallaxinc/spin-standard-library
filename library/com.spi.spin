@@ -22,7 +22,7 @@ VAR
     byte    _datapin
     byte    _clockpin
     byte    _inputmode
-    byte    _outputmode 
+    byte    _outputmode
 
 PUB Start(datapin, clockpin, inputmode, outputmode, delay, state) : okay
 {{
@@ -42,14 +42,14 @@ PUB Start(datapin, clockpin, inputmode, outputmode, delay, state) : okay
                                 ''     300ns + 14 * 50ns = 1000ns = 1us
 
          state := 1             '' 0 - Start Clock LOW
-                                '' 1 - Start Clock HIGH                                                         
+                                '' 1 - Start Clock HIGH
 }}
 
     Stop
 
     _datapin    := datapin
     _clockpin   := clockpin
-    _outputmode := outputmode 
+    _outputmode := outputmode
     _inputmode  := inputmode
 
     clockdelay := delay
@@ -83,7 +83,7 @@ PRI ShiftIn(dpin, cpin, mode, bits) | value, flag                  ''If SHIFTIN 
     flag := 1
     SetCommand(_SHIFTIN, @dpin)
     repeat until flag == 0
-    
+
     return value
 
 PRI SetCommand(cmd, argptr)
@@ -91,7 +91,7 @@ PRI SetCommand(cmd, argptr)
     command := cmd << 16 + argptr                       ''write command and pointer
     repeat while command                                ''wait for command to be cleared, signifying receipt
 
-DAT          
+DAT
               org
 
 loop          rdlong  t1,par          wz                ''wait for command
@@ -130,15 +130,15 @@ SHIFTOUT_                                               ''SHIFTOUT Entry
               muxz    outa,           t1                ''          PreSet DataPin LOW
               muxnz   dira,           t1                ''          Set DataPin to an OUTPUT
               mov     t2,             #1        wz      ''     Configure ClockPin
-              shl     t2,             arg1              ''          Set Mask             
+              shl     t2,             arg1              ''          Set Mask
               test    clockstate,     #1        wc      ''          Determine Starting state
     if_nc     muxz    outa,           t2                ''          PreSet ClockPin LOW
-    if_c      muxnz   outa,           t2                ''          PreSet ClockPin HIGH              
+    if_c      muxnz   outa,           t2                ''          PreSet ClockPin HIGH
               muxnz   dira,           t2                ''          Set ClockPin to an OUTPUT
               sub     _LSBFIRST,      arg2    wz,nr     ''     Detect LSBFIRST mode for SHIFTOUT
     if_z      jmp     #LSBFIRST_
               sub     _MSBFIRST,      arg2    wz,nr     ''     Detect MSBFIRST mode for SHIFTOUT
-    if_z      jmp     #MSBFIRST_             
+    if_z      jmp     #MSBFIRST_
               jmp     #loop                             ''     Go wait for next command
 '------------------------------------------------------------------------------------------------------------------------------
 
@@ -149,10 +149,10 @@ SHIFTIN_                                                ''SHIFTIN Entry
               shl     t1,             arg0
               muxz    dira,           t1                ''          Set DataPin to an INPUT
               mov     t2,             #1        wz      ''     Configure ClockPin
-              shl     t2,             arg1              ''          Set Mask             
+              shl     t2,             arg1              ''          Set Mask
               test    clockstate,     #1        wc      ''          Determine Starting state
     if_nc     muxz    outa,           t2                ''          PreSet ClockPin LOW
-    if_c      muxnz   outa,           t2                ''          PreSet ClockPin HIGH              
+    if_c      muxnz   outa,           t2                ''          PreSet ClockPin HIGH
               muxnz   dira,           t2                ''          Set ClockPin to an OUTPUT
               sub     _MSBPRE,        arg2    wz,nr     ''     Detect MSBPRE mode for SHIFTIN
     if_z      jmp     #MSBPRE_
@@ -163,18 +163,18 @@ SHIFTIN_                                                ''SHIFTIN Entry
               sub     _LSBPOST,       arg2    wz,nr     ''     Detect LSBPOST mode for SHIFTIN
     if_z      jmp     #LSBPOST_
               jmp     #loop                             ''     Go wait for next command
-         
-'------------------------------------------------------------------------------------------------------------------------------              
+
+'------------------------------------------------------------------------------------------------------------------------------
 MSBPRE_                                                 ''     Receive Data MSBPRE
 MSBPRE_Sin    test    t1,             ina     wc        ''          Read Data Bit into 'C' flag
               rcl     t3,             #1                ''          rotate "C" flag into return value
               call    #PreClock                         ''          Send clock pulse
               djnz    t4,             #MSBPRE_Sin       ''          Decrement t4 ; jump if not Zero
               jmp     #Update_SHIFTIN                   ''     Pass received data to SHIFTIN receive variable
-'------------------------------------------------------------------------------------------------------------------------------              
+'------------------------------------------------------------------------------------------------------------------------------
 'tested OK
 LSBPRE_                                                 ''     Receive Data LSBPRE
-              add     t4,             #1                
+              add     t4,             #1
 LSBPRE_Sin    test    t1,             ina       wc      ''          Read Data Bit into 'C' flag
               rcr     t3,             #1                ''          rotate "C" flag into return value
               call    #PreClock                         ''          Send clock pulse
@@ -221,7 +221,7 @@ MSBFIRST_                                               ''     Send Data MSBFIRS
               shl     t5,             arg3              ''          Shift "1" N number of bits to the left.
               shr     t5,             #1                ''          Shifting the number of bits left actually puts
                                                         ''          us one more place to the left than we want. To
-                                                        ''          compensate we'll shift one position right.              
+                                                        ''          compensate we'll shift one position right.
 MSB_Sout      test    t3,             t5      wc        ''          Test MSB of DataValue
               muxc    outa,           t1                ''          Set DataBit HIGH or LOW
               shr     t5,             #1                ''          Prepare for next DataBit
@@ -229,7 +229,7 @@ MSB_Sout      test    t3,             t5      wc        ''          Test MSB of 
               djnz    t4,             #MSB_Sout         ''          Decrement t4 ; jump if not Zero
               mov     t3,             #0      wz        ''          Force DataBit LOW
               muxnz   outa,           t1
-              
+
               jmp     #loop                             ''     Go wait for next command
 '------------------------------------------------------------------------------------------------------------------------------
 'tested OK
@@ -244,27 +244,27 @@ Update_SHIFTIN
 'tested OK
 PreClock
               mov     t2,             #0      nr        ''     Clock Pin
-              test    t2,             ina     wz        ''          Read ClockPin                                        
+              test    t2,             ina     wz        ''          Read ClockPin
               muxz    outa,           t2                ''          Set ClockPin to opposite  of read value
-              call    #ClkDly              
+              call    #ClkDly
               muxnz   outa,           t2                ''          Restore ClockPin to original read value
-              call    #ClkDly              
+              call    #ClkDly
 PreClock_ret  ret                                       ''          return
 '------------------------------------------------------------------------------------------------------------------------------
 'tested OK
 PostClock
               mov     t2,             #0      nr        ''     Clock Pin
               test    t2,             ina     wz        ''          Read ClockPin
-              call    #ClkDly                                                      
+              call    #ClkDly
               muxz    outa,           t2                ''          Set ClockPin to opposite  of read value
-              call    #ClkDly              
+              call    #ClkDly
               muxnz   outa,           t2                ''          Restore ClockPin to original read value
 PostClock_ret ret                                       ''          return
 '------------------------------------------------------------------------------------------------------------------------------
 'tested OK
 ClkDly
               mov       t6,     clockdelay
-ClkPause      djnz      t6,     #ClkPause                               
+ClkPause      djnz      t6,     #ClkPause
 ClkDly_ret    ret
 '------------------------------------------------------------------------------------------------------------------------------
 'tested OK
@@ -293,7 +293,7 @@ clockdelay              long    0
 clockstate              long    0
 
                                                         ''temp variables
-t1                      long    0                       ''     Used for DataPin mask     and     COG shutdown 
+t1                      long    0                       ''     Used for DataPin mask     and     COG shutdown
 t2                      long    0                       ''     Used for CLockPin mask    and     COG shutdown
 t3                      long    0                       ''     Used to hold DataValue SHIFTIN/SHIFTOUT
 t4                      long    0                       ''     Used to hold # of Bits

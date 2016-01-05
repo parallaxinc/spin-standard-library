@@ -35,14 +35,14 @@ PUB IsUpper(c)
 }}
 
     return lookdown(c: "A".."Z")
-    
+
 PUB IsSpace(c)
 {{
     Check if character is whitespace.
 }}
 
     return lookdown(c: " ", 9, 10, 13)
-    
+
 PUB ToUpper(c)
 {{
     Convert character to uppercase.

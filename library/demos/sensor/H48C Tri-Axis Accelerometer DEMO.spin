@@ -2,14 +2,14 @@
 *********************************************
 * H48C Tri-Axis Accelerometer VGA_DEMO V1.1 *
 * Author: Beau Schwabe                      *
-* Copyright (c) 2008 Parallax               *               
-* See end of file for terms of use.         *               
+* Copyright (c) 2008 Parallax               *
+* See end of file for terms of use.         *
 *********************************************
 
-Revision History: 
+Revision History:
 
 Version 1.0 - (Sept. 2006) - Initial release with a TV mode 3D-graphics cube
-Version 1.1 - (March 2008) - 3D-graphics cube removed  
+Version 1.1 - (March 2008) - 3D-graphics cube removed
                            - Basic VGA mode display used instead of TV
                            - Added 600nS padding delay around Clock rise and fall times
 }}
@@ -23,12 +23,12 @@ Version 1.1 - (March 2008) - 3D-graphics cube removed
    VSS ──│3  4│── Zero-G
            └──────────┘
 
-Note1: Zero-G output not used in this demo                          
+Note1: Zero-G output not used in this demo
 
 Note2: orientation
 
          Z   Y    
-         │  /    /   °/  reference mark on H48C Chip, not white dot on 6-Pin module 
+         │  /    /   °/  reference mark on H48C Chip, not white dot on 6-Pin module
          │ /    /    /
          │/     o   white reference mark on 6-Pin module indicating Pin #1
           ──── X
@@ -40,11 +40,11 @@ Note2: orientation
 
 
 Note3: The H48C should be powered with a 5V supply.  It has an internal regulator
-       that regulates the voltage down to 3.3V where Vref is set to 1/2 of the 3.3V 
+       that regulates the voltage down to 3.3V where Vref is set to 1/2 of the 3.3V
        In this object, the axis is already compensated with regard to Vref. Because
        of this, the formulas are slightly different (simplified) compared to what is
        stated in the online documentation.
- 
+
 G = ( axis / 4095 ) x ( 3.3 / 0.3663 )
 
         or
@@ -71,7 +71,7 @@ CON
 
         CS = 0
        DIO = 1
-       CLK = 2 
+       CLK = 2
 
 VAR
 
@@ -89,7 +89,7 @@ PUB DEMO_TEST
   'start and setup Accelerometer
   H48C.start(CS,DIO,CLK)
 
-  VGA.out($01)                              
+  VGA.out($01)
   VGA.str(string("H48C Tri-Axis Accelerometer"))
 
   VGA.str(string($A,4,$B,4))
@@ -113,10 +113,10 @@ PUB DEMO_TEST
      'vref := (H48C.vref*825)/1024   '<-- Here's how to get vref in mV
 
      vref := H48C.vref               '<-- Here's how to get vref in RAW
-          
+
 
 'Note: The returned value for X, Y, and Z is equal to the axis - Vref
-        x := H48C.x   '<-- Here's how to get x 
+        x := H48C.x   '<-- Here's how to get x
         y := H48C.y   '<-- Here's how to get y
         z := H48C.z   '<-- Here's how to get z
 
@@ -132,30 +132,30 @@ PUB DEMO_TEST
 
     VGA.str(string($A,11,$B,6))
     VGA.dec(X)
-    VGA.str(string("  "))  
+    VGA.str(string("  "))
     VGA.str(string($A,11,$B,7))
     VGA.dec(Y)
-    VGA.str(string("  "))  
+    VGA.str(string("  "))
     VGA.str(string($A,11,$B,8))
     VGA.dec(Z)
-    VGA.str(string("  "))  
+    VGA.str(string("  "))
 
     VGA.str(string($A,11,$B,10))
     VGA.dec(ThetaA)
-    VGA.str(string("  "))  
+    VGA.str(string("  "))
     VGA.str(string($A,11,$B,11))
     VGA.dec(ThetaB)
-    VGA.str(string("  "))  
+    VGA.str(string("  "))
     VGA.str(string($A,11,$B,12))
     VGA.dec(ThetaC)
     VGA.str(string("  "))
-      
+
 DAT
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │
@@ -167,4 +167,4 @@ DAT
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}                                            
+}}

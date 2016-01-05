@@ -9,18 +9,18 @@
 OBJ
   tv            : "display.tv"
   Inductor      : "sensor.inductive"
-     
+
 CON
   _clkmode = xtal1 + pll16x
 
   _xinfreq = 5_000_000
-  
+
   _stack = ($3000 + $3000 + 100) >> 2   'accomodate display memory and stack
 
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   display_base = $5000
 
 VAR
@@ -29,7 +29,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -61,13 +61,13 @@ PUB start | i,dx,dy
 
   'Start the inductor demo
   Inductor.demo
-  
+
 DAT
 
 tvparams                long    0               'status
                         long    1               'enable
                         'long   %011_0000       'pins      Old Board
-                        long     %001_0101      'pins      New Board  
+                        long     %001_0101      'pins      New Board
                         long    %0000           'mode
                         long    0               'screen
                         long    0               'colors
@@ -78,7 +78,7 @@ tvparams                long    0               'status
                         long    0               'ho
                         long    0               'vo
                         long    60_000_000      '_xinfreq<<4 'broadcast
-                        long    0               'auralcog        
+                        long    0               'auralcog
 
 DAT
 {{
@@ -97,4 +97,4 @@ DAT
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}    
+}}

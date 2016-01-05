@@ -1,9 +1,9 @@
 ' Authors: Jon Williams, Jeff Martin
 {{
     Driver for Parallax Serial LCDs (#27976, #27977, #27979)
-    
+
     ## Serial LCD Switch Settings for Baud rate
-    
+
         ┌─────────┐   ┌─────────┐   ┌─────────┐
         │   O N   │   │   O N   │   │   O N   │
         │ ┌──┬──┐ │   │ ┌──┬──┐ │   │ ┌──┬──┐ │
@@ -36,23 +36,23 @@ CON
   LCD_LINE3     = $BC                                   ' move to line 4, column 0
 
   #$F8, LCD_CC0, LCD_CC1, LCD_CC2, LCD_CC3
-  #$FC, LCD_CC4, LCD_CC5, LCD_CC6, LCD_CC7 
+  #$FC, LCD_CC4, LCD_CC5, LCD_CC6, LCD_CC7
 
 VAR
 
-  long  lcdLines, started 
+  long  lcdLines, started
 
 OBJ
 
   serial : "com.serial.terminal"
-  
+
 PUB Start(pin, baud, lines): okay
 
 '' Qualifies pin, baud, and lines input
 '' -- makes tx pin an output and sets up other values if valid
 
     started~                                              ' clear started flag
-    if lookdown(pin : 0..27)                              ' qualify tx pin 
+    if lookdown(pin : 0..27)                              ' qualify tx pin
         if lookdown(baud : 2400, 9600, 19200)               ' qualify baud rate setting
             if lookdown(lines : 2, 4)                         ' qualify lcd size (lines)
                 if serial.StartRxTx(-1, pin, 0, baud)                   ' tx pin only, true mode
@@ -61,13 +61,13 @@ PUB Start(pin, baud, lines): okay
 
     return started
 
-PUB Char(txByte) 
+PUB Char(txByte)
 {{
     Transmit a byte
 }}
 
     serial.Char(txByte)
-    
+
 PUB Str(strAddr)
 {{
     Transmit z-string at strAddr
@@ -82,9 +82,9 @@ PUB Clear
 
     if started
         Char(LCD_CLS)
-        waitcnt(clkfreq / 200 + cnt)                        ' 5 ms delay 
+        waitcnt(clkfreq / 200 + cnt)                        ' 5 ms delay
 
-PUB Home 
+PUB Home
 {{
     Moves cursor to 0, 0
 }}
@@ -101,11 +101,11 @@ PUB Position(x, y) | pos
         if lcdLines == 2                                    ' check lcd size
             if lookdown(y: 0..1)                          ' qualify y input
                 if lookdown(x : 0..15)                        ' qualify x input
-                    Char(LinePos[y] + x)                     ' move to target position       
+                    Char(LinePos[y] + x)                     ' move to target position
         else
             if lookdown(y : 0..3)
                 if lookdown(x : 0..19)
-                    Char(LinePos[y] + x)                                                  
+                    Char(LinePos[y] + x)
 
 PUB ClearLine(y)
 {{
@@ -115,25 +115,25 @@ PUB ClearLine(y)
     if started
         if lcdLines == 2                                    ' check lcd size
             if lookdown(y : 0..1)                          ' qualify line input
-                Char(LinePos[y])                             ' move to that line         
+                Char(LinePos[y])                             ' move to that line
                 repeat 16
                     Char(32)                                      ' clear line with spaces
-                Char(LinePos[y])                             ' return to start of line    
+                Char(LinePos[y])                             ' return to start of line
         else
             if lookdown(y : 0..3)
-                Char(LinePos[y])  
+                Char(LinePos[y])
                 repeat 20
                     Char(32)
-                Char(LinePos[y])                                                          
-  
+                Char(LinePos[y])
+
 
 PUB SetCursor(type)
 {{
     Selects cursor type
 
-    - 0 : cursor off, blink off  
-    - 1 : cursor off, blink on   
-    - 2 : cursor on, blink off  
+    - 0 : cursor off, blink off
+    - 1 : cursor off, blink on
+    - 2 : cursor on, blink off
     - 3 : cursor on, blink on
 }}
 
@@ -150,9 +150,9 @@ PUB EnableDisplay(enable)
 }}
     if started
         if enable
-            SetCursor(0)    
+            SetCursor(0)
         else
-            Char(LCD_OFF) 
+            Char(LCD_OFF)
 
 PUB Custom(bytechr, chrDataAddr)
 {{
@@ -173,15 +173,15 @@ PUB EnableBacklight(enable)
 }}
 
     if started
-        enable := enable <> 0                               ' promote non-zero to -1 
-        if enable 
+        enable := enable <> 0                               ' promote non-zero to -1
+        if enable
             Char(LCD_BL_ON)
         else
             Char(LCD_BL_OFF)
     else
         enable := false
-    
-    return enable 
+
+    return enable
 
 DAT
 

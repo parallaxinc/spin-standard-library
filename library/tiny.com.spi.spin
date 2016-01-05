@@ -1,4 +1,4 @@
-{{      
+{{
 ************************************************
 * Propeller SPI Engine  ... Spin Version  v1.0 *
 * Author: Beau Schwabe                         *
@@ -8,7 +8,7 @@
 
 Revision History:
          V1.0   - original program
-         
+
 }}
 CON
 
@@ -21,7 +21,7 @@ CON
 '' MSBPOST  - Most Significant Bit first ; data is valid after the clock
 '' LSBPOST  - Least Significant Bit first ; data is valid after the clock
 
-    
+
     #4,LSBFIRST,MSBFIRST                                '' Used for SHIFTOUT routines
 ''              
 ''       =4      =5
@@ -35,19 +35,19 @@ VAR     long          ClockDelay,ClockState
 PUB start(_ClockDelay, _ClockState)
     ClockState := _ClockState
     ClockDelay := ((clkfreq / 100000 * _ClockDelay) - 4296) #> 381
-        
+
 PUB SHIFTOUT(Dpin, Cpin, Mode, Bits, Value)
     dira[Dpin]~~                                         ' make Data pin output
     outa[Cpin] := ClockState                             ' set initial clock state
     dira[Cpin]~~                                         ' make Clock pin output
-                       
-    
+
+
 
     if Mode == 4                'LSBFIRST
        Value <-= 1                                       ' pre-align lsb
        repeat Bits
          outa[Dpin] := (Value ->= 1) & 1                 ' output data bit
-         PostClock(Cpin)         
+         PostClock(Cpin)
 
     if Mode == 5                'MSBFIRST
        Value <<= (32 - Bits)                             ' pre-align msb
@@ -61,15 +61,15 @@ PUB SHIFTIN(Dpin, Cpin, Mode, Bits)|Value
     outa[Cpin] := ClockState                              ' set initial clock state
     dira[Cpin]~~                                          ' make cpin output
 
-    
-    Value~                                               ' clear output 
+
+    Value~                                               ' clear output
 
 
     if Mode == 0                'MSBPRE
        repeat Bits
          value := (Value << 1) | ina[Dpin]
          PostClock(Cpin)
-          
+
     if Mode == 1                'LSBPRE
        repeat Bits +1
          Value := (Value >> 1) | (ina[Dpin] << 31)
@@ -80,11 +80,11 @@ PUB SHIFTIN(Dpin, Cpin, Mode, Bits)|Value
        repeat Bits
          PreClock(Cpin)
          Value := (Value << 1) | ina[Dpin]
- 
+
     if Mode == 3                'LSBPOST
       repeat Bits + 1
         PreClock(Cpin)
-        Value := (Value >> 1) | (ina[Dpin] << 31) 
+        Value := (Value >> 1) | (ina[Dpin] << 31)
       Value >>= (32 - Bits)
 
 
@@ -107,9 +107,9 @@ PUB PreClock(_Cpin)
 DAT
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

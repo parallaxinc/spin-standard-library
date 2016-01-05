@@ -1,8 +1,8 @@
 ''***************************************
 ''*  TV Driver v1.1                     *
 ''*  Author: Chip Gracey                *
-''*  Copyright (c) 2004 Parallax, Inc.  *               
-''*  See end of file for terms of use.  *               
+''*  Copyright (c) 2004 Parallax, Inc.  *
+''*  See end of file for terms of use.  *
 ''***************************************
 
 ' v1.0 - 01 May 2006 - original version
@@ -22,7 +22,7 @@ CON
 
   paramcount    = 14
   colortable    = $180          'start of colortable inside cog
-  
+
 
 VAR
 
@@ -126,7 +126,7 @@ field                   mov     x,vinv                  'do invisible back porch
 :skip                   djnz    vx,#:vert               'vertical expand?
                         ror     line,linerot            'set next line
                         add     line,lineadd    wc
-                        rol     line,linerot      
+                        rol     line,linerot
         if_nc           jmp     #:line
                         add     screen,hc2x             'point to first tile in next line
                         djnz    y,#:line                'another tile line?
@@ -177,7 +177,7 @@ blank_lines_ret         ret
 hsync                   test    _mode,#%0001    wc      'if pal, toggle phaseflip
         if_c            xor     phaseflip,phasemask
 
-                        mov     vscl,sync_scale1        'do hsync       
+                        mov     vscl,sync_scale1        'do hsync
                         mov     tile,phaseflip
                         xor     tile,burst
                         waitvid tile,sync_normal
@@ -507,20 +507,20 @@ _auralcog               res     1       '0-7            read-only
 ''  long  tv_enable     '0/non-0 = off/on                           write-only
 ''  long  tv_pins       '%pppmmmm = pin group, pin group mode       write-only
 ''  long  tv_mode       '%tccip = tile,chroma,interlace,ntsc/pal    write-only
-''  long  tv_screen     'pointer to screen (words)                  write-only      
-''  long  tv_colors     'pointer to colors (longs)                  write-only                            
-''  long  tv_ht         'horizontal tiles                           write-only                            
-''  long  tv_vt         'vertical tiles                             write-only                            
-''  long  tv_hx         'horizontal tile expansion                  write-only                            
-''  long  tv_vx         'vertical tile expansion                    write-only                            
-''  long  tv_ho         'horizontal offset                          write-only                            
-''  long  tv_vo         'vertical offset                            write-only                            
-''  long  tv_broadcast  'broadcast frequency (Hz)                   write-only                            
-''  long  tv_auralcog   'aural fm cog                               write-only                            
-''                                                                                              
-''The preceding VAR section may be copied into your code.        
-''After setting variables, do start(@tv_status) to start driver. 
-''                                                               
+''  long  tv_screen     'pointer to screen (words)                  write-only
+''  long  tv_colors     'pointer to colors (longs)                  write-only
+''  long  tv_ht         'horizontal tiles                           write-only
+''  long  tv_vt         'vertical tiles                             write-only
+''  long  tv_hx         'horizontal tile expansion                  write-only
+''  long  tv_vx         'vertical tile expansion                    write-only
+''  long  tv_ho         'horizontal offset                          write-only
+''  long  tv_vo         'vertical offset                            write-only
+''  long  tv_broadcast  'broadcast frequency (Hz)                   write-only
+''  long  tv_auralcog   'aural fm cog                               write-only
+''
+''The preceding VAR section may be copied into your code.
+''After setting variables, do start(@tv_status) to start driver.
+''
 ''All parameters are reloaded each superframe, allowing you to make live
 ''changes. To minimize flicker, correlate changes with tv_status.
 ''

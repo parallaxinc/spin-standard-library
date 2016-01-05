@@ -12,7 +12,7 @@ VAR
   long  positive_chr, decimal_chr, thousands_chr, thousandths_chr
   byte  float_string[20]
 
-  
+
 OBJ
 
   math : "tiny.math.float"
@@ -135,11 +135,11 @@ PUB FloatToScientific(Single) : StringPtr
 
   'do scientific notation
   DoScientific
-  
+
   'terminate z-string
   byte[p]~
 
-  
+
 PUB FloatToMetric(Single, SuffixChr) : StringPtr | x, y
 
 ''Convert floating-point number to metric string
@@ -200,11 +200,11 @@ PUB FloatToMetric(Single, SuffixChr) : StringPtr | x, y
   'if out of metric range, do scientific notation
   else
     DoScientific
-    
+
   'if SuffixChr not 0, add SuffixChr
   if SuffixChr
     byte[p++] := SuffixChr
-    
+
   'terminate z-string
   byte[p]~
 
@@ -222,7 +222,7 @@ PUB SetPrecision(NumberOfDigits)
 ''  SetPrecision(7)   "1.000000e+0"
 
   precision := NumberOfDigits
-  
+
 
 PUB SetPositiveChr(PositiveChr)
 
@@ -238,7 +238,7 @@ PUB SetPositiveChr(PositiveChr)
 ''  SetPositiveChr("+")   "+20.07"  "-20.07"
 
   positive_chr := PositiveChr
-  
+
 
 PUB SetDecimalChr(DecimalChr)
 
@@ -253,7 +253,7 @@ PUB SetDecimalChr(DecimalChr)
 ''  SetDecimalChr(",")   "20,49"
 
   decimal_chr := DecimalChr
-  
+
 
 PUB SetSeparatorChrs(ThousandsChr, ThousandthsChr)
 
@@ -276,7 +276,7 @@ PUB SetSeparatorChrs(ThousandsChr, ThousandthsChr)
 
   thousands_chr := ThousandsChr
   thousandths_chr := ThousandthsChr
-  
+
 
 PRI Setup(single) : stringptr
 
@@ -301,12 +301,12 @@ PRI Setup(single) : stringptr
 
     'not 0, estimate exponent
     exponent := ((single << 1 >> 24 - 127) * 77) ~> 8
-    
+
     'if very small, bias up
     if exponent < -32
       single := math.FMul(single, 1e13)
       exponent += result := 13
-      
+
     'determine exact exponent and integer
     repeat
       integer := math.FRound(math.FMul(single, tenf[exponent - digits + 1]))
@@ -396,7 +396,7 @@ PRI AddDecimal
     byte[p++] := decimal_chr
   else
     byte[p++] := "."
-                    
+
 
 DAT
         long                1e+38, 1e+37, 1e+36, 1e+35, 1e+34, 1e+33, 1e+32, 1e+31

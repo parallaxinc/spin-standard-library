@@ -42,7 +42,7 @@ CON
   ytiles = vp / 32
 
 ' H/V inactive states
-  
+
   hv_inactive = (hn << 1 + vn) * $0101
 
 
@@ -104,28 +104,28 @@ DAT
                         org                             'set origin to $000 for start of program
 
 ' Initialization code - init I/O
-                                                                                              
-init                    mov     dira,reg_dira           'set pin directions                   
-                        mov     dirb,reg_dirb                                                 
+
+init                    mov     dira,reg_dira           'set pin directions
+                        mov     dirb,reg_dirb
 
                         movi    ctra,#%00001_101        'enable PLL in ctra (VCO runs at 4x)
-                        movi    frqa,#(pr / 5) << 3     'set pixel rate                                      
+                        movi    frqa,#(pr / 5) << 3     'set pixel rate
 
                         mov     vcfg,reg_vcfg           'set video configuration
 
 ' Main loop, display field and do invisible sync lines
-                          
+
 field                   mov     color_ptr,color_base    'reset color pointer
                         mov     pixel_ptr,pixel_base    'reset pixel pointer
                         mov     y,#ytiles               'set y tiles
 :ytile                  mov     yl,#32                  'set y lines per tile
-:yline                  mov     yx,#2                   'set y expansion                          
+:yline                  mov     yx,#2                   'set y expansion
 :yexpand                mov     x,#xtiles               'set x tiles
                         mov     vscl,vscl_pixel         'set pixel vscl
 
 :xtile                  rdword  color,color_ptr         'get color word
                         and     color,colormask         'clear h/v bits
-                        or      color,hv                'set h/v inactive states             
+                        or      color,hv                'set h/v inactive states
                         rdlong  pixel,pixel_ptr         'get pixel long
                         waitvid color,pixel             'pass colors and pixels to video
                         add     color_ptr,#2            'point to next color word
@@ -139,16 +139,16 @@ field                   mov     color_ptr,color_base    'reset color pointer
                         call    #hsync
 
                         djnz    yx,#:yexpand            'y expand?
-                        
+
                         add     pixel_ptr,#xtiles * 4   'point to first pixels in next line
                         djnz    yl,#:yline              'another y line in same tile?
-                        
-                        add     color_ptr,#xtiles * 2   'point to first colors in next tile 
+
+                        add     color_ptr,#xtiles * 2   'point to first colors in next tile
                         djnz    y,#:ytile               'another y tile?
 
 
                         wrlong   colormask,par          'visible done, write non-0 to sync
-                        
+
                         mov     x,#vf                   'do vertical front porch lines
                         call    #blank
                         mov     x,#vs                   'do vertical sync lines
@@ -157,7 +157,7 @@ field                   mov     color_ptr,color_base    'reset color pointer
                         call    #vsync
 
                         jmp     #field                  'field done, loop
-                        
+
 
 ' Subroutine - do blank lines
 

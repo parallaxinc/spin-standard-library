@@ -13,7 +13,7 @@ CON
 
   paramcount    = 21
   colortable    = $180  'start of colortable inside cog
-  
+
 
 VAR
 
@@ -110,7 +110,7 @@ field                   wrlong  visible,par             'set status to visible
 :skip                   djnz    vx,#:vert               'vertical expand?
                         ror     line,linerot            'set next line
                         add     line,lineadd    wc
-                        rol     line,linerot                        
+                        rol     line,linerot
         if_nc           jmp     #:line
                         add     screen,hc2x             'point to first tile in next line
                         djnz    y,#:line        wc      'another tile line? (c=0)
@@ -406,7 +406,7 @@ _rate                   res     1       '500_000+       read-only
 ''  long  vga_pins      '%pppttt = pins                     write-only
 ''  long  vga_mode      '%tihv = tile,interlace,hpol,vpol   write-only
 ''  long  vga_screen    'pointer to screen (words)          write-only
-''  long  vga_colors    'pointer to colors (longs)          write-only            
+''  long  vga_colors    'pointer to colors (longs)          write-only
 ''  long  vga_ht        'horizontal tiles                   write-only
 ''  long  vga_vt        'vertical tiles                     write-only
 ''  long  vga_hx        'horizontal tile expansion          write-only

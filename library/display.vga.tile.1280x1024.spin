@@ -7,7 +7,7 @@
 │ three cogs (or four with optional cursor enabled) and at least 80 MHz.                                         │
 │                                                                                                                │
 └────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                        
+
 }}
 CON
 
@@ -34,7 +34,7 @@ CON
 VAR
 
   long cog[4]
-  
+
   long dira_                    '9 contiguous longs
   long dirb_
   long vcfg_
@@ -43,38 +43,38 @@ VAR
   long color_ptr_
   long cursor_ptr_
   long sync_ptr_
-  long mode_ 
-  
+  long mode_
+
 
 PUB start(base_pin, array_ptr, color_ptr, cursor_ptr, sync_ptr, mode) : okay | i, j
 
 '' Start driver - starts two or three cogs
 '' returns false if cogs not available
-'' 
+''
 ''     base_pin = First of eight VGA pins, must be a multiple of eight (0, 8, 16, 24, etc):
-''                                           
-''                    240Ω               240Ω                 240Ω                240Ω                  
-''                +7 ───┳─ Red   +5 ───┳─ Green   +3 ───┳─ Blue   +1 ── H        
-''                    470Ω │             470Ω │               470Ω │              240Ω                  
-''                +6 ───┘         +4 ───┘           +2 ───┘          +0 ── V         
-''  
+''
+''                    240Ω               240Ω                 240Ω                240Ω
+''                +7 ───┳─ Red   +5 ───┳─ Green   +3 ───┳─ Blue   +1 ── H
+''                    470Ω │             470Ω │               470Ω │              240Ω
+''                +6 ───┘         +4 ───┘           +2 ───┘          +0 ── V
+''
 ''    array_ptr = Pointer to 5,120 long-aligned words, organized as 80 across by 64 down,
 ''                which will serve as the tile array. Each word specifies a tile bitmap and
 ''                a color palette for its tile area. The bottom 10 bits of each word hold
 ''                the base address of a 16-long tile bitmap, while the top 6 bits select a
 ''                color palette for the bitmap. For example, $B2E5 would specify the tile
 ''                bitmap spanning $B940..$B97F ($2E5<<6) and color palette $2C ($B2E5>>10).
-''  
+''
 ''    color_ptr = Pointer to 64 longs which will define the 64 color palettes. The RGB data
 ''                in each long is arranged as %%RGBx_RGBx_RGBx_RGBx with the sub-bytes 3..0
 ''                providing the color data for pixel values %11..%00, respectively:
-''  
+''
 ''                %%3330_0110_0020_3300: %11=white, %10=dark cyan, %01=blue, %00=gold
-''  
+''
 ''   cursor_ptr = Pointer to 4 longs which will control the cursor, or 0 to disable the
 ''                cursor. If a pointer is given, an extra cog will be started to generate
 ''                the cursor overlay. Here are the 4 longs that control the cursor:
-'' 
+''
 ''                cursor_x      - X position of cursor: ..0..1279.. (left to right)
 ''                cursor_y      - Y position of cursor: ..0..1023.. (bottom to top)
 ''
@@ -90,12 +90,12 @@ PUB start(base_pin, array_ptr, color_ptr, cursor_ptr, sync_ptr, mode) : okay | i
 ''     sync_ptr = Pointer to a long which will be set to -1 after each refresh, or 0 to
 ''                disable this function. This is useful in advanced applications where
 ''                awareness of display timing is important.
-''  
+''
 ''         mode = 0 for normal 16x16 pixel tiles or 1 for taller 16x32 pixel tiles. Mode 1
 ''                is useful for displaying the internal font while requiring half the array
 ''                memory; however, the 3-D bevel characters will not be usable because of
 ''                the larger vertical tile granularity of this mode.
-                                                                                                   
+
   'If driver is already running, stop it
   stop
 
@@ -136,7 +136,7 @@ PUB stop | i
   'If already running, stop any VGA cogs
   repeat i from 0 to 3
     if cog[i]
-      cogstop(cog[i]~ - 1)              
+      cogstop(cog[i]~ - 1)
 
 
 DAT
@@ -149,8 +149,8 @@ DAT
 
 ' Move field loop into position
 
-entry                   mov     $1EF,$1EF - field + field_begin                                    
-                        sub     entry,d0s0_             '(reverse move to avoid overwrite)             
+entry                   mov     $1EF,$1EF - field + field_begin
+                        sub     entry,d0s0_             '(reverse move to avoid overwrite)
                         djnz    regs,#entry
 
 ' Build line display code
@@ -182,21 +182,21 @@ entry                   mov     $1EF,$1EF - field + field_begin
                                                         'adjust      cog index
                         test    regs,#%10       wc      'settings    0   1   2
                         test    regs,#%01       wz      '---------------------
-        if_nc           add     build,#1                'build      +1  +1  +0                    
-        if_nc_and_z     add     vf_lines,#2                                                           
-        if_c_and_z      add     vf_lines,#4             'vf_lines   +2  +0  +4                                                    
-        if_nc_and_z     sub     vb_lines,#4                                                                                          
-        if_nc_and_nz    sub     vb_lines,#2             'vb_lines   -4  -2  -0                                                    
-        if_nc_and_nz    movs    start_line,#2 * 4                                        
+        if_nc           add     build,#1                'build      +1  +1  +0
+        if_nc_and_z     add     vf_lines,#2
+        if_c_and_z      add     vf_lines,#4             'vf_lines   +2  +0  +4
+        if_nc_and_z     sub     vb_lines,#4
+        if_nc_and_nz    sub     vb_lines,#2             'vb_lines   -4  -2  -0
+        if_nc_and_nz    movs    start_line,#2 * 4
         if_c_and_z      movs    start_line,#4 * 4       'start_line +0  +2  +4
-        
-        if_c_or_z       mov     snop,#0                 'sync        N   Y   N                   
+
+        if_c_or_z       mov     snop,#0                 'sync        N   Y   N
 
                         mov     regs,vscl               'save cursor pointer
-                                                                                
+
 ' Synchronize all cogs' video circuits so that waitvid's will be pixel-locked
-                                                                                              
-                        movi    frqa,#(pr / 5) << 1     'set pixel rate (VCO runs at 1x)                     
+
+                        movi    frqa,#(pr / 5) << 1     'set pixel rate (VCO runs at 1x)
                         mov     vscl,#1                 'set video shifter to reload on every pixel
                         waitcnt cnt,d8_d4               'wait for sync count, add ~3ms - cogs locked!
                         movi    ctra,#%00001_111        'enable PLLs now - NCOs locked!
@@ -223,7 +223,7 @@ cursor                  mov     par,#vf + vs + vb - 5
 ' Do two lines minus horizontal back porch pixels to buy a big block of time
 
                         mov     vscl,vscl_two_lines_mhb
-                        waitvid ccolor,#0   
+                        waitvid ccolor,#0
 
 ' Get cursor data
 
@@ -244,19 +244,19 @@ cursor                  mov     par,#vf + vs + vb - 5
                         mov     par,#32                 'ready for 32 cursor segments
                         movd    :pix,#cpix
                         mov     cnt,cshape
-                        
+
 :pixloop                cmp     cnt,#1          wc, wz  'arrow, crosshair, or custom cursor?
         if_a            jmp     #:custom
         if_e            jmp     #:crosshair
-        
+
                         cmp     par,#32         wz      'arrow
-                        cmp     par,#32-21      wc      
+                        cmp     par,#32-21      wc
         if_z            mov     cseg,h80000000
         if_nz_and_nc    sar     cseg,#1
         if_nz_and_c     shl     cseg,#2
                         mov     coff,#0
                         jmp     #:pix
-                        
+
 :crosshair              cmp     par,#32-15      wz      'crosshair
         if_ne           mov     cseg,h00010000
         if_e            neg     cseg,#2
@@ -264,14 +264,14 @@ cursor                  mov     par,#vf + vs + vb - 5
         if_e            mov     cseg,#0
                         mov     coff,h00000F0F
                         jmp     #:pix
-                        
+
 :custom                 rdlong  cseg,cshape             'custom
                         add     cshape,#4
                         rdlong  coff,cshape
-                        
+
 :pix                    mov     cpix,cseg               'save segment into pixels
                         add     :pix,d0
-                        
+
                         djnz    par,#:pixloop           'another segment?
 
 ' Compute cursor position
@@ -287,11 +287,11 @@ cursor                  mov     par,#vf + vs + vb - 5
         if_nc           cmps    pixels_m1,cx    wc
         if_c            neg     cy,#1
 
-                        mov     cshr,#0                 'adjust for left-edge clipping               
+                        mov     cshr,#0                 'adjust for left-edge clipping
                         cmps    cx,#0           wc
         if_c            neg     cshr,cx
         if_c            mov     cx,#0
-        
+
                         mov     cshl,#0                 'adjust for right-edge clipping
                         cmpsub  cx,pixels_m32   wc
         if_c            mov     cshl,cx
@@ -316,10 +316,10 @@ cursor                  mov     par,#vf + vs + vb - 5
 
                         mov     vscl,cx                 'do left blank pixels (hb+cx)
                         waitvid ccolor,#0
-                        
+
                         mov     vscl,vscl_cursor        'do cursor pixels (32)
                         waitvid ccolor,cseg
-                        
+
                         mov     vscl,vscl_line_m32      'do right blank pixels (hp+hf+hs-32-cx)
                         sub     vscl,cx
                         waitvid ccolor,#0
@@ -346,7 +346,7 @@ lines_m1                long    vp - 1                  'visible scan lines minu
 pixels_m1               long    hp - 1                  'visible pixels minus 1
 pixels_m32              long    hp - 32                 'visible pixels minus 32
 neg31                   long    -31
-                    
+
 h80000000               long    $80000000               'arrow/crosshair cursor data
 h00010000               long    $00010000
 h00000F0F               long    $00000F0F
@@ -397,15 +397,15 @@ linecode_sc             sumc    linecode,#xtiles        '(winds up as 'sumc fiel
 linecode_wv             waitvid palettes,pixels0
 
 ' Each cog alternately builds and displays two scan lines
-                          
+
 build                   mov     cnt,#vp / 6             'ready number of two-scan-line builds/displays
 start_line              mov     tile_line,#0            'ready starting tile line (adjusted)
-                        
+
 ' Build two scan lines during four scan lines
 
-build_2y                movd    col,#linecode           'reset pointers for scan line buffers 
-                        movd    pix0,#pixels0          
-                        movd    pix1,#pixels1          
+build_2y                movd    col,#linecode           'reset pointers for scan line buffers
+                        movd    pix0,#pixels0
+                        movd    pix1,#pixels1
 
                         mov     ina,#2                  'two scan lines require two waitvid's
 
@@ -415,21 +415,21 @@ build_40x               mov     vscl,vscl_two_lines     'output lows for two sca
                         mov     inb,#xtiles / 2         'build four scan lines for half a row
 
 build_1x                rdword  vscl,ctrb               'get word from the tile array
-                        add     ctrb,#2                  
+                        add     ctrb,#2
                         ror     vscl,#10                'get color bits
 col                     movd    linecode,vscl
                         add     col,d1
                         shr     vscl,#16                'get tile line address
-                        add     vscl,tile_line                                   
+                        add     vscl,tile_line
 pix0                    rdlong  pixels0,vscl            'get line +0 tile pixels
-                        add     pix0,d0                                  
-                        add     vscl,#4                                  
-pix1                    rdlong  pixels1,vscl            'get line +1 tile pixels                 
-                        add     pix1,d0                                  
+                        add     pix0,d0
+                        add     vscl,#4
+pix1                    rdlong  pixels1,vscl            'get line +1 tile pixels
+                        add     pix1,d0
                         djnz    inb,#build_1x           'loop for next tile (16 inst/loop)
 
                         djnz    ina,#build_40x          'if first half done, loop for 2nd waitvid
-                        
+
                         sub     ctrb,#xtiles * 2        'back up to start of same row
 
 ' Display two scan lines
@@ -443,14 +443,14 @@ display                 test    inb,#1          wc
 linecode_ret            djnz    inb,#display            'another scan line?
 
 ' Another two scan lines?
-                             
+
                         add     tile_line,#6 * 4        'advance six scan lines within tile row
 tile_bytes              cmpsub  tile_line,#16 * 4 wc    'tile row done? (# doubled for mode 1)
         if_c            add     ctrb,#xtiles * 2        'if done, advance array pointer to next row
 
                         djnz    cnt,#build_2y           'another two scan lines?
 
-                        sub     ctrb,array_bytes        'display done, reset array pointer to top row                  
+                        sub     ctrb,array_bytes        'display done, reset array pointer to top row
 
 ' Visible section done, handle sync indicator
 
@@ -458,7 +458,7 @@ tile_bytes              cmpsub  tile_line,#16 * 4 wc    'tile row done? (# doubl
 snop    if_nz           wrlong  neg1,phsb               'if so, write -1 to sync indicator (change to nop unless #3)
 
 ' Do vertical sync lines and loop
-                        
+
 vf_lines                mov     ina,#vf                 'do vertical front porch lines (adjusted +4|+2|+0)
                         call    #blank
 
@@ -486,15 +486,15 @@ hsync                   mov     vscl,#hs                'do horizontal sync pixe
 :palette                mov     palettes,vscl
                         add     :palette,d0
                         add     frqb,#4
-                        add     par,count_64    wc      
+                        add     par,count_64    wc
         if_c            movd    :palette,#palettes
         if_c            sub     frqb,#64 * 4
 
                         mov     vscl,#hb                'do horizontal back porch pixels
                         waitvid hv_sync,#0
-                        
+
                         djnz    ina,#blank              'another blank line?
-hsync_ret           
+hsync_ret
 blank_ret
 blank_vsync_ret         ret
 

@@ -26,7 +26,7 @@ asm_entry     mov       dira,#1<<SDF                    'make SDF pin an output
               mov       asm_c,cnt                       'prepare for WAITCNT loop
               add       asm_c,asm_cycles
 
-              
+
 :loop         waitcnt   asm_c,asm_cycles                'wait for next CNT value
                                                         '(timing is determinant after WAITCNT)
 
@@ -35,14 +35,14 @@ asm_entry     mov       dira,#1<<SDF                    'make SDF pin an output
               mov       asm_sample,asm_new              'compute sample from 'new' - 'old'
               sub       asm_sample,asm_old
               mov       asm_old,asm_new
-              
-              wrlong    asm_sample,par                  'write sample back to Spin variable "sample" 
+
+              wrlong    asm_sample,par                  'write sample back to Spin variable "sample"
                                                         '(WRLONG introduces timing indeterminancy here..)
                                                         '(..since it must sync to the HUB)
-                                                        
+
               jmp       #:loop                          'wait for next sample
 
-              
+
 
 asm_cycles    long      $FFFF                           '(use $FFFF for 16-bit, $FFF for 12-bit, or $FF for 8-bit)
 

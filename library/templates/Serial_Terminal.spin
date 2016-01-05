@@ -2,9 +2,9 @@
 {{
     Template for Parallax Serial Terminal test applications; use this to quickly get started with a Propeller chip
     running at 80 MHz and the Parallax Serial Terminal software (included with the Propeller Tool).
-    
+
     How to use:
-    
+
      - In the Propeller Tool software, press the F7 key to determine the COM port of the connected Propeller chip.
 
      - Run the Parallax Serial Terminal (included with the Propeller Tool) and set it to the same COM Port with a
@@ -27,9 +27,9 @@ OBJ
 PUB Main | value
 
   term.Start(115200)                                                             ' Start the Parallax Serial Terminal cog
-    
+
 ''---------------- Replace the code below with your test code ----------------
-  
+
   term.Str(String("Convert Decimal to Hexadecimal..."))                          ' Heading
   repeat                                                                        ' Main loop
     term.Str(String("Enter decimal value: "))                                    ' Prompt user to enter value

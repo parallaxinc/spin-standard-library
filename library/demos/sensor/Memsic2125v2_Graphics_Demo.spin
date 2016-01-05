@@ -1,21 +1,21 @@
 ''***************************************
 ''*  Memsic 2125 Accelerometer DEMO     *
 ''*  Author: Beau Schwabe               *
-''*  Copyright (c) 2009 Parallax, Inc.  *               
-''*  See end of file for terms of use.  *               
+''*  Copyright (c) 2009 Parallax, Inc.  *
+''*  See end of file for terms of use.  *
 ''***************************************
 
 
 CON
 
   _clkmode = xtal1 + pll16x
-  _xinfreq = 5_000_000  
+  _xinfreq = 5_000_000
   _stack = ($3000 + $3000 + 100) >> 2   'accomodate display memory and stack
 
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   bitmap_base = $2000
   display_base = $5000
 
@@ -34,7 +34,7 @@ Yout ──│2 │ /\ │ 5│── Xout
  VSS ──│3 └────┘ 4│── VSS
          └──────────┘
 
-}  
+}
 
 VAR
 
@@ -43,7 +43,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -88,7 +88,7 @@ PUB start | i, dx, dy, clk_scale,d,e,f,fdeg,Offset,Bar,dx1,dy1,dx2,dy2,cordlengt
 '-------------------------------------------------------------------------------------------+
 
   MM2125.start(MMx, MMy)      '' Initialize Mx2125
-  waitcnt(clkfreq/10 + cnt)   'wait for things to settle 
+  waitcnt(clkfreq/10 + cnt)   'wait for things to settle
   MM2125.setlevel             'assume at startup that the memsic2125 is level
                                 'Note: This line is important for determining a deg
 
@@ -103,18 +103,18 @@ PUB start | i, dx, dy, clk_scale,d,e,f,fdeg,Offset,Bar,dx1,dy1,dx2,dy2,cordlengt
     gr.clear
 
     d := MM2125.theta         'Get raw 32-bit deg
-    d := d >> 19              'Convert 32-bit angle into a 13-Bit angle  
+    d := d >> 19              'Convert 32-bit angle into a 13-Bit angle
 
     f := 180- MM2125.MxTilt   'Get xTilt Deg
     fdeg := MM2125.MxTilt     'preserve Deg value
     f := (f *1024)/45         'Convert Deg to 13-Bit Angle
 
     e := 180- MM2125.MyTilt   'Get yTilt Deg
-    e := (e *1024)/45         'Convert Deg to 13-Bit Angle    
+    e := (e *1024)/45         'Convert Deg to 13-Bit Angle
 
 
 
-    
+
 
     gr.color(2)
 '-----------------------------------------------------------------------------------------
@@ -122,13 +122,13 @@ PUB start | i, dx, dy, clk_scale,d,e,f,fdeg,Offset,Bar,dx1,dy1,dx2,dy2,cordlengt
 '-----------------------------------------------------------------------------------------
     Offset := -fdeg                                     ''Draw Horizon and Ticks
     repeat i from -180+Offset to 180+Offset
-      if (i-Offset) // 5 == 0                           
+      if (i-Offset) // 5 == 0
          if i => -size and i =< size
             dx := (sin(-e+4096)*i)/65535
             dy := (cos(-e+4096)*i)/65535
 
             if i == offset                              'Draw moving Horizon
-               cordlength := ^^((Size*Size)-(fDeg*fDeg))                
+               cordlength := ^^((Size*Size)-(fDeg*fDeg))
                dx1 := dx+ (sin(-e+2048)*cordlength)/65535
                dy1 := dy+ (cos(-e+2048)*cordlength)/65535
                dx2 := dx+ (sin(-e-2048)*cordlength)/65535
@@ -137,9 +137,9 @@ PUB start | i, dx, dy, clk_scale,d,e,f,fdeg,Offset,Bar,dx1,dy1,dx2,dy2,cordlengt
                gr.line(dx2,dy2)
 
                gr.text(dx,dy,string("0 "))
-            else                                        'Draw Horizon Ticks...   
+            else                                        'Draw Horizon Ticks...
                If (i-Offset) // 5 == 0                  '...small every 5 Deg
-                  Bar := 3                              
+                  Bar := 3
                If (i-Offset) // 45 == 0                 '...large every 45 deg...
                   Bar := 10
                   if i-Offset == -180
@@ -158,14 +158,14 @@ PUB start | i, dx, dy, clk_scale,d,e,f,fdeg,Offset,Bar,dx1,dy1,dx2,dy2,cordlengt
                      gr.text(dx,dy,string("135 "))
                   if i-Offset == 180
                      gr.text(dx,dy,string("180 "))
-                     
+
                dx1 := dx+ (sin(-e+2048)*Bar)/65535
                dy1 := dy+ (cos(-e+2048)*Bar)/65535
                dx2 := dx+ (sin(-e-2048)*Bar)/65535
                dy2 := dy+ (cos(-e-2048)*Bar)/65535
                gr.plot(dx1,dy1)
                gr.line(dx2,dy2)
-               
+
             dx := (sin(-e+4096){*i})/65535              'Draw fixed Horizon
             dy := (cos(-e+4096){*i})/65535
             dx1 := dx+ (sin(-e+2048)* size)/65535
@@ -209,18 +209,18 @@ PUB start | i, dx, dy, clk_scale,d,e,f,fdeg,Offset,Bar,dx1,dy1,dx2,dy2,cordlengt
             gr.text(dx1,dy1,string("270"))
          if i == 7168
             gr.text(dx1,dy1,string("315"))
-            
-         gr.arc(0,0,((size * 75)/90),((size * 75)/90),i,0,1,0)                      'Draw fixed Rotational Ticks         
+
+         gr.arc(0,0,((size * 75)/90),((size * 75)/90),i,0,1,0)                      'Draw fixed Rotational Ticks
       else
          gr.arc(0,0,((size * 85)/90),((size * 85)/90),i,0,1,0)
-      gr.arc(0,0,size,size,i,0,1,1)   
-    gr.color(2)                       
-                             
+      gr.arc(0,0,size,size,i,0,1,1)
+    gr.color(2)
+
 
     'copy bitmap to display
     gr.copy(display_base)
 
-    
+
 pub cos(angle) : x
 
 '' Get cosine of angle (0-8191)
@@ -246,7 +246,7 @@ tvparams                long    0               'status
 
                         long    %001_0101       'pins   New Demo Board
 '                        long    %011_0000       'pins   Old Demo Board
-                        
+
                         long    %0000           'mode
                         long    0               'screen
                         long    0               'colors
@@ -265,9 +265,9 @@ pchip                   byte    "Propeller",0           'text
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

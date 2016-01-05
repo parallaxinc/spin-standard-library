@@ -59,7 +59,7 @@ PUB IsUpper(stringptr)
             return false
 
     return true
-    
+
 PUB IsSpace(stringptr)
 {{
     Check if character is whitespace.

@@ -8,14 +8,14 @@
 }}
 
 CON
-  
+
 VAR
 
    long cogon, cog
    long RCStack[16]
    long RCTemp
    long Mode
-  
+
 PUB start(Pin,State,RCValueAddress)
 
 '' Start RCTIME - starts a cog
@@ -33,11 +33,11 @@ PUB stop
 
   if cogon~
     cogstop(cog)
-    
+
 PUB RCTIME(Pin,State,RCValueAddress)
     repeat
            outa[Pin] := State                   'make I/O an output in the State you wish to measure... and then charge cap
-           dira[Pin] := 1                               
+           dira[Pin] := 1
            Pause1ms(1)                          'pause for 1mS to charge cap
            dira[Pin] := 0                       'make I/O an input
            RCTemp := cnt                        'grab clock tick counter value
@@ -46,13 +46,13 @@ PUB RCTIME(Pin,State,RCValueAddress)
            RCTemp := RCTemp - 1600              'offset adjustment (entry and exit clock cycles Note: this can vary slightly with code changes)
            RCTemp := RCTemp >> 4                'scale result (divide by 16) <<-number of clock cycles per itteration loop
            long [RCValueAddress] := RCTemp      'Write RCTemp to RCValue
-           
+
            if Mode == 0                         'Check for forground (0) or background (1) mode of operation; forground = no seperate cog / background = seperate running cog
               quit
 
-PUB Pause1ms(Period)|ClkCycles 
+PUB Pause1ms(Period)|ClkCycles
 {{Pause execution for Period (in units of 1 ms).}}
 
   ClkCycles := ((clkfreq / 1000 * Period) - 4296) #> 381     'Calculate 1 ms time unit
-  waitcnt(ClkCycles + cnt)                                   'Wait for designated time              
+  waitcnt(ClkCycles + cnt)                                   'Wait for designated time
 

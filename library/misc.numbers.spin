@@ -16,7 +16,7 @@ VAR
   byte  Symbols[7]              'Special symbols (7 characters)
   byte  StrBuf[49]              'Internal String Buffer
 
-PUB Init 
+PUB Init
 ''Initialize to default settings.  Init MUST be called before first object use.
 ''  ┌──────────────────────────────────────────────────┐
 ''  │             DEFAULT SPECIAL SYMBOLS              │
@@ -31,14 +31,14 @@ PUB Init
 ''  └─────┴──────┴─────────────────────────────────────┘
   Config(@DefaultSymbols)
 
-  
+
 PUB Config(SymAddr)
 {{Configure for custom symbols.
   PARAMETERS: SymAddr = Address of a string of characters (7 or less) to be used as Special Symbols (indexed from 1 to 7).  New symbols can be added or
               existing symbols can be modified based on regional customs.  Note:  The first four symbols must always be the logical: 1) digit group separator
               (default is ','), 2) general separator (default is '_'), 3) hexadecimal base indicator (default is '$'), and 4) binary base indicator
-              (default is '%').}}  
-  bytemove(@Symbols, SymAddr, 7)        
+              (default is '%').}}
+  bytemove(@Symbols, SymAddr, 7)
 
 
 PUB ToStr(Num, Format): StrAddr
@@ -48,7 +48,7 @@ PUB ToStr(Num, Format): StrAddr
   RETURNS:    Actual length of output string, not including null terminator.}}
   BCXToText(Format >> 19 & 7, Format >> 13 & $3F, Format >> 12 & 1, Format >> 11 & 1, Format >> 5 & $3F, BinToBCX(Num, Format & $1F #> 2 <# 16))
   StrAddr := @StrBuf
-  
+
 
 PUB FromStr(StrAddr, Format): Num | Idx, N, Val, Char, Base, GChar, IChar, Field
 ''Convert z-string (at StrAddr) to long Num using Format.
@@ -71,7 +71,7 @@ PUB FromStr(StrAddr, Format): Num | Idx, N, Val, Char, Base, GChar, IChar, Field
         N := Char == "-"                                                                                'Update N flag if not indicator
     Idx++
   Field += Val                                                                                          'Subract indicator character from remaining field size
-  repeat while (Field--) and (Char := byte[StrAddr][Idx++]) and ((Val := InBaseRange(Char, Base)) > 0 or (GChar and (Char == GChar)))           
+  repeat while (Field--) and (Char := byte[StrAddr][Idx++]) and ((Val := InBaseRange(Char, Base)) > 0 or (GChar and (Char == GChar)))
     if Val                                                                                              'While not null and valid digit or grouping char
       Num := Num * Base + --Val                                                                         'Accumulate if valid digit
   if N
@@ -88,7 +88,7 @@ PRI BinToBCX(Num, Base): Digits | N
   while Num /= Base
   BCX3 |= N                                                                                             'If negative, set flag (highest digit of BCX Workspace)
 
-  
+
 PRI BCXToText(IChar, Group, ShowPlus, SPad, Field, Digits): Size | Idx, GCnt, SChar, GChar, X
 'Convert BCX Buffer contents to z-string at StrBuf.
 'IChar..Field each correspond to elements of Format.  See "FORMAT SYNTAX" for more information.
@@ -144,7 +144,7 @@ DAT
 ''   * allows fixed widths (1 to 49 characters); left padded with either zeros (left justified) or spaces (right justified)
 ''   * can show plus sign for values > 0
 ''   * allows digit grouping (each 2 to 8 characters) with customizable separators; ex: 1000000 becomes 1,000,000 and 7AB14B9C becomes 7AB1_4B9C
-''   * allows base indicator character (inserted right after sign) with customizable characters; ex: 7AB1 becomes $7AB1 and -1011 becomes -%1011 
+''   * allows base indicator character (inserted right after sign) with customizable characters; ex: 7AB1 becomes $7AB1 and -1011 becomes -%1011
 ''   * all special symbols can be customized
 ''
 ''
@@ -302,7 +302,7 @@ DAT
 ''│                                         32-Bit Statistics for Bases 2 to 16                                        │
 ''├──────┬────────────┬────────────────────────────────────────────────────────────────────────────┬───────────────────┤
 ''│ Base │ Max Digits │                                Range (Signed)                              │   Range Is Shown  │
-''│      │ w/o symbols│               Minimum                │               Maximum               │     Grouped By    │ 
+''│      │ w/o symbols│               Minimum                │               Maximum               │     Grouped By    │
 ''├──────┼────────────┼──────────────────────────────────────┼─────────────────────────────────────┼───────────────────┤
 ''│   2  │     32     │ -10000000_00000000_00000000_00000000 │ +1111111_11111111_11111111_11111111 │    Bytes (exact)  │
 ''├──────┼────────────┼──────────────────────────────────────┼─────────────────────────────────────┼───────────────────┤
@@ -387,7 +387,7 @@ CON
   CHAR44   =  %000_000_000_0_0_101100_00000
   CHAR45   =  %000_000_000_0_0_101101_00000
   CHAR46   =  %000_000_000_0_0_101110_00000
-  CHAR47   =  %000_000_000_0_0_101111_00000 
+  CHAR47   =  %000_000_000_0_0_101111_00000
   CHAR48   =  %000_000_000_0_0_110000_00000
   CHAR49   =  %000_000_000_0_0_110001_00000
 
@@ -761,7 +761,7 @@ CON
   IDBIN38  =  DBIN38+BINCHAR
   IDBIN39  =  DBIN39+BINCHAR
   IDBIN40  =  DBIN40+BINCHAR
-  IDBIN41  =  BIN+CHAR41+GROUP4+USCORE+BINCHAR                  
+  IDBIN41  =  BIN+CHAR41+GROUP4+USCORE+BINCHAR
 
   IDSBIN8  =  DSBIN8+BINCHAR                    'Indicated binary, fixed widths, space padded, delimited with underscores
   IDSBIN9  =  DSBIN9+BINCHAR

@@ -44,12 +44,12 @@ CON
 
   #1, ErrorConnect, ErrorVersion, ErrorChecksum, ErrorProgram, ErrorVerify
   #0, Shutdown, LoadRun, ProgramShutdown, ProgramRun
-  
+
 
 VAR
 
   long P31, P30, LFSR, Ver, Echo
-  
+
 
 PUB Connect(PinRESn, PinP31, PinP30, Version, Command, CodePtr) : Error
 
@@ -58,18 +58,18 @@ PUB Connect(PinRESn, PinP31, PinP30, Version, Command, CodePtr) : Error
   P30 := PinP30
 
   'RESn low
-  outa[PinRESn] := 0            
+  outa[PinRESn] := 0
   dira[PinRESn] := 1
-  
+
   'P31 high (our TX)
-  outa[PinP31] := 1             
+  outa[PinP31] := 1
   dira[PinP31] := 1
-  
+
   'P30 input (our RX)
-  dira[PinP30] := 0             
+  dira[PinP30] := 0
 
   'RESn high
-  outa[PinRESn] := 1            
+  outa[PinRESn] := 1
 
   'wait 100ms
   waitcnt(clkfreq / 10 + cnt)
@@ -80,24 +80,24 @@ PUB Connect(PinRESn, PinP31, PinP30, Version, Command, CodePtr) : Error
 
   'P31 float
   dira[PinP31] := 0
-  
+
 
 PRI Communicate(Version, Command, CodePtr) | ByteCount
 
   'output calibration pulses
-  BitsOut(%01, 2)               
+  BitsOut(%01, 2)
 
   'send LFSR pattern
-  LFSR := "P"                   
+  LFSR := "P"
   repeat 250
     BitsOut(IterateLFSR, 1)
 
   'receive and verify LFSR pattern
-  repeat 250                   
+  repeat 250
     if WaitBit(1) <> IterateLFSR
       abort ErrorConnect
 
-  'receive chip version      
+  'receive chip version
   repeat 8
     Ver := WaitBit(1) << 7 + Ver >> 1
 
@@ -110,7 +110,7 @@ PRI Communicate(Version, Command, CodePtr) | ByteCount
   BitsOut(Command, 32)
 
   'handle command details
-  if Command          
+  if Command
 
     'send long count
     ByteCount := byte[CodePtr][8] | byte[CodePtr][9] << 8
@@ -126,63 +126,63 @@ PRI Communicate(Version, Command, CodePtr) | ByteCount
 
     'eeprom program command
     if Command > 1
-    
+
       'allow 5s for positive program response
       if WaitBit(500)
         abort ErrorProgram
-        
+
       'allow 2s for positive verify response
       if WaitBit(200)
         abort ErrorVerify
-                
+
 
 PRI IterateLFSR : Bit
 
   'get return bit
   Bit := LFSR & 1
-  
+
   'iterate LFSR (8-bit, $B2 taps)
   LFSR := LFSR << 1 | (LFSR >> 7 ^ LFSR >> 5 ^ LFSR >> 4 ^ LFSR >> 1) & 1
-  
+
 
 PRI WaitBit(Hundredths) : Bit | PriorEcho
 
   repeat Hundredths
-  
-    'output 1t pulse                        
+
+    'output 1t pulse
     BitsOut(1, 1)
-    
+
     'sample bit and echo
     Bit := ina[P30]
     PriorEcho := Echo
-    
+
     'output 2t pulse
     BitsOut(0, 1)
-    
-    'if echo was low, got bit                                      
+
+    'if echo was low, got bit
     if not PriorEcho
       return
-      
+
     'wait 10ms
     waitcnt(clkfreq / 100 + cnt)
 
   'timeout, abort
   abort ErrorConnect
 
-  
+
 PRI BitsOut(Value, Bits)
 
   repeat Bits
 
     if Value & 1
-    
+
       'output '1' (1t pulse)
-      outa[P31] := 0                        
+      outa[P31] := 0
       Echo := ina[P30]
       outa[P31] := 1
-      
+
     else
-    
+
       'output '0' (2t pulse)
       outa[P31] := 0
       outa[P31] := 0

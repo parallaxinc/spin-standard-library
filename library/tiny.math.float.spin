@@ -9,7 +9,7 @@
 
 PUB FFloat(integer) : single | s, x, m
 
-''Convert integer to float    
+''Convert integer to float
 
   if m := ||integer             'absolutize mantissa, if 0, result 0
     s := integer >> 31          'get sign
@@ -18,7 +18,7 @@ PUB FFloat(integer) : single | s, x, m
     m >>= 2                     'bit29-justify mantissa
 
     return Pack(@s)             'pack result
-   
+
 PUB FRound(single) : integer
 
 ''Convert float to rounded integer
@@ -38,14 +38,14 @@ PUB FNeg(singleA) : single
 ''Negate singleA
 
   return singleA ^ $8000_0000   'toggle sign bit
-  
+
 
 PUB FAbs(singleA) : single
 
 ''Absolute singleA
 
   return singleA & $7FFF_FFFF   'clear sign bit
-  
+
 
 PUB FSqrt(singleA) : single | s, x, m, root
 
@@ -65,7 +65,7 @@ PUB FSqrt(singleA) : single | s, x, m, root
         result ^= root
       root >>= 1
     m := result >> 1
-  
+
     return Pack(@s)             'pack result
 
 
@@ -101,7 +101,7 @@ PUB FSub(singleA, singleB) : single
 
   return FAdd(singleA, FNeg(singleB))
 
-             
+
 PUB FMul(singleA, singleB) : single | sa, xa, ma, sb, xb, mb
 
 ''Multiply singleA by singleB
@@ -130,7 +130,7 @@ PUB FDiv(singleA, singleB) : single | sa, xa, ma, sb, xb, mb
     result <<= 1
     if ma => mb
       ma -= mb
-      result++        
+      result++
     ma <<= 1
   ma := result
 
@@ -152,7 +152,7 @@ PRI FInteger(a, r) : integer | s, x, m
       -m
     return m                    'return integer
 
-      
+
 PRI Unpack(pointer, single) | s, x, m
 
 'Unpack floating-point into (sign, exponent, mantissa) at pointer
@@ -171,8 +171,8 @@ PRI Unpack(pointer, single) | s, x, m
   x -= 127                      'unbias exponent
 
   longmove(pointer, @s, 3)      'write (s,x,m) structure from locals
-  
-  
+
+
 PRI Pack(pointer) : single | s, x, m
 
 'Pack floating-point from (sign, exponent, mantissa) at pointer
@@ -180,7 +180,7 @@ PRI Pack(pointer) : single | s, x, m
   longmove(@s, pointer, 3)      'get (s,x,m) structure into locals
 
   if m                          'if mantissa 0, result 0
-  
+
     result := 33 - >|m          'determine magnitude of mantissa
     m <<= result                'msb-justify mantissa without leading 1
     x += 3 - result             'adjust exponent
@@ -188,7 +188,7 @@ PRI Pack(pointer) : single | s, x, m
     m += $00000100              'round up mantissa by 1/2 lsb
     if not m & $FFFFFF00        'if rounding overflow,
       x++                       '..increment exponent
-    
+
     x := x + 127 #> -23 <# 255  'bias and limit exponent
 
     if x < 1                    'if exponent < 1,
@@ -201,9 +201,9 @@ PRI Pack(pointer) : single | s, x, m
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │
@@ -215,4 +215,4 @@ PRI Pack(pointer) : single | s, x, m
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}    
+}}

@@ -1,15 +1,15 @@
-' Original Authors: Jeff Martin, Andy Lindsay, Chip Gracey  
+' Original Authors: Jeff Martin, Andy Lindsay, Chip Gracey
 
 {{
     This object implements core serial functionality.
 
-    # Usage 
+    # Usage
 
     -   Call Start, or StartRxTx, first.
     -   Be sure to set the Parallax Serial Terminal software to the baudrate specified in Start, and the proper COM port.
     -   At 80 MHz, this object properly receives/transmits at up to 250 Kbaud, or performs transmit-only at up to 1 Mbaud.
-}}       
-             
+}}
+
 CON
 
     BUFFER_LENGTH = 64                                      ' Recommended as 64 or higher, but can be 2, 4, 8, 16, 32, 64, 128 or 256.
@@ -18,7 +18,7 @@ CON
 VAR
 
     long    cog                                             ' Cog flag/id
-    
+
     long    rx_head                                         ' 9 contiguous longs (must keep order)
     long    rx_tail
     long    tx_head
@@ -28,7 +28,7 @@ VAR
     long    rxtx_mode
     long    bit_ticks
     long    buffer_ptr
-    
+
     byte    rx_buffer[BUFFER_LENGTH]                        ' Receive and transmit buffers
     byte    tx_buffer[BUFFER_LENGTH]
 
@@ -36,11 +36,11 @@ PUB Start(baudrate) : okay
 {{
     Start communication with the Parallax Serial Terminal using the Propeller's programming connection.
     Waits 1 second for connection, then clears screen.
-  
+
     Parameters:
         baudrate -  bits per second.  Make sure it matches the Parallax Serial Terminal's
                     Baud Rate field.
-  
+
     Returns True (non-zero) if cog started, or False (0) if no cog is available.
 }}
 
@@ -108,7 +108,7 @@ PUB Char(ch)
     repeat until (tx_tail <> ((tx_head + 1) & BUFFER_MASK))
     tx_buffer[tx_head] := ch
     tx_head := (tx_head + 1) & BUFFER_MASK
-    
+
     if rxtx_mode & %1000
         CharIn
 
@@ -132,7 +132,7 @@ PRI RxCheck
     if rx_tail <> rx_head
         result := rx_buffer[rx_tail]
         rx_tail := (rx_tail + 1) & BUFFER_MASK
-       
+
 DAT
                         org
 
@@ -178,7 +178,7 @@ receive                 jmpret  rxcode,txcode         'run chunk of tx code, the
                         mov     rxbits,#9             'ready to receive byte
                         mov     rxcnt,bitticks
                         shr     rxcnt,#1
-                        add     rxcnt,cnt                          
+                        add     rxcnt,cnt
 
 :bit                    add     rxcnt,bitticks        'ready next bit period
 
@@ -233,11 +233,11 @@ transmit                jmpret  txcode,rxcode         'run chunk of rx code, the
                         mov     txbits,#11
                         mov     txcnt,cnt
 
-:bit                    test    rxtxmode,#%100  wz    'output bit on tx pin 
+:bit                    test    rxtxmode,#%100  wz    'output bit on tx pin
                         test    rxtxmode,#%010  wc    'according to mode
         if_z_and_c      xor     txdata,#1
                         shr     txdata,#1       wc
-        if_z            muxc    outa,txmask        
+        if_z            muxc    outa,txmask
         if_nz           muxnc   dira,txmask
                         add     txcnt,bitticks        'ready next cnt
 

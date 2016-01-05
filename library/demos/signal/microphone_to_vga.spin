@@ -55,21 +55,21 @@ CON
 
 ' At 80MHz the ADC sample resolutions and rates are as follows:
 '
-' sample   sample               
-' bits       rate               
-' ----------------              
-' 9       156 KHz               
-' 10       78 KHz               
-' 11       39 KHz               
-' 12     19.5 KHz               
-' 13     9.77 KHz               
-' 14     4.88 KHz               
-                                
+' sample   sample
+' bits       rate
+' ----------------
+' 9       156 KHz
+' 10       78 KHz
+' 11       39 KHz
+' 12     19.5 KHz
+' 13     9.77 KHz
+' 14     4.88 KHz
+
   bits = 12                     'try different values from table here
   attenuation = 2               'try 0-4
 
   averaging = 13                '2-power-n samples to compute average with
-  
+
 
 DAT
 
@@ -87,11 +87,11 @@ asm_entry     mov       dira,asm_dira                   'make pin 8 (ADC) output
               mov       frqa,#1
 
               mov       xpos,#0
-              
+
               mov       asm_cnt,cnt                     'prepare for WAITCNT loop
               add       asm_cnt,asm_cycles
 
-              
+
 :loop         waitcnt   asm_cnt,asm_cycles              'wait for next CNT value (timing is determinant after WAITCNT)
 
               mov       asm_sample,phsa                 'capture PHSA and get difference
@@ -171,7 +171,7 @@ plot          mov       asm_mask,#1                     'compute pixel mask
               xor       asm_data,asm_mask
               wrlong    asm_data,y
 
-plot_ret      ret                            
+plot_ret      ret
 '
 '
 ' Data
@@ -204,9 +204,9 @@ peak_max      res       1
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

@@ -1,8 +1,8 @@
 ''*************************************************
 ''*  Memsic Dual Accelerometer Simple Driver v1.0 *
 ''*  Author: Paul Baker                           *
-''*  Copyright (c) 2007 Parallax, Inc.            *               
-''*  See end of file for terms of use.            *               
+''*  Copyright (c) 2007 Parallax, Inc.            *
+''*  See end of file for terms of use.            *
 ''*************************************************
 {
 This object implements two different versions of the MXD2125 driver, the first runs the driver in a seperate cog.
@@ -19,9 +19,9 @@ long stack[50]
 * The following methods are for the dedicated cog version of
 * the driver. The driver is started by calling the method start
 * with the pins connected to the X axis and Y axis as arguments.
-* Readings are taken by calling methods x and y. 
+* Readings are taken by calling methods x and y.
 ***************************************************************}
-PUB stop                                                               
+PUB stop
     '' Stop driver - frees a cog
     if cog
        cogstop(cog)
@@ -34,8 +34,8 @@ PUB start(Xin, Yin): okay
   '' Start driver - starts a cog
   '' returns false if no cog available
 
-  okay := cog := cognew(accel_driver, @stack)      
-  
+  okay := cog := cognew(accel_driver, @stack)
+
 PUB x
   if cog
     return XVal                                   'return current X axis pulse width
@@ -56,7 +56,7 @@ PRI accel_driver
     phsa := 0                                     'reset count
     phsb := 0
     waitpeq(pinwaitm,pinwaitm,0)                  'wait until both channels turn on
-     
+
 {**************************************************************
 * The following methods are for the execute on current cog
 * version of the driver. The driver is started by calling the init
@@ -66,10 +66,10 @@ PRI accel_driver
 PUB init(Xin, Yin)
   cog := false                                    'set cog variable to failure in case stop is accidentally called
   frqa := 1                                       'setup counters to increment by one
-  frqb := 1                                       
+  frqb := 1
   ctramode := %1000 << 26 + Xin                   'construct value for counter A mode (POS accumulator)
   ctrbmode := %1000 << 26 + Yin                   'construct value for counter B mode (POS accumulator)
-  
+
 PUB Get_XY(pX,pY)
   ctra := ctramode                                'start up both counters
   ctrb := ctrbmode
@@ -78,7 +78,7 @@ PUB Get_XY(pX,pY)
   phsb := 0
   waitpeq(pinwaitm,pinwaitm,0)                    'wait for beginning of measurement
   waitpeq(0,pinwaitm,0)                           'wait for end of measurement
-  LONG[pX] := phsa                                'record count values into pointers 
+  LONG[pX] := phsa                                'record count values into pointers
   LONG[pY] := phsb
   ctra := 0                                       'turn off counters
   ctrb := 0
@@ -86,9 +86,9 @@ PUB Get_XY(pX,pY)
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

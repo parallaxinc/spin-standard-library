@@ -22,13 +22,13 @@ VAR
   long  par_present             'mouse present  read-only
   long  par_dpin                'data pin       write-only
   long  par_cpin                'clock pin      write-only
-                                                        
+
   long  bx_min, by_min, bz_min  'min/max must be contiguous
   long  bx_max, by_max, bz_max
   long  bx_div, by_div, bz_div
   long  bx_acc, by_acc, bz_acc
 
-  
+
 PUB start(dpin, cpin) : okay
 
 '' Start mouse driver - starts a cog
@@ -152,9 +152,9 @@ PUB bound_limits(xmin, ymin, zmin, xmax, ymax, zmax) | i
 
 '' Set bounding limits
 
-  longmove(@bx_min, @xmin, 6)           
+  longmove(@bx_min, @xmin, 6)
 
-  
+
 PUB bound_scales(x_scale, y_scale, z_scale)
 
 '' Set bounding scales (usually +/-1's, bigger values divide)
@@ -170,7 +170,7 @@ PUB bound_preset(x, y, z) | i, d
     d := ||bx_div[i]
     bx_acc[i] := (x[i] - bx_min[i]) * d + d >> 1
 
-  
+
 PUB bound_x : x
 
 '' Get bound-x
@@ -196,7 +196,7 @@ PRI bound(i, delta) : b | d
 
   d := bx_div[i]
   b := bx_min[i] + (bx_acc[i] := bx_acc[i] + delta * (d < 0) | 1 #> 0 <# (bx_max[i] - bx_min[i] + 1) * ||d - 1) / ||d
-     
+
 
 DAT
 
@@ -206,7 +206,7 @@ DAT
 
                         org
 '
-'                               
+'
 ' Entry
 '
 entry                   mov     p,par                   'load input parameters:

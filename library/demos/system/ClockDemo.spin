@@ -36,14 +36,14 @@ Schematic:
 The effective circuit of the display used by this demo is represented by the schematic
 below (standard Propeller connections assumed).
 
-   ┌───────────┐   
+   ┌───────────┐
    │ Propeller │
    │  P8X32A   │
-   │           │  240 Ω  LEDs      
-   │        P16├──────────┐         
-   │        P17├──────────┫                    
-   │        P18├──────────┫                    
-   │        P19├──────────┫  
+   │           │  240 Ω  LEDs
+   │        P16├──────────┐
+   │        P17├──────────┫
+   │        P18├──────────┫
+   │        P19├──────────┫
    │        P20├──────────┫
    │        P21├──────────┫
    │        P22├──────────┫
@@ -53,11 +53,11 @@ below (standard Propeller connections assumed).
 
 {{------------------------------------REVISION HISTORY-------------------------------------
  v1.01 - Updated 05/02/2013 to fix typos in description.
-   
+
 }}
 
 CON
-  _clkmode   = xtal1 + pll16x                           
+  _clkmode   = xtal1 + pll16x
   _xinfreq   = 5_000_000                                'Set to standard clock mode and frequency (80 MHz)
 
   SLED       = 16                                       'Starting LED (for scrolling display)
@@ -68,14 +68,14 @@ CON
 VAR
   long  stack[9]                                        'Stack space for ScrollLeds method
   byte  cmIdx                                           'Clock Mode array index
-  
-OBJ                         
+
+OBJ
   clk           : "system.clock"
-  
+
 PUB Main
 {{Launch cog to scroll LEDs right/left and occasionally switch clock sources (indicated by
 flash on all LEDs).}}
-                                                                                                        
+
   clk.Init(5_000_000)                                   'Initialize Clock object
   dira[SLED..ELED]~~                                    'Drive LEDs
   cognew(ScrollLeds, @stack)                            'Launch cog to scroll time-dependant LEDs
@@ -87,7 +87,7 @@ flash on all LEDs).}}
     if ~~clockMode[cmIdx] == true                       '  Check clock mode list; reached end?
       cmIdx~                                            '    Reset back to with first entry
 
-PRI ScrollLeds 
+PRI ScrollLeds
 {Scroll a single lit LED left/right across display at a clock-dependant speed.}
 
   clk.PauseMSec(10)                                     'Wait a little before driving LED
@@ -95,10 +95,10 @@ PRI ScrollLeds
   outa[ELED]~~                                          'Turn on only last LED
 
   repeat                                                'Loop forever
-    repeat SHIFTCOUNT                                   '  Loop to scroll left 
+    repeat SHIFTCOUNT                                   '  Loop to scroll left
       waitcnt(SDELAY + cnt)                             '    Wait specific count (clock speed sensitive)
       outa[SLED..ELED] <<= 1                            '    Shift lit LED left
-    repeat SHIFTCOUNT                                   '  Loop to scroll right               
+    repeat SHIFTCOUNT                                   '  Loop to scroll right
       waitcnt(SDELAY + cnt)                             '    Wait specific count (clock speed sensitive)
       outa[SLED..ELED] >>= 1                            '    Shift lit LED right
 
@@ -108,12 +108,12 @@ PRI FlashLeds
   outa[SLED..ELED]~~                                    'All LEDs on
   clk.PauseMSec(125)                                    'Pause
   outa[SLED..ELED]~                                     'LEDs back to normal
-                                                        
+
 DAT
 {New clock mode table.  The traversal of this table by the code above takes the Propeller's
 clock source from the slowest speed through the fastest speed, then back through slowest
 speed again.}
-   
+
   clockMode  word  clk#XTAL1_PLL1x                      '=  5_000_000 Hz
              word  clk#XTAL1_PLL2x                      '= 10_000_000 Hz
              word  clk#RCFAST_                          '~ 12_000_000 Hz
@@ -127,11 +127,11 @@ speed again.}
              word  clk#XTAL1_PLL1x                      '=  5_000_000 Hz
              word  clk#RCSLOW_                          '~     20_000 Hz
              word  true                                 '<end of list>
-                                                        
+
 {{
 
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                TERMS OF USE: MIT License                                │                                                            
+│                                TERMS OF USE: MIT License                                │
 ├─────────────────────────────────────────────────────────────────────────────────────────┤
 │Permission is hereby granted, free of charge, to any person obtaining a copy of this     │
 │software and associated documentation files (the "Software"), to deal in the Software    │
@@ -149,4 +149,4 @@ speed again.}
 │OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER   │
 │DEALINGS IN THE SOFTWARE.                                                                │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
-}}           
+}}

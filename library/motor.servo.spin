@@ -8,20 +8,20 @@
 
 
 *****************************************************************
- Control up to 32-Servos      Version 7               08-18-2009 
+ Control up to 32-Servos      Version 7               08-18-2009
 *****************************************************************
- Coded by Beau Schwabe (Parallax).                                            
+ Coded by Beau Schwabe (Parallax).
 *****************************************************************
 
  History:
                             Version 1 -               initial concept
 
                             Version 2 - (03-08-2006)  Beta release
- 
+
                             Version 3 - (11-04-2007)  Improved servo resolution to 1uS
 
                             Version 4 - (05-03-2009)  Ability to disable a servo channel
-                                                      and remove channel preset requirement            
+                                                      and remove channel preset requirement
 
                             Version 5 - (05-08-2009)  Added ramping ability
 
@@ -30,7 +30,7 @@
 
                             Version 7 - (08-18-2009)  Fixed servo jitter in ramping function when
                                                       servo reached it's target position.
-                                                                                                                                          
+
 Theory of Operation:
 
 Each servo requires a pulse that varies from 1mS to 2mS with a period of 20mS.
@@ -45,14 +45,14 @@ a pulse.
   │──────────20mS───────────│        In Zone4, servo pins 24-31 are active
                   
     1-2mS servo pulse 
-              
+
 The preferred circuit of choice is to place a 4.7K resistor on each signal input
 to the servo.    If long leads are used, place a 1000uF cap at the servo power
 connector.    Servo's seem to be happy with a 5V supply receiving a 3.3V signal.
 
 }}
 
-CON 
+CON
     _1uS = 1_000_000 /        1                                                 'Divisor for 1 uS
 
     ZonePeriod = 5_000                                                          '5mS (1/4th of typical servo period of 20mS)
@@ -60,25 +60,25 @@ CON
                                                                                 'Use at least 500uS for overhead (actual overhead about 300uS)
 
      LowRange = 500             '<- during Debug I changed this value to 1 to test 1us resolution
-    HighRange = 2500                                                                                
+    HighRange = 2500
 
 VAR
         long          RampFlag
         long          ZoneClocks
         long          NoGlitch
         long          ServoPinDirection
-        long          ServoData[32]                                             '0-31 Current Servo Value 
-        long          ServoTarget[32]                                           '0-31 Desired Servo Value 
+        long          ServoData[32]                                             '0-31 Current Servo Value
+        long          ServoTarget[32]                                           '0-31 Desired Servo Value
         long          ServoDelay[32]                                            '0-31 Servo Ramp Delay
-        
+
 OBJ
 
     SERVO : "motor.servo.ramp.spin"
 
 PUB Start
-    RampFlag := 0 
+    RampFlag := 0
     ZoneClocks := (clkfreq / _1uS * ZonePeriod)                                 'calculate # of clocks per ZonePeriod
-    NoGlitch   := $FFFF_FFFF-(clkfreq / _1uS * NoGlitchWindow)                  'calculate # of clocks for GlitchFree servos. Problem occurs when 'cnt' value rollover is less than the servo's pulse width.                                                                                                                                                                                                                         
+    NoGlitch   := $FFFF_FFFF-(clkfreq / _1uS * NoGlitchWindow)                  'calculate # of clocks for GlitchFree servos. Problem occurs when 'cnt' value rollover is less than the servo's pulse width.
     cognew(@ServoStart,@ZoneClocks)
 
 PUB Ramp
@@ -88,20 +88,20 @@ PUB Ramp
 PUB SetRamp(Pin, Width,Delay)|S_Width
       ServoDelay[Pin] := Delay 'Note: The resolution of Delay is about 38.75us
                                '      or 3100 clocks
-                                       
+
       S_Width := LowRange #> Width <# HighRange                                 'limit Width value
       Pin :=    0 #> Pin <# 31                                                  'limit Pin value between 0 and 31
       ServoTarget[Pin] := ((clkfreq / _1uS * S_Width)/SERVO#CoreSpeed)*SERVO#CoreSpeed
                                                                                 'calculate # of clocks for a specific Pulse Width
                                                                                 'and adjust the snap value to match the value of
                                                                                 'CoreSpeed. (Note: this prevents jitter when Servo
-                                                                                '                  has reached it's target position) 
-      
+                                                                                '                  has reached it's target position)
 
-      if S_Width==Width 
+
+      if S_Width==Width
          dira[Pin] := 1                                                         'set selected servo pin as an OUTPUT
       else
-         dira[Pin] := 0                                                         'set selected servo pin as an INPUT only if Width out of range 
+         dira[Pin] := 0                                                         'set selected servo pin as an INPUT only if Width out of range
       ServoPinDirection := dira                                                 'Read I/O state of ALL pins
 
 PUB Set(Pin, Width)|S_Width                                                     'Set Servo value
@@ -111,15 +111,15 @@ PUB Set(Pin, Width)|S_Width                                                     
          ServoData[Pin] := (clkfreq / _1uS * S_Width)                           'calculate # of clocks for a specific Pulse Width
       else
          ServoData[Pin] := ((clkfreq / _1uS * S_Width)/SERVO#CoreSpeed)*SERVO#CoreSpeed
-          
+
       ServoTarget[Pin] := ServoData[Pin]
-      
-      if S_Width==Width 
+
+      if S_Width==Width
          dira[Pin] := 1                                                         'set selected servo pin as an OUTPUT
       else
-         dira[Pin] := 0                                                         'set selected servo pin as an INPUT only if Width out of range 
+         dira[Pin] := 0                                                         'set selected servo pin as an INPUT only if Width out of range
       ServoPinDirection := dira                                                 'Read I/O state of ALL pins
-    
+
 DAT
 
 '*********************
@@ -158,24 +158,24 @@ Zone4                   mov     ZoneIndex,              Zone4Index              
                         jmp     #IOupdate
 '------------------------------------------------------------------------------------------------------------------------------------------------
 ResetZone               mov     ZoneShift1,             #1
-                        mov     ZoneShift2,             #2                        
+                        mov     ZoneShift2,             #2
                         mov     ZoneShift3,             #4
                         mov     ZoneShift4,             #8
                         mov     ZoneShift5,             #16
                         mov     ZoneShift6,             #32
                         mov     ZoneShift7,             #64
                         mov     ZoneShift8,             #128
-ResetZone_RET           ret                        
+ResetZone_RET           ret
 '------------------------------------------------------------------------------------------------------------------------------------------------
 IncrementZone           shl     ZoneShift1,             #8
-                        shl     ZoneShift2,             #8                        
+                        shl     ZoneShift2,             #8
                         shl     ZoneShift3,             #8
                         shl     ZoneShift4,             #8
                         shl     ZoneShift5,             #8
                         shl     ZoneShift6,             #8
                         shl     ZoneShift7,             #8
                         shl     ZoneShift8,             #8
-IncrementZone_RET       ret                        
+IncrementZone_RET       ret
 '------------------------------------------------------------------------------------------------------------------------------------------------
 ZoneCore                mov     ServoByte,              #0                      'Clear ServoByte
                         mov     Index,                  ZoneIndex               'Set Index Pointer for proper Zone
@@ -191,7 +191,7 @@ ZoneSync                mov     SyncPoint,              cnt                     
 '                       add     SyncPoint,              #300                    '<- Debug - 2us becomes 3us
                         add     SyncPoint,              #260                    'Add overhead offset to counter Sync point
                                                                                 'midpoint from above Debug test.
-                                                                                 
+
                         mov     LoopCounter,            #8                      'Set Loop Counter to 8 Servos for this Zone
                         movd    LoadServos,             #ServoWidth8            'Restore/Set self-modifying code on "LoadServos" line
                         movd    ServoSync,              #ServoWidth8            'Restore/Set self-modifying code on "ServoSync" line

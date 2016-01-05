@@ -17,14 +17,14 @@
 CON
 
   maxline = 64
-  
+
 
 VAR
 
   long rx, tx, baud, linesize, linepos, hex, address, stack[40]
   byte line[maxline]
 
-  
+
 PUB start(rxpin, txpin, baudrate) : okay
 
 '' Start monitor in another cog

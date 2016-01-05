@@ -15,10 +15,10 @@ CON
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   bitmap_base = $2000
   display_base = $5000
- 
+
 VAR
 
   long  mousex, mousey
@@ -28,7 +28,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -76,7 +76,7 @@ PUB start | x, y, i, c, k
         0, 2 : i := $30 + x
         3..4 : i := $20 + x
         5..6 : i := $10 + x
-        8    : i := x 
+        8    : i := x
         other:  i := 0
       screen[x + y * tv_hc] := i << 10 + display_base >> 6 + x * tv_vc + y
 
@@ -108,7 +108,7 @@ PUB start | x, y, i, c, k
     'draw monochrome samples
     gr.color(3)
     repeat x from 5 to 10
-      gr.plot(x << 4 + 7, 55) 
+      gr.plot(x << 4 + 7, 55)
 
     'draw mouse pointer
     gr.width(0)
@@ -138,8 +138,8 @@ PUB start | x, y, i, c, k
     else
       gr.colorwidth(3, 0)
       gr.textmode(2, 2, 6, %0101)
-      gr.text(128, 20, string("Point mouse to color"))        
-     
+      gr.text(128, 20, string("Point mouse to color"))
+
     'copy bitmap to display
     gr.copy(display_base)
 
@@ -180,15 +180,15 @@ pixdef                  word                    'arrow pointer
                         word    %%10111000
                         word    %%00011000
 
-colorstring             byte    "COLOR "                        
+colorstring             byte    "COLOR "
 hexstring               byte    "00",0
 
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

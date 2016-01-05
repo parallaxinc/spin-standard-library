@@ -9,12 +9,12 @@
     VSS ──│3 └────┘ 4│── P1
             └──────────┘
 
-}}      
+}}
 CON
     _clkmode = XTAL1 + PLL16X
     _xinfreq = 5_000_000
 
-    ' Setup Constants for the TV and Graphics display  
+    ' Setup Constants for the TV and Graphics display
 
     stack           = ($3000 + $3000 + 100) >> 2               'accommodate display memory and stack
     x_tiles         = 16
@@ -28,15 +28,15 @@ CON
     Enable  = 0
     Clock   = 1
     Data    = 2
-   
-VAR     ''Setup variables related to the TV display 
+
+VAR     ''Setup variables related to the TV display
 
     long  tv_status     '0/1/2 = off/visible/invisible           read-only
     long  tv_enable     '0/? = off/on                            write-only
     long  tv_pins       '%ppmmm = pins                           write-only
     long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
     long  tv_screen     'pointer to screen (words)               write-only
-    long  tv_colors     'pointer to colors (longs)               write-only               
+    long  tv_colors     'pointer to colors (longs)               write-only
     long  tv_hc         'horizontal cells                        write-only
     long  tv_vc         'vertical cells                          write-only
     long  tv_hx         'horizontal cell expansion               write-only
@@ -48,16 +48,16 @@ VAR     ''Setup variables related to the TV display
     word  screen[x_tiles * y_tiles]
     long  colors[64]
 
-VAR     ''Setup variables related to converting numbers to strings for display 
+VAR     ''Setup variables related to converting numbers to strings for display
 
-    long  idx           ' ( 1 long ) pointer into string    
+    long  idx           ' ( 1 long ) pointer into string
     byte  nstr[64]      ' (16 longs) string
     byte  z_pad
 
-VAR     ''Setup variables related to the compass    
+VAR     ''Setup variables related to the compass
 
     long CorrectHeading
-    long Deg               
+    long Deg
 
 OBJ     ''Setup Object references that make this demo work
 
@@ -86,19 +86,19 @@ PUB DEMO_Initialization | i,dx,dy
                       ││ ││ ││ Color 0
                       ││ ││ ││ ││
         colors[i] := $02_9D_BB_2A
-    
+
     Examples: (See Palette Demo for other available colors)
       BB RED
       2A Dark BLUE
       02 BLACK
       5B GREEN
       9D YELLOW
-      CD PINK        
+      CD PINK
       FC PURPLE
       BC ORANGE
       04 GREY
       3C Light BLUE
-    
+
 }
     ' init tile screen
     repeat dx from 0 to tv_hc - 1
@@ -127,21 +127,21 @@ PUB Compass_Demo|RawHeading
 
       RawHeading := HM55B.Theta                         ' Read RAW 13-bit Angle
 
-      CorrectHeading := Calibrate.Correct(RawHeading)   ' Calibrate Correct Heading 
-            
+      CorrectHeading := Calibrate.Correct(RawHeading)   ' Calibrate Correct Heading
+
       Deg := CorrectHeading * 45 / 1024                 ' Convert 13-Bit Angle to Deg
                                                         ' Note: This only makes it easier for us Humans to
                                                         '       read.
 ''#########################################################
 ''#########################################################
 
-''        This section for Calibration purposes only.   - See 'HM55B Compass Calibration.Spin' 
+''        This section for Calibration purposes only.   - See 'HM55B Compass Calibration.Spin'
 ''        You may remove or comment after calibration.
 
       gr.text(-125, -80,string("RAW"))                  ' Display RAW Heading as a 13-Bit Angle
       gr.text(-125, -95, string("Heading:"))
       gr.text(-65, -95, dec(RawHeading/11*11))          ' Reduce returned Coordic value down to about 0.5 Deg
-                                                        ' resolution.  This helps to reduce LSB jitter 
+                                                        ' resolution.  This helps to reduce LSB jitter
       gr.finish
 ''#########################################################
 ''#########################################################
@@ -149,9 +149,9 @@ PUB Compass_Demo|RawHeading
 
       gr.text(40, -80, string("Correct"))               ' Display Correct Heading as a Degree
       gr.text(40, -95, string("Heading:"))
-      gr.text(100, -95, dec(Deg))                       
-      
-                                                                               
+      gr.text(100, -95, dec(Deg))
+
+
       gr.finish
 
       DrawNeedle(1,RawHeading)                          ' Display Compass Needle Raw Heading Graphic
@@ -172,7 +172,7 @@ PUB DrawCompass|i                                         ' Draw compass
       gr.text(45, -55, string("135"))
       gr.text(-9, -76, string("180"))
       gr.text(-65, -55, string("225"))
-      gr.text(-83, -8, string("270"))  
+      gr.text(-83, -8, string("270"))
       gr.text(-62, 42, string("315"))
 
       gr.text(-2, 38, string("N"))                      ' Spell the NEWS
@@ -187,16 +187,16 @@ PUB DrawNeedle(_Color,_Deg)
     gr.arc(0, 0, 5, 5, -_Deg, 0, 1, 0)                   ' Draw needle cross
     gr.arc(0, 0, 5, 5, -_Deg+4096, 0, 1, 1)
     gr.arc(0, 0, 40, 40, -_Deg+2048-150, 0, 1, 0)        ' Draw needle arrow
-    gr.arc(0, 0, 50, 50, -_Deg+2048, 0, 1, 1)      
+    gr.arc(0, 0, 50, 50, -_Deg+2048, 0, 1, 1)
     gr.arc(0, 0, 40, 40, -_Deg+2048+150, 0, 1, 1)
-      
-PRI decstr(value) | div   
+
+PRI decstr(value) | div
 
 ' Converts value to signed-decimal string equivalent
 ' -- characters written to current position of idx
 ' -- returns pointer to nstr
 
-  if (value < 0)                                         ' negative value? 
+  if (value < 0)                                         ' negative value?
     -value                                               '   yes, make positive
     nstr[idx++] := "-"                                   '   and print sign indicator
 
@@ -210,7 +210,7 @@ PRI decstr(value) | div
       z_pad~~                                            '   set zflag
     elseif z_pad or (div == 1)                           ' printing or last column?
       nstr[idx++] := "0"
-    div /= 10 
+    div /= 10
 
   return @nstr
 
@@ -218,7 +218,7 @@ PRI Dec(value)
     bytefill(@nstr, 0, 64)                               ' clear string to zeros
     idx~                                                 ' reset index
     return decstr(value)
-    
+
 PUB Decx(value, digits) | div
 
 '' Returns pointer to zero-padded, signed-decimal string
@@ -228,16 +228,16 @@ PUB Decx(value, digits) | div
     idx~                                                 ' reset index
     digits := 1 #> digits <# 10
 
-    if (value < 0)                                       ' negative value?   
+    if (value < 0)                                       ' negative value?
       -value                                             '   yes, make positive
       nstr[idx++] := "-"                                 '   and print sign indicator
       div := 1_000_000_000                               ' initialize divisor
     if digits < 10                                       ' less than 10 digits?
       repeat (10 - digits)                               '   yes, adjust divisor
         div /= 10
-  
+
     value //= (div * 10)                                 ' truncate unused digits
-  
+
     repeat digits
       nstr[idx++] := (value / div + "0")                 ' convert digit to ASCII
       value //= div                                      ' update value

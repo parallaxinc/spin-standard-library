@@ -1,8 +1,8 @@
 ''*******************************************
 ''*  TSL230 Light to Frequency Driver v1.0  *
 ''*  Author: Paul Baker                     *
-''*  Copyright (c) 2007 Parallax, Inc.      *               
-''*  See end of file for terms of use.      *               
+''*  Copyright (c) 2007 Parallax, Inc.      *
+''*  See end of file for terms of use.      *
 ''*******************************************
 {{********************************************************
    Taos TSL230 light to frequency sensor v1.0 driver
@@ -10,24 +10,24 @@
                     ┌──────────┐
     ctrlpinbase ──│1 o      8│──┳──┐
                     │          │   │  
-  ctrlpinbase+1 ──│2        7│──┘ 
-                    │    []    │   
+  ctrlpinbase+1 ──│2        7│──┘
+                    │    []    │
                 ┌──│3        6│──── inpin
-                │   │          │    
-                ┣──│4        5│──┘ 3.3V 
-                   └──────────┘          
+                │   │          │   
+                ┣──│4        5│──┘ 3.3V
+                   └──────────┘
 *********************************************************}}
-CON 
-        _clkmode = xtal1 + pll16x 
+CON
+        _clkmode = xtal1 + pll16x
         _XinFREQ = 5_000_000
 
-        ctrmode = $28000000        
-        
+        ctrmode = $28000000
+
 VAR
   long freq, cog
   long scale, cbase, sps, auto
 
-PUB Stop                                                               
+PUB Stop
     '' Stop driver - frees a cog
     if cog
        cogstop(cog~ -  1)
@@ -53,10 +53,10 @@ PUB Start(inpin, ctrlpinbase, samplefreq, autoscale): okay
 
   dira := %11 << cbase                                  'set control pins to output
   outa := %11 << cbase                                  'set scale
-  
+
   ctra_ := ctrmode + inpin                              'compute counter mode
   cntadd := 80_000_000 / samplefreq                     'compute wait period
-  
+
   cog := okay := cognew(@entry, @freq)                  'start driver
 
 PUB GetSample : val
@@ -80,7 +80,7 @@ PUB SetScale(range)
 DAT
 {{********************************************************
  Assembly driver for tsl230
-*********************************************************}}              
+*********************************************************}}
         org
 
 entry   mov     ctra, ctra_             'setup counter to count positive edges
@@ -89,9 +89,9 @@ entry   mov     ctra, ctra_             'setup counter to count positive edges
         add     cnt_, cntadd
 
 :loop   waitcnt cnt_, cntadd            'wait for next sampling period
-        mov     new, phsa               'record new count  
+        mov     new, phsa               'record new count
         mov     temp, new               'make second copy
-        sub     new, old                'compute cycles since last 
+        sub     new, old                'compute cycles since last
         mov     old, temp               'record a new old count
 
         wrlong  new, par                'write number of cycles since last period to hub memory

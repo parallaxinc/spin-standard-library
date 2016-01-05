@@ -14,7 +14,7 @@ OBJ
 
 VAR
 
-    byte    look  
+    byte    look
     long    sum
     byte    err
     byte    inputstring[32]
@@ -26,14 +26,14 @@ PUB Main
     repeat
         err := false
 
-        term.Flush        
+        term.Flush
         term.Str (string("> "))
 
         GetChar
         SkipSpace
-        
+
         sum := GetExpression
-        
+
         if not err
             term.Char (term#NL)
             term.Chars (" ",2)
@@ -46,11 +46,11 @@ PUB GetChar
 
 PUB Error(str)
 
-    if not err    
+    if not err
         err := true
         term.Str (string("Error: "))
         term.Str (str)
-    
+
 PUB Expected(str)
 
     if not err
@@ -81,15 +81,15 @@ PUB GetNumber | i
     if not cc.IsDigit(look) and look <> term#NL
         Expected(string("number"))
         return
-    
+
     i := 0
     repeat while cc.IsDigit(look) and look <> term#NL
         inputstring[i] := look
         GetChar
         i++
-    
+
     inputstring[i] := 0
- 
+
     result := num.StrToBase(@inputstring, 10)
     if cc.IsAlpha(look)
         Expected(string("number"))
@@ -105,7 +105,7 @@ PUB GetFactor
             Expected(string("factor"))
             return
         Match(")")
-    else        
+    else
         result := GetNumber
 
 PUB GetTerm
@@ -114,7 +114,7 @@ PUB GetTerm
     if cc.IsDigit(look)
         Expected(string("operator"))
         return
-        
+
     repeat while look == "*" or look == "/"
         case look
             "*"     : result *= GetMultiply
@@ -128,7 +128,7 @@ PUB GetExpression
     if cc.IsDigit(look)
         Expected(string("operator"))
         return
-        
+
     repeat while look == "+" or look == "-"
         case look
             "+"     : result += GetAdd

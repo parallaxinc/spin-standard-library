@@ -13,7 +13,7 @@
 '' RC.RCTIME(Pin,State,VariableAddress)     <<-- Variable will be updated with result every time this line is executed.
 ''
 ''
-''State = 1 (Preferred) - because this mode provides a slightly higher resolution due to the I/O threshold not being exactly Vdd/2 
+''State = 1 (Preferred) - because this mode provides a slightly higher resolution due to the I/O threshold not being exactly Vdd/2
 ''
 ''         220Ω  C
 ''I/O Pin ──┳── GND
@@ -23,7 +23,7 @@
 ''           └─┻─── GND
 ''
 ''
-''State = 0 
+''State = 0
 ''
 ''         220Ω  C
 ''I/O Pin ──┳── GND
@@ -34,7 +34,7 @@
 
 
 
-''In my test setup I used I/O pin #0 and a 10MHz crystal with a PLL setting of x8 
+''In my test setup I used I/O pin #0 and a 10MHz crystal with a PLL setting of x8
 ''C = 0.1µF
 ''
 ''            approximate returned values from RCtime:
@@ -71,7 +71,7 @@ CON
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   bitmap_base = $2000
   display_base = $5000
 
@@ -84,7 +84,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -107,7 +107,7 @@ VAR
   long RCValue, IntegerTemp,RCtemp
   byte int_string[20],p
 
-  
+
 
 OBJ
   tv    : "display.tv"
@@ -155,15 +155,15 @@ PUB start | i,dx,dy
 
     'display text of RCtime value
     gr.text(0,50,Num.ToStr(RCValue, 10))
-    
+
     'copy bitmap to display
     gr.copy(display_base)
-    
+
 DAT
 tvparams                long    0               'status
                         long    1               'enable
 
-                        'long   %011_0000       'pins      Old Board 
+                        'long   %011_0000       'pins      Old Board
                         long    %001_0101       'pins      New Board
 
                         long    %0000           'mode
@@ -195,4 +195,4 @@ DAT
 │COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
 │ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}                        
+}}

@@ -2,8 +2,8 @@
 ''****************************************
 ''*  HM55B Compass Module DEMO      V1.2 *
 ''*  Author: Beau Schwabe                *
-''*  Copyright (c) 2008 Parallax, Inc.   *               
-''*  See end of file for terms of use.   *               
+''*  Copyright (c) 2008 Parallax, Inc.   *
+''*  See end of file for terms of use.   *
 ''****************************************
 
             ┌────┬┬────┐
@@ -13,7 +13,7 @@
             │  │/  \│  │
     VSS ──│3 └────┘ 4│── P1
             └──────────┘
-                               
+
 }}
 VAR
 long    cog,Enable,Clock,Data,HM55B_x,HM55B_y,HM55B_theta
@@ -28,17 +28,17 @@ PUB start(EnablePin,ClockPin,DataPin):okay
 '' returns false if no cog available
     Enable := EnablePin
     Clock := ClockPin
-    Data := DataPin 
+    Data := DataPin
     okay := cog := cognew(@HM55B, @Enable)
 
 PUB x
-    return HM55B_x 
+    return HM55B_x
 
 PUB y
     return HM55B_y
 
 PUB theta
-    return HM55B_theta 
+    return HM55B_theta
 
 DAT
 HM55B         org
@@ -69,13 +69,13 @@ HM55B         org
 
               or        outa,                   EnablePin_mask                  'Pre-Set Enable pin HIGH
               or        dira,                   EnablePin_mask                  'Set Enable pin as an OUTPUT
-              
+
               call      #ClockTheEnable
 
               mov       t4,                     #4                              'Reset Compass
               mov       t3,                     Reset
               call      #SHIFTOUT
-              
+
               call      #ClockTheEnable
 
               mov       t4,                     #4                              'Start Compass Measurement
@@ -88,7 +88,7 @@ Status        call      #ClockTheEnable
               mov       t3,                     Report
               call      #SHIFTOUT
 
-              mov       t4,                     #4                              
+              mov       t4,                     #4
               call      #SHIFTIN
 
               and       t3,                     #$0F
@@ -96,12 +96,12 @@ Status        call      #ClockTheEnable
               sub       Report,                 t3    wz,nr                     'Exit loop when status is ready
     if_nz     jmp      #Status
 
-              mov       t4,                     #11                             'Read Compass x value                              
+              mov       t4,                     #11                             'Read Compass x value
               call      #SHIFTIN
               and       t3,                     DataMask
               mov       x_,                     t3
-              
-              mov       t4,                     #11                             'Read Compass y value                              
+
+              mov       t4,                     #11                             'Read Compass y value
               call      #SHIFTIN
               and       t3,                     DataMask
               mov       y_,                     t3
@@ -115,7 +115,7 @@ Status        call      #ClockTheEnable
     if_nz     or        y_,                     NegMask
 
               neg       y_,                     y_
-                      
+
 
               mov       cx,                     x_
               mov       cy,                     y_
@@ -131,8 +131,8 @@ Status        call      #ClockTheEnable
 
               mov       t1,                     HM55B_Theta_                    '     Write theta data back
               wrlong    Theta_,                 t1
-              
-              jmp       #HM55B                            
+
+              jmp       #HM55B
 '------------------------------------------------------------------------------------------------------------------------------
 SHIFTOUT                                                                        'SHIFTOUT Entry
               andn      outa,                   DataPin_mask                    'Pre-Set Data pin LOW
@@ -145,7 +145,7 @@ MSBFIRST_                                                                       
               shl       t5,                     t4                              '          Shift "1" N number of bits to the left.
               shr       t5,                     #1                              '          Shifting the number of bits left actually puts
                                                                                 '          us one more place to the left than we want. To
-                                                                                '          compensate we'll shift one position right.              
+                                                                                '          compensate we'll shift one position right.
 MSB_Sout      test      t3,                     t5      wc                      '          Test MSB of DataValue
               muxc      outa,                   DataPin_mask                    '          Set DataBit HIGH or LOW
               shr       t5,                     #1                              '          Prepare for next DataBit
@@ -164,11 +164,11 @@ MSBPOST_Sin   call      #Clk                                                    
               test      DataPin_mask,           ina     wc                      '          Read Data Bit into 'C' flag
               rcl       t3,                     #1                              '          rotate "C" flag into return value
               djnz      t4,                     #MSBPOST_Sin                    '          Decrement t4 ; jump if not Zero
-SHIFTIN_ret   ret              
+SHIFTIN_ret   ret
 '------------------------------------------------------------------------------------------------------------------------------
 Clk           or        outa,                   ClockPin_mask                   '          Set ClockPin HIGH
               andn      outa,                   ClockPin_mask                   '          Set ClockPin LOW
-Clk_ret       ret              
+Clk_ret       ret
 '------------------------------------------------------------------------------------------------------------------------------
 ClockTheEnable
               or        outa,                   EnablePin_mask                  '          Set EnablePin HIGH
@@ -177,9 +177,9 @@ ClockTheEnable_ret      ret
 '------------------------------------------------------------------------------------------------------------------------------
 ' Perform CORDIC cartesian-to-polar conversion
 
-cordic        abs       cx,cx           wc 
-        if_c  neg       cy,cy             
-              mov       ca,#0             
+cordic        abs       cx,cx           wc
+        if_c  neg       cy,cy
+              mov       ca,#0
               rcr       ca,#1
 
               movs      :lookup,#table

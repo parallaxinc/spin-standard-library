@@ -9,7 +9,7 @@
     VSS ──│3 └────┘ 4│── P1
             └──────────┘
 
-}}      
+}}
 CON
 
   _clkmode = XTAL1 + PLL16X
@@ -20,11 +20,11 @@ CON
     Enable = 0
      Clock = 1
       Data = 2
-   
+
 VAR
 
     long    correctheading
-    long    Deg, OldDeg               
+    long    Deg, OldDeg
 
 OBJ
 
@@ -43,12 +43,12 @@ PUB Main | i, dx, dy, rawheading
         term.Str(string("compass Propeller Compass Demo"))   ' Display Header Text
         term.Char(term#NL)                                        ' Send the RETURN key code to the DEBUG terminal
         term.Char(term#NL)                                        ' Send the RETURN key code to the DEBUG terminal
-        term.Char(term#NL)                                        ' Send the RETURN key code to the DEBUG terminal            
+        term.Char(term#NL)                                        ' Send the RETURN key code to the DEBUG terminal
 
         rawheading := compass.Theta                         ' Read RAW 13-bit Angle
 
-        correctheading := calibrate.Correct(rawheading)   ' calibrate Correct Heading 
-              
+        correctheading := calibrate.Correct(rawheading)   ' calibrate Correct Heading
+
         Deg := correctheading * 45 / 1024                 ' Convert 13-Bit Angle to Deg
                                                           ' Note: This only makes it easier for us Humans to
                                                           '       read.
@@ -64,7 +64,7 @@ PUB Main | i, dx, dy, rawheading
 ''#########################################################
 ''#########################################################
 
-''        This section for Calibration purposes only.   - See 'compass Compass Calibration.Spin' 
+''        This section for Calibration purposes only.   - See 'compass Compass Calibration.Spin'
 ''        You may remove or comment after calibration.
 
       term.str(string("RAW Heading: "))                  ' Display RAW Heading as a 13-Bit Angle
@@ -78,7 +78,7 @@ PUB Main | i, dx, dy, rawheading
 ''#########################################################
 ''#########################################################
 
-''        This section for DEBUG graphics only. 
+''        This section for DEBUG graphics only.
 
       if Deg<>OldDeg                                    'No need to update if position has not moved
          DrawCompassNeedle(OldDeg,(" "))
@@ -89,11 +89,11 @@ PUB Main | i, dx, dy, rawheading
 
 ''#########################################################
 ''#########################################################
-                 
+
 PUB DrawCompassNeedle(_Deg,Character) | LineStep, Line, X, Y, X_Size, Y_Size, X_Center, Y_Center
 
     _Deg := 360 - (_Deg + 180)                          'Adjust Deg value for screen coordinate system
-    
+
     X_Size := 26
     Y_Size := 13
     X_Center := 50
@@ -101,7 +101,7 @@ PUB DrawCompassNeedle(_Deg,Character) | LineStep, Line, X, Y, X_Size, Y_Size, X_
 
     LineStep := 5
 
-    repeat Line from 0 to LineStep                            
+    repeat Line from 0 to LineStep
         X := X_Center + (GetSine(Deg2Bit13(_Deg))* ((X_Size * Line)/LineStep))/ 65535
         Y := Y_Center + (GetCoSine(Deg2Bit13(_Deg))* ((Y_Size * Line)/LineStep))/ 65535
         term.Position(X,Y)
@@ -113,7 +113,7 @@ PUB DrawCompassCircle | _Deg, X, Y, X_Size, Y_Size, X_Center, Y_Center
     Y_Size := 15
     X_Center := 50
     Y_Center := 15
-    
+
     repeat _Deg from 0 to 360 step 5
         X := X_Center + (GetSine(Deg2Bit13(_Deg))* X_Size)/ 65535
         Y := Y_Center + (GetCoSine(Deg2Bit13(_Deg))* Y_Size)/ 65535
@@ -127,9 +127,9 @@ PUB Deg2Bit13(_Deg)
 PUB GetCosine(angle)
 
     return GetSine(angle+$0800)
-    
+
 PUB GetSine(angle) | C,Z
- 
+
     C := (angle & $0800)/$0800                          'Get quadrant 2/4 into C
     Z := 1-(angle & $1000)/$1000                        'Get quadrant 3/4 into Z
     if C==1

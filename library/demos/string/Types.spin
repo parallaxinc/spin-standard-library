@@ -10,7 +10,7 @@ OBJ
 PUB Main
 
     term.Start (115200)
-    
+
     TestString(string("BACON"))
     TestString(string("bacon"))
     TestString(string("34545"))
@@ -29,11 +29,11 @@ PUB TestString(stringptr)
     PrintOutcome(string("         Digit"),ss.IsDigit          (stringptr))
     PrintOutcome(string("         Lower"),ss.IsLower          (stringptr))
     PrintOutcome(string("         Upper"),ss.IsUpper          (stringptr))
-    PrintOutcome(string("         Space"),ss.IsSpace          (stringptr))    
+    PrintOutcome(string("         Space"),ss.IsSpace          (stringptr))
     term.Str    (string("----------------------"))
 
     term.Str    (string(term#NL, term#NL))
-    
+
 PUB PrintOutcome(stringptr, outcome)
 
     term.Str (stringptr)
@@ -43,6 +43,5 @@ PUB PrintOutcome(stringptr, outcome)
         term.Str (string("true"))
     else
         term.Str (string("false"))
-        
+
     term.NewLine
-    

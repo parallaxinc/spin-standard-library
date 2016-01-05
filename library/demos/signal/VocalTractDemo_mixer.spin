@@ -27,7 +27,7 @@ VAR
   long  stackspace[40]
   long  buffer[buffersize]
   byte  aa,ga,gp,vp,vr,f1,f2,f3,f4,na,nf,fa,ff
-   
+
   word  sm_input[4] 'addresses of sample streams for each channel (0=disabled)
   word  sm_angle[4] 'angles for each channel (-111 = far left, 0 = center, +111 = far right)
   word  sm_depth[4] 'depths for each channel (0..buffersize-16)
@@ -42,19 +42,19 @@ PUB go | i, d, dx, dy
     sm_input[i] := v.sample_ptr
     sm_depth[i] := $1000
     'sm_angle[i] := i << 28
-    
+
   sm.start(@sm_input, @buffer, buffersize, 11, -1, 10, -1)
   'di.start(sm.sample_ptr)
-                          
+
   sm_knobs := %000_110_111_001
-  
+
 ' s.start(@sources, @distances, @angles, 0,1,2,3)
 
   m.start(24,25)
   m.bound_limits(-127,0,0,127,4095*256,16)
   m.bound_scales(1,1,1)
 
-  
+
 
   'vp := 64
   'vr := 20
@@ -74,14 +74,14 @@ PUB go | i, d, dx, dy
       sm_depth[i] := sm_depth[i] - dy #> 0 <# $FFFF'(buffersize - 16)
 
 {
-      if d & $1000   
+      if d & $1000
         sm_angle[i] := 0
         sm_depth[i] := 0
       else
         sm_angle[i] := -1
         sm_depth[i] := buffersize -1
-}       
-  
+}
+
 
 PRI doit | a, b, n
 
@@ -90,24 +90,24 @@ PRI doit | a, b, n
   'gp := 10'0 +96
   'ga := 255
   'v.go(100)
-  
+
 
   'vp := 80
   'vr := 20
 v.set_pace(100)
-  
+
 repeat
 
   setformants(470,1650,2500,3500)
   gp := 80' +40+40
 
-  ff := 170                                      
+  ff := 170
   v.go(10)
   fa := 40
   v.go(150)
   fa := 0
   aa := 25
-  
+
   v.go(100)
 
 
@@ -145,7 +145,7 @@ repeat
   ga := 10
   aa := 0
 
-  ff := 250 
+  ff := 250
   v.go(20)
 
   fa := 10
@@ -160,7 +160,7 @@ repeat
   ga := 70
   aa := 15
   setformants(500,1440,2300,3300)
-  v.go(20)  
+  v.go(20)
 
   setformants(550,1750,2400,3400)
   v.go(60)
@@ -170,7 +170,7 @@ repeat
   setformants(250,1700,2300,3400)
   setnasal(2000)
   na := $FF
-  
+
   v.go(60)
   ga := 60
   v.go(150)
@@ -190,7 +190,7 @@ PRI go_ah
     setformants(775,1300,2500,3500)
     gp := 130
     ga := 80'-30
-    
+
     'ga := 0
     'fa := 100
     'ff := 0
@@ -219,10 +219,10 @@ PRI setnasal(f)
   nf := (f + jj/2) / jj <# 255
 
 
-  
+
 
 DAT
-'       byte  aa,ga,gp,vp,vr,f1,q1,f2,q2,f3,q3,f4,q4,fn,qn,fa,ff   
+'       byte  aa,ga,gp,vp,vr,f1,q1,f2,q2,f3,q3,f4,q4,fn,qn,fa,ff
 note    byte  0,2,4,5,7,9,11,12,11,9,7,5,4,2,0,0
 
 s1      byte  '0,0,0,0,0,670/jj,qx1,1033/jj,qx2,2842/jj,qx3,3933/19,qx4,0,0,0,0,0,0
@@ -255,9 +255,9 @@ f4s     long  3800,3600,3400,3400,3500,3500,3500,3500
 
 {{
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

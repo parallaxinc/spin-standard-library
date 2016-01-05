@@ -1,8 +1,8 @@
 ''***************************************
 ''*  Graphics Demo                      *
 ''*  Author: Chip Gracey                *
-''*  Copyright (c) 2005 Parallax, Inc.  *               
-''*  See end of file for terms of use.  *               
+''*  Copyright (c) 2005 Parallax, Inc.  *
+''*  See end of file for terms of use.  *
 ''***************************************
 
 
@@ -15,13 +15,13 @@ CON
   x_tiles = 16
   y_tiles = 12
 
-  paramcount = 14       
+  paramcount = 14
   bitmap_base = $2000
   display_base = $5000
 
   lines = 5
   thickness = 2
-  
+
 
 VAR
 
@@ -32,7 +32,7 @@ VAR
   long  tv_pins       '%ppmmm = pins                           write-only
   long  tv_mode       '%ccinp = chroma,interlace,ntsc/pal,swap write-only
   long  tv_screen     'pointer to screen (words)               write-only
-  long  tv_colors     'pointer to colors (longs)               write-only               
+  long  tv_colors     'pointer to colors (longs)               write-only
   long  tv_hc         'horizontal cells                        write-only
   long  tv_vc         'vertical cells                          write-only
   long  tv_hx         'horizontal cell expansion               write-only
@@ -49,7 +49,7 @@ VAR
   byte  y[lines]
   byte  xs[lines]
   byte  ys[lines]
-  
+
 
 OBJ
 
@@ -169,7 +169,7 @@ PUB start | i, j, k, kk, dx, dy, pp, pq, rr, numx, numchr
 
     'increment counter that makes everything change
     k++
-    
+
 
 DAT
 
@@ -248,9 +248,9 @@ pchip                   byte    "Propeller",0           'text
 {{
 
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │                                                            
+│                                                   TERMS OF USE: MIT License                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │ 
+│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
 │files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
 │modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
 │is furnished to do so, subject to the following conditions:                                                                   │

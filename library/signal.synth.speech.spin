@@ -51,12 +51,12 @@
 │ eight frames will be queued in order to relax the frame-generation timing requirement of the parent object. If   │
 │ eight frames are queued, the parent must then wait to queue another frame. If the vocal tract runs out of        │
 │ frames, it will continue generating samples based on the last frame. When a new frame is queued, it will         │
-│ immediately load it and begin inter-polating towards it.                                                         │                                    
+│ immediately load it and begin inter-polating towards it.                                                         │
 │                                                                                                                  │
 │ The vocal tract generates audio samples at a continuous rate of 20KHz. These samples can be output to pins via   │
 │ delta-modulation for RC filtering or direct transducer driving. An FM aural subcarrier can also be generated for │
 │ inclusion into a TV broadcast controlled by another cog. Regardless of any output mode, samples are always       │
-│ streamed into a special variable so that other objects can access them in real-time.                             │                                                           
+│ streamed into a special variable so that other objects can access them in real-time.                             │
 │                                                                                                                  │
 │ In order to achieve optimal sound quality, it is worthwhile to maximize amplitudes such as 'ga' to the point     │
 │ just shy of numerical overflow. Numerical overflow results in high-amplitude noise bursts which are quite        │
@@ -64,7 +64,7 @@
 │ that can be applied before overflow occurs. You must determine through experimentation what the limits are. By   │
 │ pushing 'ga' close to the overflow point, you will maximize the signal-to-noise ratio of the vocal tract,        │
 │ resulting in the highest quality sound. Once your vocal tract programming is complete, the attenuation level     │
-│ can then be used to reduce the overall output in 3dB steps while preserving the signal-to-noise ratio.           │                                       
+│ can then be used to reduce the overall output in 3dB steps while preserving the signal-to-noise ratio.           │
 │                                                                                                                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Revision History                                                                   v1.0 released 26 October 2006 │
@@ -73,85 +73,85 @@
 │       last frame's values. Before, they were left one interpolation point shy, and then set to the last frame's  │
 │       values at the start of the next frame. For continuous frames this was trivial, but it posed a problem      │
 │       during frame gaps because the internal parameters would get stalled at transition points just shy of the   │
-│       last frame's values. This change makes the vocal tract behave more sensibly during frame gaps.             │                                                                        
+│       last frame's values. This change makes the vocal tract behave more sensibly during frame gaps.             │
 │                                                                                                                  │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘                                     
-                                                                                                                                            
-}}                                                                                                                                          
-CON                                                                                                                                         
-                                                                                                                                            
-  frame_buffers = 8                                     'frame buffers (2n)                                                                
-                                                                                                                                            
-  frame_bytes = 3 {for stepsize} + 13 {for aa..ff}      '16 bytes per frame                                                                 
-  frame_longs = frame_bytes / 4                         '4 longs per frame                                                                  
-                                                                                                                                            
-  frame_buffer_bytes = frame_bytes * frame_buffers                                                                                          
-  frame_buffer_longs = frame_longs * frame_buffers                                                                                          
-                                                                                                                                            
-                                                                                                                                            
-VAR                                                                                                                                         
-                                                                                                                                            
-  long  cog, tract, pace                                                                                                                    
-                                                                                                                                            
-  long  index, attenuation, sample                      '3 longs       ...must                                                              
-  long  dira_, dirb_, ctra_, ctrb_, frqa_, cnt_         '6 longs       ...be                                                                
-  long  frames[frame_buffer_longs]                      'many longs    ...contiguous                                                        
-                                                                                                                                            
-                                                                                                                                            
-PUB start(tract_ptr, pos_pin, neg_pin, fm_offset) : okay                                                                                    
-                                                                                                                                            
-'' Start vocal tract driver - starts a cog                                                                                                  
-'' returns false if no cog available                                                                                                        
-''                                                                                                                                          
-''   tract_ptr = pointer to vocal tract parameters (13 bytes)                                                                               
-''     pos_pin = positive delta-modulation pin (-1 to disable)                                                                              
-''     neg_pin = negative delta-modulation pin (pos_pin must also be enabled, -1 to disable)                                                
-''   fm_offset = offset frequency for fm aural subcarrier generation (-1 to disable, 4_500_000 for NTSC)                                    
-                                                                                                                                            
-  'Reset driver                                                                                                                             
-  stop                                                                                                                                      
-                                                                                                                                            
-  'Remember vocal tract parameters pointer                                                                                                  
-  tract := tract_ptr                                                                                                                        
-                                                                                                                                            
-  'Initialize pace to 100%                                                                                                                  
-  pace := 100                                                                                                                               
-                                                                                                                                            
-  'If delta-modulation pin(s) enabled, ready output(s) and ready ctrb for duty mode                                                         
-  if pos_pin > -1                                                                                                                           
-    dira_[pos_pin >> 5 & 1] |= |< pos_pin                                                                                                   
-    ctrb_ := $18000000 + pos_pin & $3F                                                                                                      
-    if neg_pin > -1                                                                                                                         
-      dira_[neg_pin >> 5 & 1] |= |< neg_pin                                                                                                 
-      ctrb_ += $04000000 + (neg_pin & $3F) << 9                                                                                             
-                                                                                                                                            
-  'If fm offset is valid, ready ctra for pll mode with divide-by-16 (else disabled)                                                         
-  if fm_offset > -1                                                                                                                         
-    ctra_ := $05800000                                                                                                                      
-                                                                                                                                            
-  'Ready frqa value for fm offset                                                                                                           
-  repeat 33                                                                                                                                 
-    frqa_ <<= 1                                                                                                                             
-    if fm_offset => clkfreq                                                                                                                 
-      fm_offset -= clkfreq                                                                                                                  
-      frqa_++                                                                                                                               
-    fm_offset <<= 1                                                                                                                         
-                                                                                                                                            
-  'Ready 20KHz sample period                                                                                                                
-  cnt_ := clkfreq / 20_000                                                                                                                  
-                                                                                                                                            
-  'Launch vocal tract cog                                                                                                                   
-  return cog := cognew(@entry, @attenuation) + 1                                                                                            
-                                                                                                                                            
-                                                                                                                                            
-PUB stop                                                                                                                                    
-                                                                                                                                            
-'' Stop vocal tract driver - frees a cog                                                                                                    
-                                                                                                                                            
-  'If already running, stop vocal tract cog                                                                                                 
-  if cog                                                                                                                                    
-    cogstop(cog~ -  1)                                                                                                                      
-                                                                                                                                            
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+}}
+CON
+
+  frame_buffers = 8                                     'frame buffers (2n)
+
+  frame_bytes = 3 {for stepsize} + 13 {for aa..ff}      '16 bytes per frame
+  frame_longs = frame_bytes / 4                         '4 longs per frame
+
+  frame_buffer_bytes = frame_bytes * frame_buffers
+  frame_buffer_longs = frame_longs * frame_buffers
+
+
+VAR
+
+  long  cog, tract, pace
+
+  long  index, attenuation, sample                      '3 longs       ...must
+  long  dira_, dirb_, ctra_, ctrb_, frqa_, cnt_         '6 longs       ...be
+  long  frames[frame_buffer_longs]                      'many longs    ...contiguous
+
+
+PUB start(tract_ptr, pos_pin, neg_pin, fm_offset) : okay
+
+'' Start vocal tract driver - starts a cog
+'' returns false if no cog available
+''
+''   tract_ptr = pointer to vocal tract parameters (13 bytes)
+''     pos_pin = positive delta-modulation pin (-1 to disable)
+''     neg_pin = negative delta-modulation pin (pos_pin must also be enabled, -1 to disable)
+''   fm_offset = offset frequency for fm aural subcarrier generation (-1 to disable, 4_500_000 for NTSC)
+
+  'Reset driver
+  stop
+
+  'Remember vocal tract parameters pointer
+  tract := tract_ptr
+
+  'Initialize pace to 100%
+  pace := 100
+
+  'If delta-modulation pin(s) enabled, ready output(s) and ready ctrb for duty mode
+  if pos_pin > -1
+    dira_[pos_pin >> 5 & 1] |= |< pos_pin
+    ctrb_ := $18000000 + pos_pin & $3F
+    if neg_pin > -1
+      dira_[neg_pin >> 5 & 1] |= |< neg_pin
+      ctrb_ += $04000000 + (neg_pin & $3F) << 9
+
+  'If fm offset is valid, ready ctra for pll mode with divide-by-16 (else disabled)
+  if fm_offset > -1
+    ctra_ := $05800000
+
+  'Ready frqa value for fm offset
+  repeat 33
+    frqa_ <<= 1
+    if fm_offset => clkfreq
+      fm_offset -= clkfreq
+      frqa_++
+    fm_offset <<= 1
+
+  'Ready 20KHz sample period
+  cnt_ := clkfreq / 20_000
+
+  'Launch vocal tract cog
+  return cog := cognew(@entry, @attenuation) + 1
+
+
+PUB stop
+
+'' Stop vocal tract driver - frees a cog
+
+  'If already running, stop vocal tract cog
+  if cog
+    cogstop(cog~ -  1)
+
   'Reset variables and buffers
   longfill(@index, 0, constant(3 + 6 + frame_buffer_longs))
 
@@ -192,7 +192,7 @@ PUB go(time)
 PUB full : status
 
 '' Returns true if the parameter queue is full
-'' (useful for checking if "go" would have to wait) 
+'' (useful for checking if "go" would have to wait)
 
   return frames[index]
 
@@ -206,15 +206,15 @@ PUB empty : status | i
     if frames[i * frame_longs]
       return {false}
   return true
-  
- 
+
+
 PUB sample_ptr : ptr
 
 '' Returns the address of the long which receives the audio samples in real-time
 '' (signed 32-bit values updated at 20KHz)
 
   return @sample
-  
+
 
 PUB aural_id : id
 
@@ -238,7 +238,7 @@ entry                   org
 
                         mov     t1,#2*15                'assemble 15 multiply steps into reserves
 :minst                  mov     mult_steps,mult_step    '(saves hub memory)
-                        add     :minst,d0s0             
+                        add     :minst,d0s0
                         test    t1,#1           wc
         if_c            sub     :minst,#2
                         djnz    t1,#:minst
@@ -253,7 +253,7 @@ entry                   org
                         add     cordic_dx,#1
                         add     cordic_dy,#1
                         add     cordic_a,#1
-                        djnz    t1,#:cstep                       
+                        djnz    t1,#:cstep
                         mov     cordic_ret,antilog_ret  'write 'ret' over last instruction
 
                         mov     t1,par                  'get dira/dirb/ctra/ctrb
@@ -265,10 +265,10 @@ entry                   org
                         djnz    t2,#:regs
 
                         rdlong  frqa_center,t1          'get frqa center
-                        
+
                         add     t1,#4                   'get cnt ticks
                         rdlong  cnt_ticks,t1
-                        
+
                         mov     cnt_value,cnt           'prepare for initial waitcnt
                         add     cnt_value,cnt_ticks
 
@@ -282,7 +282,7 @@ entry                   org
 loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
 
                         rdlong  t1,par                  'perform master attenuation
-                        sar     x,t1                    
+                        sar     x,t1
 
                         mov     t1,x                    'update fm aural subcarrier for tv broadcast
                         sar     t1,#10
@@ -311,7 +311,7 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
                         mov     t1,aa                   'aspiration amplitude
                         mov     t2,lfsr
                         call    #mult
-                        
+
                         sar     t1,#8                   'set x
                         mov     x,t1
 
@@ -324,15 +324,15 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
                         mov     t1,vp                   'vibrato pitch
                         mov     t2,vphase
                         call    #sine
-                        
+
                         add     t1,gp                   'sum glottal pitch (+) into vibrato pitch (+/-)
 
 ' Glottal pulse
 
-                        shr     t1,#2                   'divide final pitch by 3 to mesh with                                                                   
+                        shr     t1,#2                   'divide final pitch by 3 to mesh with
                         mov     t2,t1                   '...12 notes/octave musical scale
                         shr     t2,#2                   '(multiply by %0.0101010101010101)
-                        add     t1,t2                                                             
+                        add     t1,t2
                         mov     t2,t1
                         shr     t2,#4
                         add     t1,t2
@@ -343,10 +343,10 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
                         add     t1,tune                 'tune scale so that gp=100 produces 110.00Hz (A2)
 
                         call    #antilog                'convert pitch (log frequency) to phase delta
-                        add     gphase,t2              
+                        add     gphase,t2
 
                         mov     t1,gphase               'convert phase to glottal pulse sample
-                        call    #antilog    
+                        call    #antilog
                         sub     t2,h40000000
                         mov     t1,ga
                         call    #sine
@@ -358,29 +358,29 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
 
                         mov     y,#0                    'reset y
 
-                        mov     a,f1                    'formant1, sum and rotate (x,y) 
-                        add     x,f1x                   
+                        mov     a,f1                    'formant1, sum and rotate (x,y)
+                        add     x,f1x
                         add     y,f1y
                         call    #cordic
                         mov     f1x,x
                         mov     f1y,y
 
-                        mov     a,f2                    'formant2, sum and rotate (x,y) 
-                        add     x,f2x                   
+                        mov     a,f2                    'formant2, sum and rotate (x,y)
+                        add     x,f2x
                         add     y,f2y
                         call    #cordic
                         mov     f2x,x
                         mov     f2y,y
 
-                        mov     a,f3                    'formant3, sum and rotate (x,y) 
-                        add     x,f3x                  
+                        mov     a,f3                    'formant3, sum and rotate (x,y)
+                        add     x,f3x
                         add     y,f3y
                         call    #cordic
                         mov     f3x,x
                         mov     f3y,y
-               
-                        mov     a,f4                    'formant4, sum and rotate (x,y)    
-                        add     x,f4x                  
+
+                        mov     a,f4                    'formant4, sum and rotate (x,y)
+                        add     x,f4x
                         add     y,f4y
                         call    #cordic
                         mov     f4x,x
@@ -396,10 +396,10 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
                         mov     t1,na                   'nasal amplitude
                         mov     t2,x
                         call    #mult
-                        
+
                         mov     x,nx                    'restore x
                         neg     nx,t1                   'negate nx
-                        
+
 ' Frication
 
                         mov     t1,lfsr                 'phase noise
@@ -415,7 +415,7 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
                         mov     t1,fa                   'frication amplitude
                         mov     t2,fphase
                         call    #sine
-                        
+
                         add     x,t1                    'add to x
 
 ' Handle frame
@@ -437,7 +437,7 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
                         rdlong  step_size,frame_ptr     'get stepsize
                         and     step_size,h00FFFFFF  wz 'isolate stepsize and check if not 0
         if_nz           jmp     #:next                  'if not 0, next frame ready
-        
+
 
                         mov     :final1,:finali         'no frame ready, ready to finalize parameters
                         mov     frame_cnt,#13           'iterate aa..ff
@@ -446,16 +446,16 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
 :final1                 mov     par_curr,par_next       'current parameter = next parameter
                         add     :final1,d0s0            'update pointers
                         djnz    frame_cnt,#:final       'another parameter?
-                        
+
                         jmp     #:wait                  'check for next frame
 
 
 :next                   add     step_size,#1            'next frame ready, insure accurate accumulation
-                        mov     step_acc,step_size      'initialize step accumulator                    
+                        mov     step_acc,step_size      'initialize step accumulator
 
 
                         movs    :set1,#par_next         'ready to get parameters and steps for aa..ff
-                        movd    :set2,#par_curr   
+                        movd    :set2,#par_curr
                         movd    :set3,#par_next
                         movd    :set4,#par_step
                         add     frame_ptr,#3            'point to first parameter
@@ -467,7 +467,7 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
 :set1                   mov     t2,par_next             'get next parameter
 :set2                   mov     par_curr,t2             'current parameter = next parameter
 :set3                   mov     par_next,t1             'next parameter = new parameter
-                        sub     t1,t2           wc      'get next-current delta with sign in c            
+                        sub     t1,t2           wc      'get next-current delta with sign in c
                         negc    t1,t1                   'make delta absolute (by c, not msb)
                         rcl     vscl,#1         wz, nr  'save sign into nz (vscl unaffected)
 
@@ -489,28 +489,28 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
 :stepframe              jmpret  :ret,#loop              '(47.5 or 8 cycles)
                         mov     :step1,:stepi           'ready to step parameters
                         mov     frame_cnt,#13           'iterate aa..ff
-                        
+
 :step                   jmpret  :ret,#loop              '(3 or 4 cycles)
 :step1                  add     par_curr,par_step       'step parameter
                         add     :step1,d0s0             'update pointers for next parameter+step
                         djnz    frame_cnt,#:step        'another parameter?
-                        
+
                         add     step_acc,step_size      'accumulate frame steps
                         test    step_acc,h01000000  wc  'check for frame steps done
         if_nc           jmp     #:stepframe             'another frame step?
 
-        
+
                         sub     frame_ptr,#frame_bytes  'zero stepsize in frame to signal frame done
                         wrlong  vscl,frame_ptr
 
                         add     frame_index,#frame_bytes'point to next frame
                         and     frame_index,#frame_buffer_bytes - 1
-                        
+
                         jmp     #:wait                  'check for next frame
 
 
-:finali                 mov     par_curr,par_next       'instruction used to finalize parameters                 
-:stepi                  add     par_curr,par_step       'instruction used to step parameters               
+:finali                 mov     par_curr,par_next       'instruction used to finalize parameters
+:stepi                  add     par_curr,par_step       'instruction used to step parameters
 
 
 ' ┌────────────────────┐
@@ -523,7 +523,7 @@ loop                    waitcnt cnt_value,cnt_ticks     'wait for sample period
 '
 '   out:        t2 = antilog ($00010000..$FFEA0000)
 
-antilog                 mov     t2,t1                   
+antilog                 mov     t2,t1
                         shr     t2,#16                  'position 11-bit fraction
                         shr     t1,#16+12               'position 4-bit whole number
                         and     t2,h00000FFE            'get table offset
@@ -554,7 +554,7 @@ sine                    shr     t2,#32-13               'get 13-bit angle
                                                         'multiply follows...
 
 ' Multiply
-'                                                                                             
+'
 '   in:         t1 = unsigned multiplier (15 top bits used)
 '               t2 = signed multiplicand (17 top bits used)
 '
@@ -569,24 +569,24 @@ mult                    shr     t1,#32-15               'position unsigned multi
 
 
 mult_step               sar     t1,#1           wc      'multiply step that gets assembled into reserves (x15)
-        if_c            add     t1,t2                   
+        if_c            add     t1,t2
 
 
 ' Cordic rotation
 '
 '   in:          a = 0 to <90 degree angle (~13 top bits used)
-'              x,y = signed coordinates     
+'              x,y = signed coordinates
 '
 '   out:       x,y = scaled and rotated signed coordinates
 
-cordic                  sar     x,#1                    'multiply (x,y) by %0.10011001 (0.60725 * 0.984)                   
-                        mov     t1,x                    '...for cordic pre-scaling and slight damping         
+cordic                  sar     x,#1                    'multiply (x,y) by %0.10011001 (0.60725 * 0.984)
+                        mov     t1,x                    '...for cordic pre-scaling and slight damping
                         sar     t1,#3
                         add     x,t1
                         mov     t1,x
                         sar     t1,#4
                         add     x,t1
-                        
+
                         sar     y,#1
                         mov     t1,y
                         sar     t1,#3
@@ -604,7 +604,7 @@ cordic                  sar     x,#1                    'multiply (x,y) by %0.10
 
 
 cordic_step             mov     a,a             wc      'cordic step that gets assembled into reserves (x13)
-                        mov     t1,y                    
+                        mov     t1,y
 cordic_dx               sar     t1,#1                   '(source incremented for each step)
                         mov     t2,x
 cordic_dy               sar     t2,#1                   '(source incremented for each step)
@@ -627,7 +627,7 @@ cordic_delta            long    $4B901476               'cordic angle deltas (fi
                         long    $14444750
                         long    $0A2C350C
                         long    $05175F85
-                        long    $028BD879                                       
+                        long    $028BD879
                         long    $0145F154
                         long    $00A2F94D
                         long    $00517CBB
@@ -639,7 +639,7 @@ h80000000               long    $80000000               'miscellaneous constants
 h40000000               long    $40000000
 h01000000               long    $01000000
 h00FFFFFF               long    $00FFFFFF
-h00010000               long    $00010000        
+h00010000               long    $00010000
 h0000D000               long    $0000D000
 h00007000               long    $00007000
 h00001000               long    $00001000
@@ -669,7 +669,7 @@ frame_cnt               res     1
 
 step_size               res     1
 step_acc                res     1
-                                                
+
 vphase                  res     1
 gphase                  res     1
 fphase                  res     1
@@ -693,11 +693,11 @@ t2                      res     1
 
 par_curr                                                '*** current parameters
 aa                      res     1                       'aspiration amplitude
-ga                      res     1                       'glottal amplitude       
+ga                      res     1                       'glottal amplitude
 gp                      res     1                       'glottal pitch
-vp                      res     1                       'vibrato pitch           
-vr                      res     1                       'vibrato rate            
-f1                      res     1                       'formant1 frequency      
+vp                      res     1                       'vibrato pitch
+vr                      res     1                       'vibrato rate
+f1                      res     1                       'formant1 frequency
 f2                      res     1                       'formant2 frequency
 f3                      res     1                       'formant3 frequency
 f4                      res     1                       'formant4 frequency

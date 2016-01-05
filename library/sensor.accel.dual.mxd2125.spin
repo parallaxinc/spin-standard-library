@@ -1,14 +1,14 @@
 ''******************************************
 ''*  Memsic Dual Accelerometer Driver v1.0 *
 ''*  Author: Paul Baker                    *
-''*  Copyright (c) 2007 Parallax, Inc.     *               
-''*  See end of file for terms of use.     *               
+''*  Copyright (c) 2007 Parallax, Inc.     *
+''*  See end of file for terms of use.     *
 ''******************************************
 
 VAR
 long cog, XVal, YVal                  'variable which contains the cog identifier and Raw sensor data
 
-PUB stop                                                               
+PUB stop
     '' Stop driver - frees a cog
     if cog
        cogstop(cog)
@@ -21,7 +21,7 @@ PUB start(Xin,Yin):okay
     '' Start driver - starts a cog
     '' returns false if no cog available
 
-    okay := cog := cognew(@MXD2125, @XVal)      
+    okay := cog := cognew(@MXD2125, @XVal)
 
 PUB x
   return XVal                                   'return current X axis pulse width
@@ -32,7 +32,7 @@ PUB y
 DAT
 MXD2125       org
               'set shared memory locations
-              mov Xarg, par                     'store location to write X value 
+              mov Xarg, par                     'store location to write X value
               mov Yarg, par                     'store location to write Y value
               add Yarg, #4                      'adjust location of Y value
               'establish counter A as pulse width counter
@@ -42,7 +42,7 @@ MXD2125       org
               mov frqb, #1                      'add 1 to counter B total each cycle pin is high
               mov ctrb, ctrbmode
 :loop         waitpeq zero, pinwaitm            'wait until both channels have completed thier cycle
-              mov temp, phsa                    'copy X axis value to hub 
+              mov temp, phsa                    'copy X axis value to hub
               wrlong temp, Xarg
               mov temp, phsb                    'copy Y axis value to hub
               wrlong temp, Yarg
