@@ -42,7 +42,7 @@ CON
 OBJ
 
     ser : "com.serial"
-    num : "string.numbers"
+    num : "string.integer"
 
 VAR
 

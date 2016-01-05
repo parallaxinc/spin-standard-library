@@ -12,7 +12,7 @@ OBJ
     term  : "com.serial.terminal"
     fp    : "math.float"
     fs    : "string.float"
-    num   : "string.numbers"
+    num   : "string.integer"
 
 PUB Main | idx, f0, fn, a, n
 

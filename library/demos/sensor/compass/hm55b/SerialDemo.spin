@@ -31,7 +31,7 @@ OBJ
     term        : "com.serial.terminal"
     compass     : "sensor.compass.hm55b"
     calibrate   : "Calibration"
-    num         : "string.numbers"
+    num         : "string.integer"
 
 PUB Main | i, dx, dy, rawheading
 

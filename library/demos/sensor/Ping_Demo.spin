@@ -17,7 +17,7 @@ OBJ
 
     term : "display.lcd.serial"
     ping : "sensor.ping"
-    num  : "string.numbers"
+    num  : "string.integer"
 
 PUB Start
 

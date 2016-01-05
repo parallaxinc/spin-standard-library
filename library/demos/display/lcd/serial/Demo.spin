@@ -10,7 +10,7 @@ CON
 OBJ
 
     lcd : "display.lcd.serial"
-    num : "string.numbers"
+    num : "string.integer"
 
 PUB Main | idx
 

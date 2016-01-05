@@ -37,7 +37,7 @@ OBJ
 
     spi  : "com.spi"
     term : "com.serial.terminal"
-    num  : "string.numbers"
+    num  : "string.integer"
 
 CON
 

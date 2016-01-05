@@ -9,7 +9,7 @@ CON
 OBJ
 
     term    : "com.serial.terminal"
-    num     : "string.numbers"
+    num     : "string.integer"
     MM2125  : "sensor.accel.dual.memsic2125"
 
 PUB Main | a, b, c, d, e, f, clk_scale
