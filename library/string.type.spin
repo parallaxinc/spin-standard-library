@@ -1,73 +1,72 @@
 {{
-    This object contains functions to test individual character types.
+    This object contains functions to test string types.
 }}
 OBJ
 
     cc : "char.type"
 
-PUB IsAlphaNumeric(stringptr)
+PUB IsAlphaNumeric(str)
 {{
     Check if string is alphanumeric.
 }}
 
-    repeat strsize(stringptr)
-        if not cc.IsAlphaNumeric (byte[stringptr++])
+    repeat strsize(str)
+        if not cc.IsAlphaNumeric (byte[str++])
             return false
 
     return true
 
-PUB IsAlpha(stringptr)
+PUB IsAlpha(str)
 {{
     Check if character is alphabetic.
 }}
 
-    repeat strsize(stringptr)
-        if not cc.IsAlpha (byte[stringptr++])
+    repeat strsize(str)
+        if not cc.IsAlpha (byte[str++])
             return false
 
     return true
 
-PUB IsDigit(stringptr)
+PUB IsDigit(str)
 {{
     Check if character is decimal.
 }}
 
-    repeat strsize(stringptr)
-        if not cc.IsDigit (byte[stringptr++])
+    repeat strsize(str)
+        if not cc.IsDigit (byte[str++])
             return false
 
     return true
 
-PUB IsLower(stringptr)
+PUB IsLower(str)
 {{
     Check if character is lowercase.
 }}
 
-    repeat strsize(stringptr)
-        if not cc.IsLower (byte[stringptr++])
+    repeat strsize(str)
+        if not cc.IsLower (byte[str++])
             return false
 
     return true
 
-PUB IsUpper(stringptr)
+PUB IsUpper(str)
 {{
     Check if character is uppercase.
 }}
 
-    repeat strsize(stringptr)
-        if not cc.IsUpper (byte[stringptr++])
+    repeat strsize(str)
+        if not cc.IsUpper (byte[str++])
             return false
 
     return true
 
-PUB IsSpace(stringptr)
+PUB IsSpace(str)
 {{
     Check if character is whitespace.
 }}
 
-    repeat strsize(stringptr)
-        if not cc.IsSpace (byte[stringptr++])
+    repeat strsize(str)
+        if not cc.IsSpace (byte[str++])
             return false
 
     return true
-
