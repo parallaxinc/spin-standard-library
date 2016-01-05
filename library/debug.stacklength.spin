@@ -109,3 +109,4 @@ PUB GetLength(TxPin, BaudRate): UsedLongs | ISeed
         term.StartRxTx(TxPin, TxPin, 0, BaudRate)                                    '  Start Parallax Serial Terminal object
         term.Str(string(term#CS, "Stack Usage: "))                                    '  Transmit text
         term.Dec(UsedLongs)                                                          '  Transmit stack utilization value
+

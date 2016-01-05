@@ -1,44 +1,29 @@
+' Author: Jeff Martin
 {{
-┌──────────────────────────────────────────────────────────────┐
-│ Object File: Clock.spin                                      │
-│ Version:     1.2                                             │
-│ Date:        2006 - July 16, 2012                            │
-│ Author:      Jeff Martin                                     │
-│ Company:     Parallax Semiconductor                          │
-│ Email:       jmartin@parallaxsemiconductor.com               │
-│ Licensing:   MIT License - see end of file for terms of use. │
-└──────────────────────────────────────────────────────────────┘
+    Provides clock timing functions to:
 
-Description:
+    -   Set clock mode and frequency at run-time using similar clock setting constants as with
+        the _clkmode system constant; like the constant: xtal1_pll16x
 
-Provides clock timing functions to:
-  • Set clock mode and frequency at run-time using similar clock setting constants as with
-    the _clkmode system constant; like the constant: xtal1_pll16x
-  • Pause execution in units of microseconds, milliseconds, or seconds 
-  • Synchronize code to the start of time-windows in units of microseconds, milliseconds,
-    or seconds.
+    -   Pause execution in units of microseconds, milliseconds, or seconds 
 
-Example of Use:
-  
-    OBJ                                                 
-      clk : "system.clock"           ' Include Clock object in parent object
+    -   Synchronize code to the start of time-windows in units of microseconds, milliseconds,
+        or seconds.
+    
+    Example of Use:
       
-    PUB Main
-      clk.Init(5_000_000)            ' Initialize Clock object with external frequency 5 MHz
-      <...>
-      clk.SetMode(XTAL1_PLL2X)       ' Switch system clock to gain 1 and 2x wind-up (10 MHz)
-      <...>
-      clk.PauseMS(100)               ' Pause for approximately 100 ms
-      <...>     
-
-See "Theory of Operation" below for more information.
-
-{{------------------------------------REVISION HISTORY-------------------------------------
- v1.1 - Updated 11/27/2006 to fix clock mode value when new mode is XINPUT.
- v1.2 - Updated 07/14/2012 to fix oscillator start-up delay bug that prevented proper
-        operation in certain cases.  Also, heavily revised to make setting the clock mode
-        12x faster, code smaller, and made the object conform to the Gold Standard.  Added
-        the SetMode method.  Deprecated the SetClock method.
+        OBJ                                                 
+          clk : "system.clock"           ' Include Clock object in parent object
+          
+        PUB Main
+          clk.Init(5_000_000)            ' Initialize Clock object with external frequency 5 MHz
+          <...>
+          clk.SetMode(XTAL1_PLL2X)       ' Switch system clock to gain 1 and 2x wind-up (10 MHz)
+          <...>
+          clk.PauseMS(100)               ' Pause for approximately 100 ms
+          <...>     
+    
+    See "Theory of Operation" below for more information.
 }}
 
 CON                                                     
@@ -101,24 +86,6 @@ PUB SetMode(clockMode): newFreq
   clkset(clockMode, newFreq := ircFreq[clockMode <# 2] * |<(clockMode & $7 - 3 #> 0)) 'Switch to new clock mode, indicate new frequency (ideal RCFAST, ideal RCSLOW, or                                                                 
                                                                                       'XINFreq * PLL multiplier) and update return value (new frequency)
            
-PUB SetClock(mode): newFreq 
-{{[DEPRECATED] - Use SetMode instead.  This method remains for legacy code only.
-Set System Clock to mode and adjust frequency appropriately.
-Ensure that valid mode expressions are used; some invalid expressions will be translated
-to nearby modes, but others will be ignored.
-  PARAMETERS: mode = a combination of RCSLOW, RCFAST, XINPUT, XTALx and PLLx clock setting
-              constants.  For example: XTAL1 + PLL16x.
-  RETURNS:    New clock frequency.  Returns 0 and does not affect system clock if mode
-              expression is malformed.
-
-  See "SetClock Method Explanation" for more information.             
-}}                                                                                                      
-  mode := >|mode + ( >|(mode ^ (|<(>|mode - 1))) - 3 #> 0 ) * 5 - 1                   'Convert mode to index (0..25) of corresponding clkValue array                      
-  
-  if mode < 26                                                                        'If mode is valid     
-    newFreq := SetMode(clkValue[mode])                                                '  Set clock mode to proper value
-
-
 PUB PauseUSec(duration) 
 {{Pause execution in microseconds.
   PARAMETERS: duration = number of microseconds to delay.
@@ -465,26 +432,4 @@ SETCLOCK METHOD EXPLANATION:
           │ XTAL3 + PLL8X   │ %01000100000 ││ 10 │  6 │  3  │ 15 │ 25  ││ %01111110 ($7E) │
           │ XTAL3 + PLL16X  │ %10000100000 ││ 11 │  6 │  3  │ 15 │ 26  ││ %01111111 ($7F) │
           └─────────────────┴──────────────┴┴────┴────┴─────┴────┴─────┴┴─────────────────┘                                                                        
-                                              
-           
-          
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                TERMS OF USE: MIT License                                │                                                            
-├─────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this     │
-│software and associated documentation files (the "Software"), to deal in the Software    │
-│without restriction, including without limitation the rights to use, copy, modify, merge,│
-│publish, distribute, sublicense, and/or sell copies of the Software, and to permit       │
-│persons to whom the Software is furnished to do so, subject to the following conditions: │
-│                                                                                         │
-│The above copyright notice and this permission notice shall be included in all copies or │
-│substantial portions of the Software.                                                    │
-│                                                                                         │
-│THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESSED OR IMPLIED,    │
-│INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR │
-│PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE│
-│FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR     │
-│OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER   │
-│DEALINGS IN THE SOFTWARE.                                                                │
-└─────────────────────────────────────────────────────────────────────────────────────────┘
 }}                    

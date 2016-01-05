@@ -70,3 +70,4 @@ PUB IsSpace(stringptr)
             return false
 
     return true
+
