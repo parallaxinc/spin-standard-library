@@ -43,7 +43,7 @@ PUB IsSpace(c)
 
     return lookdown(c: " ", 9, 10, 13)
 
-PUB ToUpper(c)
+PUB Upper(c)
 {{
     Convert character to uppercase.
 }}
@@ -53,7 +53,7 @@ PUB ToUpper(c)
     else
         return c
 
-PUB ToLower(c)
+PUB Lower(c)
 {{
     Convert character to lowercase.
 }}

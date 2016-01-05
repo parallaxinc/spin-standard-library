@@ -10,7 +10,7 @@ OBJ
 
     term  : "com.serial.terminal"
     num   : "string.integer"
-    cc    : "string.char"
+    cc    : "char.type"
 
 VAR
 

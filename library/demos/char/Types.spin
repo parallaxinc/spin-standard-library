@@ -5,7 +5,7 @@ CON
 OBJ
 
     term  : "com.serial.terminal"
-    ss    : "string.string"
+    ss    : "string.type"
 
 PUB Main
 
@@ -45,3 +45,4 @@ PUB PrintOutcome(stringptr, outcome)
         term.Str (string("false"))
 
     term.NewLine
+

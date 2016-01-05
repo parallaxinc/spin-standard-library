@@ -3,7 +3,7 @@
 }}
 OBJ
 
-    cc : "string.char"
+    cc : "char.type"
 
 PUB IsAlphaNumeric(stringptr)
 {{

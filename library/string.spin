@@ -1,15 +1,24 @@
 ' Derived from ASCII0_STREngine.spin
 ' Original author: Kwabena W. Agyeman, J Moxham
-PUB Append(source, destination)
 {{
-    Concatenates a string onto the end of another. This method can corrupt memory.
-    
-    Parameters:
+    This objects contains generic functions for string manipulation.
+}}
+OBJ
 
-    -   source - The string to be appended.
-    -   destination - The string that the source string is appended to.
-    
+    cc : "char.type"
+
+VAR
+
+    word    tokenstr
+
+PUB Append(destination, source)
+{{
+    Append `source` string to the end of `destination` string.
+
     Returns a pointer to the new string.
+
+    Destination string must be larger or equal to size of source
+    string to prevent memory corruption.
 }}
 
     bytemove((destination + strsize(destination)), source, (strsize(source) + 1))
@@ -18,16 +27,12 @@ PUB Append(source, destination)
 PUB Compare(str1, str2, casesensitive)
 {{
     Compare two strings.
-    
+
     - Return zero if the two strings are equal.
     - Return positive value if `str1` comes after  `str2`.
     - Return negative value if `str1` comes before `str2`.
-    
-    Parameters:
 
-    - str1 - the first string to compare.
-    - str2 - the second string to compare.
-    - casesensitive - use `true` for case-sensitive comparison, or `false` for case-insensitive.
+    If `casesensitive` is true, use case-sensitive comparison, or false for case-insensitive.
 }}
 
     if casesensitive
@@ -36,20 +41,33 @@ PUB Compare(str1, str2, casesensitive)
         while(byte[str1++] and (not(result)))
     else
         repeat
-            result := (IgnoreCase(byte[str1]) - IgnoreCase(byte[str2++]))
+            result := (cc.Lower(byte[str1]) - cc.Lower(byte[str2++]))
         while(byte[str1++] and (not(result)))
 
-PUB Copy(source, destination)
+PUB Copy(destination, source)
 {{
     Copies a string from one location to another.
-    
+
     Returns a pointer to the new string.
-    
+
     Destination string must be larger or equal to size of source string.
 }}
 
     bytemove(destination, source, (strsize(source) + 1))
     return destination
+
+PUB EndsWith(str, substr) | end
+{{
+    Checks if the string of characters ends with the specified characters.
+
+    Returns true if yes and false if no.
+
+    str - A pointer to the string of characters to search.
+    substr - A pointer to the string of characters to find in the string of characters to search.
+}}
+
+    end := str + strsize(str) - strsize(substr)
+    return (end == Find(end, substr))
 
 PUB Fill(str, char)
 {{
@@ -60,75 +78,36 @@ PUB Fill(str, char)
     byte[str + strsize(str)] := 0
     return str
 
-PUB Lower(str)
+PUB Find(str, substr) | index, size '' 7 Stack Longs
 {{
-    Converts all uppercase characters in string to lowercase.
-    
-    Note: This function operates on the original string and does not make a copy.
+    Searches a string of characters for the first occurence of the specified string of characters.
+
+    Returns the address of that string of characters if found and zero if not found.
+
+    str - A pointer to the string of characters to search.
+    substr - A pointer to the string of characters to find in the string of characters to search.
 }}
 
-    repeat strsize(str--)
-        result := byte[++str]
-        if((result => "A") and (result =< "Z"))
-            byte[str] := (result + 32)
+    size := strsize(substr)
+    if(size--)
 
-PUB Upper(str)
-{{
-    Converts all lowercase characters in string to uppercase.
-}}
+        repeat strsize(str--)
+            if(byte[++str] == byte[substr])
 
-    repeat strsize(str--)
-        result := byte[++str]
-        if((result => "a") and (result =< "z"))
-            byte[str] := (result - 32)
+                repeat index from 0 to size
+                    if(byte[str][index] <> byte[substr][index])
+                        result := true
+                        quit
 
-PUB IsEmpty(str)
-{{
-    Returns true if string contains no characters, otherwise false.
-}}
-
-    return (strsize(str) == 0)
-
-PUB Strip(str)
-{{
-    Removes white space and new lines arround the outside of string of characters.
-    
-    Returns a pointer to the trimmed string of characters.
-    
-    str - A pointer to a string of characters to be trimmed.
-}}
-
-    result := IgnoreSpace(str)
-    str := (result + ((strsize(result) - 1) #> 0))
-    
-    repeat
-        case byte[str]
-            8 .. 13, 32, 127: byte[str--] := 0
-            other: quit
-
-PUB Join(str)
-{{
-    Removes white space and new lines arround the inside of a string of characters.
-    
-    Returns a pointer to the tokenized string of characters, or an empty string when out of tokenized strings of characters.
-    
-    str - A pointer to a string of characters to be tokenized, or null to continue tokenizing a string of characters.
-}}
-    
-    result := str := IgnoreSpace(str)
-    
-    repeat while(byte[str])
-        case byte[str++]
-            8 .. 13, 32, 127:
-                byte[str - 1] := 0
-                quit
+                ifnot(result~)
+                    return str
 
 PUB FindChar(str, char)
 {{
     Searches a string of characters for the first occurence of the specified character.
-    
+
     Returns the address of that character if found and zero if not found.
-    
+
     str - A pointer to the string of characters to search.
     CharacterToFind - The character to find in the string of characters to search.
 }}
@@ -137,64 +116,47 @@ PUB FindChar(str, char)
         if(byte[++str] == char)
             return str
 
-PUB ReplaceChar(str, char, newchar)
+PUB IsEmpty(str)
 {{
-    Replaces the first occurence of the specified character in a string of characters with another character.
-    
-    Returns the address of the next character after the character replaced on success and zero on failure.
-    
-    str - A pointer to the string of characters to search.
-    CharacterToReplace - The character to find in the string of characters to search.
-    CharacterToReplaceWith - The character to replace the character found in the string of characters to search.
+    Returns true if string contains no characters, otherwise false.
 }}
 
-    result := FindChar(str, char)
-    if(result)
-        byte[result++] := newchar
+    return (strsize(str) == 0)
 
-PUB ReplaceAllChars(str, char, newchar)
+PUB Left(destination, source, count)
 {{
-    Replaces all occurences of the specified character in a string of characters with another character.
-    
-    str - A pointer to the string of characters to search.
-    CharacterToReplace - The character to find in the string of characters to search.
-    CharacterToReplaceWith - The character to replace the character found in the string of characters to search.
+    returns the left number of characters
+}}
+    bytemove(destination, source, count)
+    byte[destination + count] := 0
+    return destination
+
+PUB Lower(str)
+{{
+    Converts all uppercase characters in string to lowercase.
+
+    Note: This function operates on the original string and does not make a copy.
+}}
+    result := str
+    repeat strsize(str)
+        byte[str++] := cc.Lower (byte[str])
+
+PUB Mid(destination, source, start, count)
+{{
+    returns strings starting at start with number characters
 }}
 
-    repeat while(str)
-        str := ReplaceChar(str, char, newchar)
-
-PUB Find(str, substr) | index, size '' 7 Stack Longs
-{{
-    Searches a string of characters for the first occurence of the specified string of characters.
-    
-    Returns the address of that string of characters if found and zero if not found.
-    
-    str - A pointer to the string of characters to search.
-    substr - A pointer to the string of characters to find in the string of characters to search.
-}}
-
-    size := strsize(substr)
-    if(size--)
-    
-        repeat strsize(str--)
-            if(byte[++str] == byte[substr])
-            
-                repeat index from 0 to size
-                    if(byte[str][index] <> byte[substr][index])
-                        result := true
-                        quit
-                
-                ifnot(result~)
-                    return str
+    bytemove(destination, source + start, count)
+    byte[destination + count] := 0
+    return destination
 
 PUB Replace(str, substr, newsubstr)
 {{
     Replaces the first occurence of the specified string of characters in a string of characters with another string of
     characters. Will not enlarge or shrink a string of characters.
-    
+
     Returns the address of the next character after the string of characters replaced on success and zero on failure.
-    
+
     str - A pointer to the string of characters to search.
     substr - A pointer to the string of characters to find in the string of characters to search.
     newsubstr - A pointer to the string of characters that will replace the string of characters found in the
@@ -210,7 +172,7 @@ PUB ReplaceAll(str, substr, newsubstr) '' 19 Stack Longs
 {{
     Replaces all occurences of the specified string of characters in a string of characters with another string of
     characters. Will not enlarge or shrink a string of characters.
-    
+
     str - A pointer to the string of characters to search.
     substr - A pointer to the string of characters to find in the string of characters to search.
     newsubstr - A pointer to the string of characters that will replace the string of characters found in the
@@ -220,46 +182,37 @@ PUB ReplaceAll(str, substr, newsubstr) '' 19 Stack Longs
     repeat while(str)
         str := Replace(str, substr, newsubstr)
 
-PUB EndsWith(str, substr) | end
+PUB ReplaceChar(str, char, newchar)
 {{
-    Checks if the string of characters ends with the specified characters.
-    
-    Returns true if yes and false if no.
-    
+    Replaces the first occurence of the specified character in a string of characters with another character.
+
+    Returns the address of the next character after the character replaced on success and zero on failure.
+
     str - A pointer to the string of characters to search.
-    substr - A pointer to the string of characters to find in the string of characters to search.
+    CharacterToReplace - The character to find in the string of characters to search.
+    CharacterToReplaceWith - The character to replace the character found in the string of characters to search.
 }}
 
-    end := str + strsize(str) - strsize(substr)
-    return (end == Find(end, substr))
+    result := FindChar(str, char)
+    if(result)
+        byte[result++] := newchar
 
-PUB StartsWith(str, substr)
+PUB ReplaceAllChars(str, char, newchar)
 {{
-    Checks if the string of characters starts with the specified characters.
-}}
-    return (str == Find(str, substr))
+    Replaces all occurences of the specified character in a string of characters with another character.
 
-PUB Left(source, destination, count)
-{{
-    returns the left number of characters
-}}
-    bytemove(destination, source, count)
-    byte[destination + count] := 0
-    return destination
- 
-PUB Mid(source, destination, start, count)
-{{
-    returns strings starting at start with number characters
+    str - A pointer to the string of characters to search.
+    CharacterToReplace - The character to find in the string of characters to search.
+    CharacterToReplaceWith - The character to replace the character found in the string of characters to search.
 }}
 
-    bytemove(destination, source + start, count)
-    byte[destination + count] := 0
-    return destination
+    repeat while(str)
+        str := ReplaceChar(str, char, newchar)
 
-PUB Right(source, destination, count)
+PUB Right(destination, source, count)
 {{
     Copies the `count` rightmost characters of `source` string to `destination` string.
-    
+
     Returns resulting string.
 }}
 
@@ -267,16 +220,63 @@ PUB Right(source, destination, count)
     byte[destination + count] := 0
     return destination
 
-PRI IgnoreCase(character)
+PUB StartsWith(str, substr)
+{{
+    Checks if the string of characters starts with the specified characters.
+}}
+    return (str == Find(str, substr))
 
-    result := character
-    if((character => "a") and (character =< "z"))
-        result -= 32
+PUB Strip(str)
+{{
+    Removes white space and new lines arround the outside of string of characters.
 
-PRI IgnoreSpace(characters)
+    Returns a pointer to the trimmed string of characters.
+}}
 
-    result := characters
-    repeat strsize(characters--)
-        case byte[++characters]
+    result := IgnoreSpace(str)
+    str := (result + ((strsize(result) - 1) #> 0))
+
+    repeat
+        case byte[str]
+            8 .. 13, 32, 127: byte[str--] := 0
+            other: quit
+
+PUB Tokenize(str)
+{{
+    Removes white space and new lines arround the inside of a string of characters.
+
+    Returns a pointer to the tokenized string of characters, or null when out of tokenized strings of characters.
+
+    str - A pointer to a string of characters to be tokenized, or null to continue tokenizing a string of characters.
+}}
+
+    if str
+        tokenstr := str
+
+    tokenstr := IgnoreSpace(tokenstr)
+
+    if strsize(tokenstr)
+        result := tokenstr
+
+    repeat while(byte[tokenstr])
+        case byte[tokenstr++]
             8 .. 13, 32, 127:
-            other: return characters
+                byte[tokenstr - 1] := 0
+                quit
+
+PUB Upper(str)
+{{
+    Converts all lowercase characters in string to uppercase.
+}}
+
+    result := str
+    repeat strsize(str)
+        byte[str++] := cc.Upper (byte[str])
+
+PRI IgnoreSpace(str)
+
+    result := str
+    repeat strsize(str--)
+        case byte[++str]
+            8 .. 13, 32, 127:
+            other: return str
