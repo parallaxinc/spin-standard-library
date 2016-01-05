@@ -78,7 +78,7 @@ PUB Fill(str, char)
     byte[str + strsize(str)] := 0
     return str
 
-PUB Find(str, substr) | index, size '' 7 Stack Longs
+PUB Find(str, substr) | index, size
 {{
     Searches a string of characters for the first occurence of the specified string of characters.
 
@@ -168,7 +168,7 @@ PUB Replace(str, substr, newsubstr)
         repeat (strsize(newsubstr) <# strsize(substr))
             byte[result++] := byte[newsubstr++]
 
-PUB ReplaceAll(str, substr, newsubstr) '' 19 Stack Longs
+PUB ReplaceAll(str, substr, newsubstr)
 {{
     Replaces all occurences of the specified string of characters in a string of characters with another string of
     characters. Will not enlarge or shrink a string of characters.
