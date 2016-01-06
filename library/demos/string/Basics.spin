@@ -19,17 +19,17 @@ PUB Main
 
     term.Str (string("String!"))
     term.NewLine
-    
+
     ' Create a string in a DAT block and use the address.
-    
+
     term.Str (@magicstring)
     term.NewLine
-    
+
     ' Get the size of a string with strsize()
-    
+
     term.Dec (strsize(@magicstring))
     term.NewLine
-        
+
 DAT
 
     magicstring     byte    "another string!",0
