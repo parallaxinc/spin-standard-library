@@ -19,11 +19,7 @@ OBJ
 
 
 
-PUB
-
-
-
-PRI
+PUB Main
 
 
 
