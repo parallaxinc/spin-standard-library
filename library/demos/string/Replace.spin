@@ -11,7 +11,7 @@ VAR
 
     byte    str1[64]
 
-PUB Main | i
+PUB Main
 
     term.Start (115200)
 
@@ -21,4 +21,4 @@ PUB Main | i
 
 DAT
 
-magicstring     byte    "Mary had a little ______, little ______, little ______!",0
+    magicstring     byte    "Mary had a little ______, little ______, little ______",0

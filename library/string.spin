@@ -78,7 +78,7 @@ PUB Fill(str, char)
     byte[str + strsize(str)] := 0
     return str
 
-PUB Find(str, substr) | index, size
+PUB Find(str, substr) | i, size
 {{
     Searches a string of characters for the first occurence of the specified string of characters.
 
@@ -94,8 +94,8 @@ PUB Find(str, substr) | index, size
         repeat strsize(str--)
             if(byte[++str] == byte[substr])
 
-                repeat index from 0 to size
-                    if(byte[str][index] <> byte[substr][index])
+                repeat i from 0 to size
+                    if(byte[str][i] <> byte[substr][i])
                         result := true
                         quit
 
@@ -109,7 +109,7 @@ PUB FindChar(str, char)
     Returns the address of that character if found and zero if not found.
 
     str - A pointer to the string of characters to search.
-    CharacterToFind - The character to find in the string of characters to search.
+    char - The character to find in the string of characters to search.
 }}
 
     repeat strsize(str--)
@@ -127,9 +127,7 @@ PUB Left(destination, source, count)
 {{
     returns the left number of characters
 }}
-    bytemove(destination, source, count)
-    byte[destination + count] := 0
-    return destination
+    return Mid(destination, source, 0, count)
 
 PUB Lower(str)
 {{
@@ -150,7 +148,7 @@ PUB Mid(destination, source, start, count)
     byte[destination + count] := 0
     return destination
 
-PUB Replace(str, substr, newsubstr)
+PUB Replace(str, substr, newsubstr) | size
 {{
     Replaces the first occurence of the specified string of characters in a string of characters with another string of
     characters. Will not enlarge or shrink a string of characters.
@@ -164,9 +162,10 @@ PUB Replace(str, substr, newsubstr)
 }}
 
     result := Find(str, substr)
-    if(result)
-        repeat (strsize(newsubstr) <# strsize(substr))
-            byte[result++] := byte[newsubstr++]
+    if result
+        size := strsize(newsubstr) <# strsize(substr)
+        bytemove(result, newsubstr, size)
+        result += size
 
 PUB ReplaceAll(str, substr, newsubstr)
 {{
@@ -189,12 +188,12 @@ PUB ReplaceChar(str, char, newchar)
     Returns the address of the next character after the character replaced on success and zero on failure.
 
     str - A pointer to the string of characters to search.
-    CharacterToReplace - The character to find in the string of characters to search.
-    CharacterToReplaceWith - The character to replace the character found in the string of characters to search.
+    char - The character to find in the string of characters to search.
+    newchar - The character to replace the character found in the string of characters to search.
 }}
 
     result := FindChar(str, char)
-    if(result)
+    if result
         byte[result++] := newchar
 
 PUB ReplaceAllChars(str, char, newchar)
@@ -202,8 +201,8 @@ PUB ReplaceAllChars(str, char, newchar)
     Replaces all occurences of the specified character in a string of characters with another character.
 
     str - A pointer to the string of characters to search.
-    CharacterToReplace - The character to find in the string of characters to search.
-    CharacterToReplaceWith - The character to replace the character found in the string of characters to search.
+    char - The character to find in the string of characters to search.
+    newchar - The character to replace the character found in the string of characters to search.
 }}
 
     repeat while(str)
@@ -216,9 +215,7 @@ PUB Right(destination, source, count)
     Returns resulting string.
 }}
 
-    bytemove(destination, source + strsize(source) - count, count)
-    byte[destination + count] := 0
-    return destination
+    return Mid(destination, source, strsize(source) - count, count)
 
 PUB StartsWith(str, substr)
 {{

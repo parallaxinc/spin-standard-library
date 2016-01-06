@@ -11,7 +11,7 @@ VAR
 
     word    tokenptr
 
-PUB Main | i
+PUB Main
 
     term.Start (115200)
 

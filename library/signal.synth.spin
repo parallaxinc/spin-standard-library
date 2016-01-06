@@ -1,24 +1,5 @@
-{{
-*****************************************
-* Frequency Synthesizer demo v1.1       *
-* Author: Beau Schwabe                  *
-* Copyright (c) 2007 Parallax           *
-* See end of file for terms of use.     *
-*****************************************
-  Original Author: Chip Gracey
-  Modified by Beau Schwabe
-*****************************************
-}}
-{
-Revision History:
-                  Version 1.0   -    original file created
+' Original authors: Chip Gracey, Beau Schwabe
 
-                  Version 1.1   -    For Channel "B" there was a typo in the 'Synth' object
-                                     The line that reads...
-                                     DIRB[Pin]~~                        'make pin output
-                                     ...should read...
-                                     DIRA[Pin]~~                        'make pin output
-}
 PUB Synth(CTR_AB, Pin, Freq) | s, d, ctr, frq
 
   Freq := Freq #> 0 <# 128_000_000     'limit frequency range

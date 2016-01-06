@@ -12,7 +12,7 @@ VAR
     byte    str1[20]
     byte    strtemp[20]
 
-PUB Main | i
+PUB Main
 
     term.Start (115200)
 

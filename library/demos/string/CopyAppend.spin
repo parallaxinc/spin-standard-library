@@ -17,22 +17,18 @@ PUB Main
 
     str.Copy  (@str1, string("BACON"))
     term.Str  (@str1)
-
     term.NewLine
 
     str.Append(@str1, string(" AND"))
     term.Str  (@str1)
-
     term.NewLine
 
     str.Append(@str1, string(" CHICKEN"))
     term.Str  (@str1)
-
     term.NewLine
 
     str.Append(@str1, string(" IS"))
     term.Str  (@str1)
-
     term.NewLine
 
     str.Append(@str1, string(" GOOD"))
