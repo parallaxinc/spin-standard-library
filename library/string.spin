@@ -139,6 +139,15 @@ PUB Lower(str)
     repeat strsize(str)
         byte[str++] := cc.Lower (byte[str])
 
+PUB Match(s1, s2)
+{{
+    Returns true if strings match, otherwise false.
+    
+    This is a convenience function for Compare(s1, s2).
+}}
+
+    return (Compare (s1, s2, true) == 0)
+
 PUB Mid(destination, source, start, count)
 {{
     returns strings starting at start with number characters
