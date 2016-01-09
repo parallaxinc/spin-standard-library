@@ -24,6 +24,10 @@ PUB Append(destination, source)
     bytemove((destination + strsize(destination)), source, (strsize(source) + 1))
     return destination
 
+PUB Clear(s)
+
+    Fill(s, 0)
+
 PUB Compare(str1, str2, casesensitive)
 {{
     Compare two strings.

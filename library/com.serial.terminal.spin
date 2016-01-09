@@ -294,3 +294,17 @@ PUB MoveDown(y)
 
     repeat y
         ser.Char(MD)
+
+PUB ReadLine(line, maxline) : size | c
+
+    repeat
+        case c := CharIn
+            BS:     if size
+                        size--
+                        Char(c)
+            NL, LF: byte[line][size] := 0
+                    Char(c)
+                    quit
+            other:  if size < maxline
+                        byte[line][size++] := c
+                        Char(c)    

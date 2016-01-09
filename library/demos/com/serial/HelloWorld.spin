@@ -7,7 +7,7 @@ OBJ
 
 PUB Main
 
-    ser.Start(115_200)
+    ser.Start(115200)
 
     ser.Char("H")
     ser.Char("e")

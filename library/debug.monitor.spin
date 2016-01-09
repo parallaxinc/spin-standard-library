@@ -13,37 +13,37 @@
 '       addr <enter>            - dump 256 bytes starting at addr
 '       addr b1 b2 b3 <enter>   - enter bytes starting at addr
 
-
 CON
+    _clkmode = xtal1 + pll16x
+    _xinfreq = 5_000_000
+    
+    MAX_LINE = 64
 
-  maxline = 64
+OBJ
 
+    term : "com.serial.terminal"
+    str : "string"
 
 VAR
 
-  long rx, tx, baud, linesize, linepos, hex, address, stack[40]
-  byte line[maxline]
+    long linesize, linepos, hex, address, stack[40]
+    byte line[MAX_LINE]
 
+PUB Main
 
-PUB start(rxpin, txpin, baudrate) : okay
-
-'' Start monitor in another cog
-
-  rx := rxpin
-  tx := txpin
-  baud := clkfreq / baudrate
-  okay := cognew(monitor, @stack) > 0
-
-
-PRI monitor
-
-' Actual 'monitor' program that runs in another cog
-
-  outa[tx] := dira[tx] := 1
+  term.Start (115200)
+  
+  cognew(monitor, @stack)
+  
+PUB monitor
 
   repeat
-    linesize := getline
-    linepos := 0
+    term.Str (string(">"))
+    
+    term.ReadLine (@line, MAX_LINE-4)
+    term.Str (@line)
+    
+{
     if gethex
       address := hex
       if gethex
@@ -54,83 +54,22 @@ PRI monitor
         hexpage
     else
       hexpage
-
-
-PRI gethex : got | c
-
-  hex := 0
-  repeat while linepos <> linesize
-    case c := line[linepos++]
-      " ":   if got
-               quit
-      other: hex := hex << 4 + lookdownz(c : "0".."9", "A".."F")
-             got++
-
-
-PRI getline : size | c
-
-  serout(">")
-  repeat
-    case c := uppercase(serin)
-      "0".."9", "A".."F", " ":
-          if size <> maxline
-            line[size++] := c
-            serout(c)
-      8:  if size
-            size--
-            serout(8)
-            serout(" ")
-            serout(8)
-      13: serout(c)
-          quit
-
-
-PRI uppercase(c) : chr
-
-  if lookdown(c: "a".."z")
-    c -= $20
-  chr := c
-
+      
+    term.Newline
 
 PRI hexpage | c
 
   repeat 16
-    hexout(address,4)
-    serout("-")
+    term.Hex (address,4)
+    term.Char ("-")
     repeat 16
-      hexout(byte[address++],2)
-      serout(" ")
+      term.Hex (byte[address++],2)
+      term.Char (" ")
     address -= 16
     repeat 16
       c := byte[address++]
       if not lookdown(c : $20..$80)
         c := "."
-      serout(c)
-    serout(13)
-
-
-PRI hexout(value, digits)
-
-  value <<= (8-digits) << 2
-  repeat digits
-    serout(lookupz((value <-= 4) & $F : "0".."9", "A".."F"))
-
-
-PRI serout(b) | t
-
-  b := b.byte << 2 + $400
-  t := cnt
-  repeat 10
-    waitcnt(t += baud)
-    outa[tx] := (b >>= 1) & 1
-
-
-PRI serin : b | t
-
-  waitpeq(0, |< rx, 0)
-  t := cnt + baud >> 1
-  repeat 8
-    waitcnt(t += baud)
-    b := ina[rx] << 7 | b >> 1
-  waitcnt(t + baud)
-
+      term.Char(c)
+    term.Char(13)
+}

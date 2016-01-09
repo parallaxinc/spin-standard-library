@@ -32,17 +32,13 @@ PUB Main
         term.Flush
         term.Str (@prompt)
         
-        term.StrIn (@line)
+        term.ReadLine (@line, MAX_LINE)
         
-        ifnot Process(@line)
-            Usage
+        if Process(@line)
+            term.Str (@data_usage)
             next
 
 PUB Process(s)
-
-    if strsize(s) => MAX_LINE
-        term.Str (string("Too many characters!"))
-        return false
     
     argc := 0
     argv[argc] := str.Tokenize (s)       
@@ -50,7 +46,7 @@ PUB Process(s)
         argv[++argc] := str.Tokenize (0)
         
     if argc < 1
-        return true
+        return
 
     if Match(argv[0], string("ls"))
         ListStuff
@@ -65,12 +61,11 @@ PUB Process(s)
         Bizz
         
     elseifnot str.Compare (argv[0], string("help"), false)
-        return false
+        return true
     
     else
         term.Str (string("Bad command or file name!",10))
-        
-    return true
+
     
 PUB PrintWorkingDirectory
 
@@ -135,10 +130,6 @@ PUB SetPrompt
     str.Copy (@prompt, string("user@propeller:"))
     str.Append (@prompt, @directory)
     str.Append (@prompt, string("$ "))
-    
-PUB Usage
-
-    term.Str (@data_usage)
 
 PRI Match(s1, s2)
 
