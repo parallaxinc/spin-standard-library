@@ -1,14 +1,111 @@
+{{
+    This object defines a rich command line parser for Spin terminals.
+    
+    Some key features:
+    
+    -   Automatically generates command line help.
+    
+    -   Supports options and one positional argument.
+    
+    -   Supports multiple commands.
+    
+    -   Uses only the `string` library so you can plug it into any output driver you want.
+        
+    # Usage
+    
+    As with any thing else, we can define a string in place or in a DAT block elsewhere.
+    In this case, however, it is a good idea to define them in a DAT block because we will
+    refer to the strings by name frequently, and this way it is less wasteful.
+    
+    ## Setting up the parser
+    
+    So let's start by writing out all our descriptions of the commands we want to use.
+    
+        DAT
+            data_description    byte    "This shell enables an interface to a live"
+                                byte    "Propeller for debugging.",0
+            
+            cmd_help            byte    "help",0
+            
+            cmd_hex             byte    "hex",0
+            cmd_hex_desc        byte    "output hex to terminal",0
+            
+            cmd_info            byte    "info",0
+            cmd_info_desc       byte    "print information about the running application",0
+            
+            opt_b               byte    "-b",0
+            opt_b_desc          byte    "Enable some feature",0
+            
+            opt_c               byte    "-c",0
+            opt_c_desc          byte    "And cool",0
+            
+            opt_d               byte    "-d",0
+            opt_d_desc          byte    "Turn this on!",0
+            
+            pos_file            byte    "FILE",0
+            pos_file_desc       byte    "The file on which to operate",0
+    
+    ### Setting the description
+    
+    The description gives people a general overview of what this interface is for. It is the
+    first thing displayed when `Usage` is called.
+    
+        commandparser.SetDescription(@data_description)
+    
+    ### Adding a command
+
+    Let's add our first command, `hex`. We store the return value from `AddCommand` in a variable
+    because we will need it to add options to it.
+
+        hex := commandparser.AddCommand(@cmd_hex, @cmd_hex_desc)
+        
+    Now let's add the options.
+
+        commandparser.AddOption (hex, @opt_b, @opt_b_desc, true)
+        commandparser.AddOption (hex, @opt_c, @opt_c_desc, true)
+        commandparser.AddOption (hex, @opt_d, @opt_d_desc, false)
+
+    Now let's add a positional argument. 
+
+        commandparser.AddPositionalArgument (hex, @pos_file, @pos_file_desc)
+        
+    ### Adding another command
+    
+    Now that we've added `hex`, let's add a second command called `info`.
+        
+        commandparser.AddCommand(@cmd_info, @cmd_info_desc)
+        
+    By default, this library allows a maximum of 5 commands, 5 options, and 10 arguments.
+    This can be easily change by updating the constants.
+    
+    ### Starting up
+    
+    The only thing left to do before we can start parsing arguments is to start the parser.
+    This performs all the remaining setup left.
+        
+        commandparser.Start(@line, MAX_LINE)
+        
+    @line is a pointer to a string that will contain the workspace for the command line parser.
+    It needs to be long enough to fit all of the arguments, which will depend on your needs.
+    
+    Here is a good example definition:
+    
+        CON
+            MAX_LINE = 40
+        VAR
+            byte    line[MAX_LINE]
+    
+    ## Processing arguments
+        
+}}
 CON
-    MAX_ARGUMENTS = 10
+
+    MAX_ARGUMENTS   = 10
+    MAX_COMMANDS    = 5
+    MAX_OPTIONS     = 5
+    MAX_ERRORS      = 5
     
-    MAX_COMMANDS = 5
-    MAX_OPTIONS = 5
-    
-    MAX_ERRORS = 5
-    
-    MAX_POSITIONAL_ARGUMENTS = 3
-    
-    MAX_USAGE = (MAX_COMMANDS+MAX_OPTIONS+10)*40
+    MAX_USAGE       = (MAX_COMMANDS+MAX_OPTIONS+10)*40
     
     #0, ERROR_NONE, ERROR_MAX_ARGS, ERROR_INVALID_ARGS, ERROR_INVALID_COMMAND, ERROR_MISSING_PARAMETER
 
@@ -20,8 +117,6 @@ VAR
 
     byte    max_line
     word    ptr_str
-    
-    word    ptr_prompt
     word    ptr_description
     
     byte    argc
@@ -32,6 +127,7 @@ VAR
     word    command_description[MAX_COMMANDS]
     word    command_positional_argument_name[MAX_COMMANDS]
     word    command_positional_argument_description[MAX_COMMANDS]
+
     byte    currentcommand
 
     byte    optc
@@ -41,16 +137,17 @@ VAR
     byte    option_hasvalue[MAX_OPTIONS]
     word    option_value[MAX_OPTIONS]
 
-    
     byte    posc
     word    positional_argument
     
     word    error_string[MAX_ERRORS]
-    
     byte    data_usage[MAX_USAGE]
 
-
 PUB Start(s, size)
+{{
+    Initialize the command line parser. You will need provide a string and
+    corresponding size of which you want the parser to be able to handle.
+}}
 
     ptr_str := s
     max_line := size
@@ -61,9 +158,13 @@ PUB Start(s, size)
     error_string[ERROR_MISSING_PARAMETER]   := string("Option missing parameter")
     
     AddCommand (string("help"), string("show help"))
-    
 
 PUB Process | i
+{{
+    Process all command line tokens inside of the string.
+    
+    This command should be run once every time ths argument string changes.
+}}
 
     wordfill(@option_value, 0, MAX_OPTIONS)
     
@@ -73,19 +174,19 @@ PUB Process | i
     argv[argc] := str.Tokenize (ptr_str)       
 
     currentcommand := MatchCommand(argv[0])
+    
     if (currentcommand == 255)
         return ERROR_INVALID_COMMAND
 
-    argv[++argc] := str.Tokenize (0)    ' pump for arguments
-                                        ' 
-    
+    argv[++argc] := str.Tokenize (0)
 
     repeat while argv[argc]
+    
         if argc => MAX_ARGUMENTS
             return ERROR_MAX_ARGS
 
-        
         if (i := MatchOption(argv[argc])) > -1
+
             if option_hasvalue[i]
                 argv[++argc] := str.Tokenize (0)
                 
@@ -100,21 +201,24 @@ PUB Process | i
                     return ERROR_INVALID_ARGS
                     
                 option_value[i] := argv[argc]                
-                
-'            return COMMAND_FOUND
+
         else
+        
             ifnot IsOption(argc)
                 positional_argument[posc++] := argv[argc]
             else
                 return ERROR_INVALID_ARGS
- '           return COMMAND_FOUND2
-
-
-        ' put more stuff here
             
         argv[++argc] := str.Tokenize (0)
 
 PUB AddCommand(name, description)
+{{
+    Add a new command to the parser, with the name `name` and
+    a brief description called `description`.
+    
+    This parser supports multiple commands, with different options
+    and positional arguments for each command.
+}}
 
     result := cmdc
     if cmdc < MAX_COMMANDS
@@ -125,6 +229,26 @@ PUB AddCommand(name, description)
         cmdc++
         
 PUB AddOption(cmd, name, description, hasvalue)
+{{
+    Add an option to an existing command.
+    
+    -   `name` - the name of the new option. Must start with `-`.
+        For example, `-b` or `--new`.
+        
+    -   `description` - a description of the new option for the
+        help printer. No text wrapping is performed so try to keep
+        descriptions short.
+    
+    -   `hasvalue` - if true, the command line parser will look for
+        a parameter following this option in the list of arguments.
+        For example, `--digit 23423`, `-b hello`.
+        
+    This command line does not support quotation marks, so parameters
+    should be single word.
+    
+    This function does nothing if the command is not
+    already defined.
+}}
 
     result := optc
     if optc < MAX_OPTIONS
@@ -137,20 +261,53 @@ PUB AddOption(cmd, name, description, hasvalue)
         optc++
         
 PUB AddPositionalArgument(cmd, name, description)
+{{
+    Add a positional argument to the command line parser.
+    
+    These are arguments that are not associated with any option.
+    For example, if you had the following list of arguments:
+    
+        hex -b 115200 0x3234 -d on
+        
+    The positional argument would be 0x3234.
+    
+    This command line parser supports exactly one positional
+    argument per command.
+}}
 
-    if posc < MAX_POSITIONAL_ARGUMENTS and cmd => 0 and cmd < MAX_COMMANDS
+    if cmd => 0 and cmd < MAX_COMMANDS
         command_positional_argument_name[cmd] := name
         command_positional_argument_description[cmd] := description
 
 PUB PositionalArgument
+{{
+    Return a pointer to the string containing the positional
+    argument.
+}}
 
     return positional_argument
 
 PUB IsCommand(cmd)
+{{
+    Return true if the command passed to the parser is equal
+    to `cmd`, otherwise false.
+}}
 
     return str.Match(argv[0], cmd)
 
+PUB IsOption(n)
+{{
+    Return true if the argument at position `n` in the string
+    is an option, otherwise false.
+}}
+
+    return (byte[argv[n]][0] == "-")
+
 PUB IsSet(option) | i, j
+{{
+    Return true if the option `option` was passed on the
+    command line, otherwise false.
+}}
 
     i := MatchOption(option)
     if option_hasvalue[i]
@@ -161,28 +318,51 @@ PUB IsSet(option) | i, j
             if str.Match(argv[j++], option)
                 return true
 
-PUB IsOption(n)
-
-    return (byte[argv[n]][0] == "-")
-
 PUB Value(option) | i
+{{
+    Return a pointer to the string containing the value of
+    the option `option`.
+}}
 
     if (i := MatchOption(option)) > -1
         return option_value[i]
 
-PUB SetPrompt(s)
-
-    ptr_prompt := s
-    
 PUB SetDescription(s)
+{{
+    Set a brief description for the command line parser and
+    what it does.
+}}
 
     ptr_description := s
 
 PUB ErrorString(err)
+{{
+    Return a string describing the error that was thrown when
+    `Process` was called.
+    
+        if (i := commandparser.Process) <> commandparser#ERROR_NONE
+            term.Str(commandparser.ErrorString(i))
+}}
 
     return error_string[err]
 
 PUB Usage | i
+{{
+    Print a formatted help of the current command line parser.
+    
+    `commandparser` automatically adds a `help` function to the
+    list of commands when a parser is created.
+    
+    `Usage` does one of two things depending on when it is called.
+    
+    -   If an invalid command has been passed to the parser, or `help`
+        is called without a positional argument, a list of commands
+        is printed.
+        
+    -   If a valid command is passed but its parameters are invalid, 
+        or `help` passed with the name of a valid command, usage
+        for that command is printed.        
+}}
 
     str.Clear (@data_usage)
     
@@ -247,11 +427,13 @@ PRI AddLine(name, description, hasvalue)
 
     str.Append(@data_usage, string("    "))
     str.Append(@data_usage, name)
+    
     if hasvalue
         str.Append(@data_usage, string(" VAL"))
         bytefill  (@data_usage + strsize(@data_usage), " ", 12 - strsize(name) - 4)
     else
         bytefill  (@data_usage + strsize(@data_usage), " ", 12 - strsize(name))
+        
     str.Append(@data_usage, description)
     str.Append(@data_usage, string(10))
 
