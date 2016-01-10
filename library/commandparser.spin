@@ -1,23 +1,49 @@
+' UNIX-style command line parsing for Spin
 {{
     This object defines a rich command line parser for Spin terminals.
     
     Some key features:
     
     -   Automatically generates command line help.
-    
     -   Supports options and one positional argument.
-    
     -   Supports multiple commands.
-    
     -   Uses only the `string` library so you can plug it into any output driver you want.
+    
+    `commandparser` will generate your list of commands for you on demand.
+
+        $ help
+        This shell enables an interface to a live Propeller for debugging.
+        commands:
         
-    # Usage
+            hex         output contents of memory to terminal
+            info        print information about the running application
+            help        show help
+
+    It will also generate help text for individual commands.
+    
+        $ help hex
+        Usage: hex [OPTIONS]... ADDR
+        
+        options:
+        
+            -l VAL      Lines to print (default 16, limit 64)
+        
+        positional argument:
+        
+            ADDR        The starting address of the RAM to examine.
+            
+    It generates specific errors when incorrect commands are typed.
+    
+        $ hex -l
+        ERROR: Option missing parameter
+        
+    ## Usage
     
     As with any thing else, we can define a string in place or in a DAT block elsewhere.
     In this case, however, it is a good idea to define them in a DAT block because we will
     refer to the strings by name frequently, and this way it is less wasteful.
     
-    ## Setting up the parser
+    ### Setting up the parser
     
     So let's start by writing out all our descriptions of the commands we want to use.
     
@@ -45,14 +71,14 @@
             pos_file            byte    "FILE",0
             pos_file_desc       byte    "The file on which to operate",0
     
-    ### Setting the description
+    #### Setting the description
     
     The description gives people a general overview of what this interface is for. It is the
     first thing displayed when `Usage` is called.
     
         commandparser.SetDescription(@data_description)
     
-    ### Adding a command
+    #### Adding a command
 
     Let's add our first command, `hex`. We store the return value from `AddCommand` in a variable
     because we will need it to add options to it.
@@ -69,7 +95,7 @@
 
         commandparser.AddPositionalArgument (hex, @pos_file, @pos_file_desc)
         
-    ### Adding another command
+    #### Adding another command
     
     Now that we've added `hex`, let's add a second command called `info`.
         
@@ -78,10 +104,10 @@
     By default, this library allows a maximum of 5 commands, 5 options, and 10 arguments.
     This can be easily change by updating the constants.
     
-    ### Starting up
+    #### Starting up
     
     The only thing left to do before we can start parsing arguments is to start the parser.
-    This performs all the remaining setup left.
+    This performs the remaining setup.
         
         commandparser.Start(@line, MAX_LINE)
         
@@ -95,8 +121,45 @@
         VAR
             byte    line[MAX_LINE]
     
-    ## Processing arguments
+    ### Processing commands
+    
+    Processing arguments is straightforward. It is as simple as setting up some boilerplate code.
+
+    The first step is running `Process`, and checking to see if it returned any errors. If so,
+    we can get more information about what happened with `ErrorString` and remind the user how
+    to use the command line with `Usage`. The printout from `Usage` is context-sensitive and changes
+    depending on what the user was last doing.
+    
+        if (i := commandparser.Process) <> commandparser#ERROR_NONE
+            term.Str (commandparser.ErrorString(i))
+            term.Str (commandparser.Usage)
+
+    We can also explicitly print the help information if a command is received.
+
+        elseif commandparser.IsCommand (@cmd_help)
+            term.Str (commandparser.Usage)
+            
+    Here is where we start processing commands
         
+        elseif commandparser.IsCommand (@cmd_hex)
+            HexCommand
+        
+        elseif commandparser.IsCommand (@cmd_info)
+            InfoCommand
+            
+    An `else` is not be needed as an error would have been received before it had a chance to get here.
+    
+    ### Processing options and positional arguments
+    
+    Once the command is known, we can start processing the arguments for individual commands with the
+    following functions: `IsSet`, `Value`, and `PositionalArgument`.
+    
+    -   `IsSet` returns true if an option was set, otherwise false.
+    -   `Value` returns a pointer to the string containing the value of the option if available, or null.
+    -   `PositionalArgument` returns a pointer to the string containing the positional argument, or null
+        if not available.
+        
+    And that's all. The parser is ready to use.    
 }}
 CON
 
@@ -366,17 +429,16 @@ PUB Usage | i
 
     str.Clear (@data_usage)
     
-    i := MatchCommand(PositionalArgument)
-    
     if (currentcommand == 255)
         BuildHelp
     elseif IsCommand(string("help"))
+        i := MatchCommand(PositionalArgument)
         if i > -1
             BuildCommandHelp(i)
         else
             BuildHelp
     else
-        BuildCommandHelp(i)
+        BuildCommandHelp(currentcommand)
         
     str.Append(@data_usage, string(10))
 

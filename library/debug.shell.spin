@@ -1,3 +1,6 @@
+{{
+    This object can be included as a library or run in place.
+}}
 CON
     _clkmode = xtal1 + pll16x
     _xinfreq = 5_000_000
@@ -7,30 +10,40 @@ CON
 OBJ
 
     term            : "com.serial.terminal"
-    commandparser   : "debug.shell.commandparser"
+    commandparser   : "commandparser"
     str             : "string"
+    num             : "string.integer"
 
 VAR
 
     byte    line[MAX_LINE]
+    long    stack[40]
+
+PUB Start | hex
+{{
+    Start the debug shell. This will launch the shell on the the host
+    serial port, allowing you to access the Propeller from your computer.
     
-PUB Main | hex, i
+    The debugger is launched in a separate cog.
+}}
 
     term.Start (115200)
-
+    
     commandparser.SetDescription(@data_description)
     
     hex := commandparser.AddCommand(@cmd_hex, @cmd_hex_desc)
-    commandparser.AddOption (hex, @opt_b, @opt_b_desc, true)
-    commandparser.AddOption (hex, @opt_c, @opt_c_desc, true)
-    commandparser.AddOption (hex, @opt_d, @opt_d_desc, false)
+    commandparser.AddOption (hex, @opt_l, @opt_l_desc, true)
 
-    commandparser.AddPositionalArgument (hex, @pos_file, @pos_file_desc)
+    commandparser.AddPositionalArgument (hex, @pos_addr, @pos_addr_desc)
 
     commandparser.AddCommand(@cmd_info, @cmd_info_desc)
 
     commandparser.Start(@line, MAX_LINE)
-    
+
+    cognew(RunShell, @stack)
+
+PRI RunShell | i
+
     repeat
         term.Flush
         term.Str (@data_prompt)
@@ -57,23 +70,39 @@ PUB Main | hex, i
         
             InfoCommand
 
-PUB HexCommand | j
+PRI HexCommand | address, c, l
+' Derived from Chip Gracey's Monitor program.
 
-    if commandparser.IsSet (@opt_b)
-        term.Str (string("-b triggered: "))
-        term.Str (commandparser.Value (@opt_b))
-        term.NewLine
+    l := 16
+    if commandparser.IsSet (@opt_l)
+        l := num.StrToBase (commandparser.Value(@opt_l), 10)
+        if l < 0
+            l := 0
+        if l > 63
+            l := 63
 
-    if commandparser.IsSet (@opt_c)
-        term.Str (string("-c triggered: "))
-        term.Str (commandparser.Value (@opt_c))
-        term.NewLine
+    address := num.StrToBase (commandparser.PositionalArgument, 16)
+    
+    repeat l
+    
+        term.Hex (address,4)
+        term.Str(string("  "))
         
-    if commandparser.IsSet (@opt_d)
-        term.Str (string("-d triggered!"))
-        term.NewLine
+        repeat 16
+            term.Hex (byte[address++],2)
+            term.Char (" ")
+            
+        address -= 16
         
-PUB InfoCommand
+        repeat 16
+            c := byte[address++]
+            if not lookdown(c : $20..$80)
+                c := "."
+            term.Char(c)
+            
+        term.Newline
+
+PRI InfoCommand
 
     term.Str (string("chipver: "))
     term.Dec (chipver)
@@ -103,19 +132,13 @@ DAT
     cmd_help            byte    "help",0
     
     cmd_hex             byte    "hex",0
-    cmd_hex_desc        byte    "output hex to terminal",0
+    cmd_hex_desc        byte    "output contents of memory to terminal",0
 
     cmd_info            byte    "info",0
     cmd_info_desc       byte    "print information about the running application",0
     
-    opt_b               byte    "-b",0
-    opt_b_desc          byte    "Enable some feature",0
-
-    opt_c               byte    "-c",0
-    opt_c_desc          byte    "And cool",0
+    opt_l               byte    "-l",0
+    opt_l_desc          byte    "Lines to print (default 16, limit 64)",0
     
-    opt_d               byte    "-d",0
-    opt_d_desc          byte    "Turn this on!",0
-    
-    pos_file            byte    "FILE",0
-    pos_file_desc       byte    "The file on which to operate",0
+    pos_addr            byte    "ADDR",0
+    pos_addr_desc       byte    "The starting address of the RAM to examine.",0
