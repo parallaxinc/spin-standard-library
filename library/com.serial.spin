@@ -45,7 +45,6 @@ PUB Start(baudrate) : okay
 }}
 
     okay := StartRxTx(31, 30, 0, baudrate)
-    waitcnt(clkfreq + cnt)                                  ' Wait 1 second for PST
 
 PUB StartRxTx(rxpin, txpin, mode, baudrate) : okay
 {{

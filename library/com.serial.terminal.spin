@@ -307,4 +307,4 @@ PUB ReadLine(line, maxline) : size | c
                     quit
             other:  if size < maxline
                         byte[line][size++] := c
-                        Char(c)    
+                        Char(c)

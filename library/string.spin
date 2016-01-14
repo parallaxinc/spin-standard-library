@@ -146,7 +146,7 @@ PUB Lower(str)
 PUB Match(s1, s2)
 {{
     Returns true if strings match, otherwise false.
-    
+
     This is a convenience function for Compare(s1, s2).
 }}
 
