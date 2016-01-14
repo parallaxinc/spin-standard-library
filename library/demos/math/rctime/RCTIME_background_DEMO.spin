@@ -1,6 +1,6 @@
 {{
 *****************************************
-* RCTIME foreground Demo v1.0.b         *
+* RCTIME background Demo v1.0.b         *
 * Author: Beau Schwabe                  *
 * Copyright (c) 2010 Parallax           *
 * See end of file for terms of use.     *
@@ -9,8 +9,8 @@
 ''
 '' Usage:
 ''
-'' foreground:  (This needs to be run every time you want to read a value from a Potentiometer you have connected)
-'' RC.RCTIME(Pin,State,VariableAddress)     <<-- Variable will be updated with result every time this line is executed.
+'' background:  (This only needs to be run once for each Potentiometer you have connected)
+'' RC.start(Pin,State,VariableAddress )     <<-- Variable will be updated with result and can be read at any time from the program.
 ''
 ''
 ''State = 1 (Preferred) - because this mode provides a slightly higher resolution due to the I/O threshold not being exactly Vdd/2
@@ -104,10 +104,7 @@ VAR
   byte  ys[lines]
 
 
-  long RCValue, IntegerTemp,RCtemp
-  byte int_string[20],p
-
-
+  long RCValue
 
 OBJ
   tv    : "display.tv"
@@ -138,6 +135,7 @@ PUB start | i,dx,dy
 
   'Initialize RCValue
   RCValue := 0
+  RC.start(0,1,@RCValue )
 
   repeat
 
@@ -147,17 +145,13 @@ PUB start | i,dx,dy
     'draw text
     gr.textmode(1,1,7,5)
     gr.colorwidth(1,0)
-    gr.text(0,90,string("Parallax RCTIME foreground demo"))
-
-
-    'Read RCTIME value; place value of RCTIME into 'RCValue'
-    RC.RCTIME(0,1,@RCValue)
+    gr.text(0,90,string("Parallax RCTIME background demo"))
 
     'display text of RCtime value
     gr.text(0,50,Num.ToStr(RCValue, 10))
-
     'copy bitmap to display
     gr.copy(display_base)
+
 
 DAT
 tvparams                long    0               'status
@@ -178,21 +172,3 @@ tvparams                long    0               'status
                         long    60_000_000'_xinfreq<<4 'broadcast
                         long    0               'auralcog
 
-DAT
-{{
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                   TERMS OF USE: MIT License                                                  │
-├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation    │
-│files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,    │
-│modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software│
-│is furnished to do so, subject to the following conditions:                                                                   │
-│                                                                                                                              │
-│The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.│
-│                                                                                                                              │
-│THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE          │
-│WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR         │
-│COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,   │
-│ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-}}

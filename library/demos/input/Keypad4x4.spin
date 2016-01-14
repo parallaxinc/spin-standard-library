@@ -3,14 +3,14 @@
     This is some kind of keypad reader.
 
     ## Operation
-    
+
     This object uses a capacitive PIN approach to reading the keypad.
     To do so, ALL pins are made LOW and an OUTPUT to "discharge" the
     I/O pins. Then, ALL pins are set to an INPUT state. At this point,
     only one pin is made HIGH and an OUTPUT at a time. If the "switch"
     is closed, then a HIGH will be read on the input, otherwise a LOW
     will be returned.
-    
+
     The keypad decoding routine only requires two subroutines and returns
     the entire 4x4 keypad matrix into a single WORD variable indicating
     which buttons are pressed. Multiple button presses are allowed with
@@ -20,14 +20,14 @@
     even when they are not. There is no danger of any physical or
     electrical damage, that's just the way this sensing method happens to
     work.
-    
+
     ## Schematic
 
     No resistors, No capacitors. The connections are made directly from
     the keypad to the Propeller inputs.
-    
+
     Back of the 4x4 keypad
-    
+
                P7         P0
                  ││││││││
         ┌─────── ││││││││ ───────┐
@@ -66,10 +66,10 @@ PUB start
     text.str(string(13,"4x4 Keypad Demo..."))
     text.str(string($A,1,$B,7))
     text.str(string(13,"RAW keypad value 'word'"))
-    
+
     text.str(string($A,1,$B,13))
     text.str(string(13,"Note: Try pressing multiple keys"))
-    
+
     repeat
         keypad := KP.ReadKeyPad                             ' <-- One line command to read the 4x4 keypad
 

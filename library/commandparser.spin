@@ -402,9 +402,6 @@ PUB ErrorString(err)
 {{
     Return a string describing the error that was thrown when
     `Process` was called.
-
-        if (i := commandparser.Process) <> commandparser#ERROR_NONE
-            term.Str(commandparser.ErrorString(i))
 }}
 
     return error_string[err]
